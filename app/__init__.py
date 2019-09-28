@@ -2,7 +2,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from instance.config import DevelopmentConfig as config
+from instance.config import development_config as config
+from .hacks import init_mysql_driver
 
 app = Flask(__name__)
 
@@ -10,7 +11,7 @@ app = Flask(__name__)
 app.config.from_object(config)
 
 # Configure database
-app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URI
+app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_URI
 db = SQLAlchemy(app)
 # We import db from 'model.py' and thus force model instantiation (required for proper migration)
 from .model import db
@@ -22,12 +23,7 @@ manager = Manager(app)
 migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)
 
-
-# Workaround about mysql driver (since mysql-python doesn't work)
-# see https://toster.ru/q/74604 for details
-import pymysql
-pymysql.install_as_MySQLdb()
-
+init_mysql_driver()
 
 # Export ready application
 ready_app = manager
