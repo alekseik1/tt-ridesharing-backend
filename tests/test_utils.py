@@ -1,6 +1,7 @@
 import sqlalchemy
-from instance.config import test_config as config
+from utils.config_loaders import load_config
 from hacks import init_mysql_driver
+config = load_config()
 
 
 def create_test_db():
