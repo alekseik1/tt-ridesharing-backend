@@ -9,6 +9,10 @@ class User(db.Model):
     photo = db.Column(db.String(2000))
     is_trusful = db.Column(db.Boolean)
 
+    # For some reason, `User` database creation happens twice.
+    # I cannot locate with bug, so I'm just leaving a hack here :)
+    __table_args__ = {'extend_existing': True}
+
 
 class Driver(User):
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
@@ -17,3 +21,7 @@ class Driver(User):
     passport_selfie = db.Column(db.String(2000))
     driver_license_1 = db.Column(db.String(2000))
     driver_license_2 = db.Column(db.String(2000))
+
+    # For some reason, `Driver` database creation happens twice.
+    # I cannot locate with bug, so I'm just leaving a hack here :)
+    __table_args__ = {'extend_existing': True}
