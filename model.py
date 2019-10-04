@@ -15,10 +15,6 @@ class User(db.Model):
     photo = db.Column(db.String(MAX_URL_LENGTH))
     is_trusful = db.Column(db.Boolean)
 
-    # For some reason, `User` database creation happens twice.
-    # I cannot locate with bug, so I'm just leaving a hack here :)
-    __table_args__ = {'extend_existing': True}
-
 
 class UserSchema(ma.ModelSchema):
     class Meta:
@@ -32,10 +28,6 @@ class Driver(User):
     passport_selfie = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
     driver_license_1 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
     driver_license_2 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
-
-    # For some reason, `Driver` database creation happens twice.
-    # I cannot locate with bug, so I'm just leaving a hack here :)
-    __table_args__ = {'extend_existing': True}
 
 
 class DriverSchema(ma.ModelSchema):
