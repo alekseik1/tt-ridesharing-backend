@@ -27,11 +27,11 @@ class UserSchema(ma.ModelSchema):
 
 class Driver(User):
     id = db.Column(db.Integer, db.ForeignKey(User.__tablename__ + '.id'), primary_key=True)
-    passport_1 = db.Column(db.String(MAX_URL_LENGTH))
-    passport_2 = db.Column(db.String(MAX_URL_LENGTH))
-    passport_selfie = db.Column(db.String(MAX_URL_LENGTH))
-    driver_license_1 = db.Column(db.String(MAX_URL_LENGTH))
-    driver_license_2 = db.Column(db.String(MAX_URL_LENGTH))
+    passport_1 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
+    passport_2 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
+    passport_selfie = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
+    driver_license_1 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
+    driver_license_2 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
 
     # For some reason, `Driver` database creation happens twice.
     # I cannot locate with bug, so I'm just leaving a hack here :)
