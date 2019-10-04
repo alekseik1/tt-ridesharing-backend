@@ -2,6 +2,8 @@ flask
 flask_sqlalchemy
 flask_script
 flask_migrate
+marshmallow-sqlalchemy
+marshmallow
 cryptography
 mimesis
 psycopg2
