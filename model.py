@@ -1,4 +1,5 @@
 from app import db, ma
+from werkzeug.security import generate_password_hash, check_password_hash
 
 MAX_NAME_LENGTH = 40
 MAX_SURNAME_LENGTH = 40
@@ -14,6 +15,13 @@ class User(db.Model):
     email = db.Column(db.String(MAX_EMAIL_LENGTH), nullable=False)
     photo = db.Column(db.String(MAX_URL_LENGTH))
     is_trusful = db.Column(db.Boolean)
+    password_hash = db.Column(db.String(94))
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 
 class UserSchema(ma.ModelSchema):

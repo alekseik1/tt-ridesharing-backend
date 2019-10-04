@@ -49,3 +49,19 @@ class ModelTest(TestCase):
         db.session.commit()
         all_added = db.session.query(Driver)
         self.assertNotEqual(len(list(all_added)), 0)
+
+    def test_user_password_set_and_check(self):
+        user = User(name='test', surname='test', email='a@mail.ru')
+        passwords = ['complicated_password', 'notsocomplicated', 'justYaYa123']
+        for p in passwords:
+            user.set_password(p)
+            self.assertTrue(user.check_password(p))
+
+    def test_driver_password_set_and_check(self):
+        driver = Driver(name='test', surname='test', email='a@mail.ru',
+                      passport_1='url1', passport_2='url2', passport_selfie='url3',
+                      driver_license_1='url4', driver_license_2='url5')
+        passwords = ['complicated_password', 'notsocomplicated', 'justYaYa123']
+        for p in passwords:
+            driver.set_password(p)
+            self.assertTrue(driver.check_password(p))
