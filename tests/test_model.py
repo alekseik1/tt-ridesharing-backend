@@ -1,18 +1,48 @@
 import unittest
-from tests.test_utils import create_test_db, drop_test_db
+from tests.test_utils import generate_random_person
+from app import db
+from model import User, Driver
 
 
 class ModelTest(unittest.TestCase):
 
     def setUp(self):
-        drop_test_db()
-        create_test_db()
+        db.session.close()
+        db.drop_all()
+        db.create_all()
 
     def tearDown(self):
-        drop_test_db()
+        db.session.close()
+        db.drop_all()
 
-    def test_add_user(self):
-        pass
+    def test_simply_add_user(self):
+        for i in range(10):
+            person = generate_random_person()
+            db.session.add(User(
+                name=person.name(),
+                surname=person.surname(),
+                email=person.email(),
+                is_trusful=(True if i % 2 == 0 else False)
+            ))
+        db.session.commit()
+        all_added = db.session.query(User)
+        # Check if users were added
+        self.assertNotEqual(len(list(all_added)), 0)
 
     def test_add_driver(self):
-        pass
+        for i in range(10):
+            person = generate_random_person()
+            db.session.add(Driver(
+                name=person.name(),
+                surname=person.surname(),
+                email=person.email(),
+                is_trusful=True,
+                driver_license_1='https://our.storage.com/your_lisence_1.png',
+                driver_license_2='https://our.storage.com/your_lisence_2.png',
+                passport_1='https://our.storage.com/your_passport_1.png',
+                passport_2='https://our.storage.com/your_passport_2.png',
+                passport_selfie='https://our.storage.com/your_passport_selfie.png',
+            ))
+        db.session.commit()
+        all_added = db.session.query(Driver)
+        self.assertNotEqual(len(list(all_added)), 0)

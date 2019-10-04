@@ -2,6 +2,7 @@ from app import db
 
 
 class User(db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40))
     surname = db.Column(db.String(40))
@@ -15,7 +16,7 @@ class User(db.Model):
 
 
 class Driver(User):
-    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey(User.__tablename__ + '.id'), primary_key=True)
     passport_1 = db.Column(db.String(2000))
     passport_2 = db.Column(db.String(2000))
     passport_selfie = db.Column(db.String(2000))

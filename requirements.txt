@@ -2,5 +2,6 @@ flask
 flask_sqlalchemy
 flask_script
 flask_migrate
-pymysql
 cryptography
+mimesis
+psycopg2
