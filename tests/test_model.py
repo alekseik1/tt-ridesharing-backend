@@ -1,10 +1,13 @@
-import unittest
 from utils.misc import generate_random_person
-from app import db
+from app import db, create_app
 from model import User, Driver
+from flask_testing import TestCase
 
 
-class ModelTest(unittest.TestCase):
+class ModelTest(TestCase):
+
+    def create_app(self):
+        return create_app('test')
 
     def setUp(self):
         db.session.close()

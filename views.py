@@ -1,7 +1,7 @@
-from app import app
-from flask import request, abort, jsonify
+from flask import request, jsonify
 from model import UserSchema
 from utils.exceptions import InvalidData
+from flask import current_app as app
 
 
 @app.route('/')
