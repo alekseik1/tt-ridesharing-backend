@@ -1,5 +1,5 @@
 import unittest
-from tests.test_utils import generate_random_person
+from utils.misc import generate_random_person
 from app import db
 from model import User, Driver
 

@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from utils.config_loaders import load_config
+from utils.misc import load_config
 
 config = load_config()
 
