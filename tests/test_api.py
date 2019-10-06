@@ -43,23 +43,42 @@ class APITest(TestCase):
         url = url_for('{0}.{0}'.format(login.__name__))
         email, password = self._add_user_with_password('1234')
         login_result = self.client.post(url,
-                                        data={'email': email, 'password': password + '1'})
+                                        data={'email': email,
+                                              # Here we add extra char
+                                              'password': password + '1'}
+                                        )
         # Check if we're redirected to login page
         self.assertTrue(login_result.headers.get('Location')
                         .endswith(url_for('{0}.{0}'.format(login.__name__))))
 
-    def test_login_user(self):
+    def test_user_gets_cookies_after_login(self):
+        from views import login
+        # Create user
+        email, password = self._add_user_with_password('1234')
+        url = url_for('{0}.{0}'.format(login.__name__))
+        result = self.client.post(url, data={'email': email, 'password': password})
+        cookies = result.headers['Set-Cookie']
+        self.assertTrue(len(cookies) > 0, "Didn't receive any cookies")
+
+    def test_user_is_redirected_to_index_page_after_login(self):
+        from views import login, index
+        # Create user
+        email, password = self._add_user_with_password('1234')
+        url = url_for('{0}.{0}'.format(login.__name__))
+        result = self.client.post(url, data={'email': email, 'password': password})
+        self.assertEqual(302, result.status_code, "status code didn't match")
+        self.assertTrue(result.headers.get('Location')
+                        .endswith(url_for('{0}.{0}'.format(index.__name__))), "No redirect to index page")
+
+    def test_authenticated_user_is_redirected_to_index_page_after_accessing_login_page(self):
         from views import login, index
         # Create user
         email, password = self._add_user_with_password('1234')
         url = url_for('{0}.{0}'.format(login.__name__))
         result = self.client.post(url, data={'email': email, 'password': password})
         cookies = result.headers['Set-Cookie']
-        with self.subTest('We get cookies'):
-            self.assertTrue(len(cookies) > 0)
-        with self.subTest('We can login with cookies'):
-            login_result = self.client.post(url_for('{0}.{0}'.format(login.__name__, cookies=cookies)))
-            # Check the status code
-            self.assertEqual(302, login_result.status_code, "status code didn't match")
-            # Check if we're redirected to index page
-            self.assertTrue(login_result.headers.get('Location').endswith(index.__name__), "redirect URL didn't match")
+        login_result = self.client.post(url_for('{0}.{0}'.format(login.__name__, cookies=cookies)))
+        # Check the status code
+        self.assertEqual(302, login_result.status_code, "status code didn't match")
+        # Check if we're redirected to index page
+        self.assertTrue(login_result.headers.get('Location').endswith(index.__name__), "No redirect to index page")
