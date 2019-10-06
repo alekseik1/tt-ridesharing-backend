@@ -27,7 +27,7 @@ class APITest(TestCase):
 
     def test_register_incorrect_user(self):
         from views import register_user
-        url = url_for('{0}.{0}'.format(register_user.__name__))
+        url = url_for('.'+register_user.__name__)
         bad_request_data = [
             {'name': 'aleks'},
             {'surname': 'kozh'},
@@ -40,7 +40,7 @@ class APITest(TestCase):
 
     def test_incorrect_login(self):
         from views import login
-        url = url_for('{0}.{0}'.format(login.__name__))
+        url = url_for('.'+login.__name__)
         email, password = self._add_user_with_password('1234')
         login_result = self.client.post(url,
                                         data={'email': email,
@@ -49,13 +49,13 @@ class APITest(TestCase):
                                         )
         # Check if we're redirected to login page
         self.assertTrue(login_result.headers.get('Location')
-                        .endswith(url_for('{0}.{0}'.format(login.__name__))))
+                        .endswith(url_for('.'+login.__name__)))
 
     def test_user_gets_cookies_after_login(self):
         from views import login
         # Create user
         email, password = self._add_user_with_password('1234')
-        url = url_for('{0}.{0}'.format(login.__name__))
+        url = url_for('.'+login.__name__)
         result = self.client.post(url, data={'email': email, 'password': password})
         cookies = result.headers['Set-Cookie']
         self.assertTrue(len(cookies) > 0, "Didn't receive any cookies")
@@ -64,20 +64,20 @@ class APITest(TestCase):
         from views import login, index
         # Create user
         email, password = self._add_user_with_password('1234')
-        url = url_for('{0}.{0}'.format(login.__name__))
+        url = url_for('.'+login.__name__)
         result = self.client.post(url, data={'email': email, 'password': password})
         self.assertEqual(302, result.status_code, "status code didn't match")
         self.assertTrue(result.headers.get('Location')
-                        .endswith(url_for('{0}.{0}'.format(index.__name__))), "No redirect to index page")
+                        .endswith(url_for('.'+index.__name__)), "No redirect to index page")
 
     def test_authenticated_user_is_redirected_to_index_page_after_accessing_login_page(self):
         from views import login, index
         # Create user
         email, password = self._add_user_with_password('1234')
-        url = url_for('{0}.{0}'.format(login.__name__))
+        url = url_for('.'+login.__name__)
         result = self.client.post(url, data={'email': email, 'password': password})
         cookies = result.headers['Set-Cookie']
-        login_result = self.client.post(url_for('{0}.{0}'.format(login.__name__, cookies=cookies)))
+        login_result = self.client.post(url_for('.'+login.__name__))
         # Check the status code
         self.assertEqual(302, login_result.status_code, "status code didn't match")
         # Check if we're redirected to index page

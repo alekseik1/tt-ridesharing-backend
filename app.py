@@ -28,9 +28,8 @@ def create_app(config_name):
     ma.init_app(app)
     login.init_app(app)
     # register all Blueprints
-    from views import root_page, login_page, register_page, index_page
-    for bp in [root_page, login_page, register_page, index_page]:
-        app.register_blueprint(bp)
+    from views import api
+    app.register_blueprint(api)
 
     # register error handler
     # TODO: maybe move error handler to different module?
