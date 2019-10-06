@@ -1,9 +1,10 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from flask_login import LoginManager
 from instance.config import configs
+from utils.exceptions import InvalidData
 
 
 db = SQLAlchemy()
@@ -26,11 +27,19 @@ def create_app(config_name):
     migrate.init_app(app, db)
     ma.init_app(app)
     login.init_app(app)
+    # register all Blueprints
+    from views import root_page, login_page, register_page, index_page
+    for bp in [root_page, login_page, register_page, index_page]:
+        app.register_blueprint(bp)
 
-    # Initialize views and db models
-    with app.app_context():
-        import views
-        import model
+    # register error handler
+    # TODO: maybe move error handler to different module?
+    def handle_invalid_data_error(error):
+        response = jsonify(error.to_dict())
+        response.status_code = error.status_code
+        return response, error.status_code
+
+    app.register_error_handler(InvalidData, handle_invalid_data_error)
 
     return app
 

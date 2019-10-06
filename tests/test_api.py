@@ -20,13 +20,14 @@ class APITest(TestCase):
         return email, password
 
     def setUp(self) -> None:
+        self.app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = False
         db.session.close()
         db.drop_all()
         db.create_all()
 
     def test_register_incorrect_user(self):
         from views import register_user
-        url = url_for(register_user.__name__)
+        url = url_for('{0}.{0}'.format(register_user.__name__))
         bad_request_data = [
             {'name': 'aleks'},
             {'surname': 'kozh'},
@@ -39,25 +40,25 @@ class APITest(TestCase):
 
     def test_incorrect_login(self):
         from views import login
-        url = url_for(login.__name__)
+        url = url_for('{0}.{0}'.format(login.__name__))
         email, password = self._add_user_with_password('1234')
         login_result = self.client.post(url,
                                         data={'email': email, 'password': password + '1'})
         # Check if we're redirected to login page
         self.assertTrue(login_result.headers.get('Location')
-                        .endswith(url_for(login.__name__)))
+                        .endswith(url_for('{0}.{0}'.format(login.__name__))))
 
     def test_login_user(self):
         from views import login, index
         # Create user
         email, password = self._add_user_with_password('1234')
-        url = url_for(login.__name__)
+        url = url_for('{0}.{0}'.format(login.__name__))
         result = self.client.post(url, data={'email': email, 'password': password})
         cookies = result.headers['Set-Cookie']
         with self.subTest('We get cookies'):
             self.assertTrue(len(cookies) > 0)
         with self.subTest('We can login with cookies'):
-            login_result = self.client.post(url_for(login.__name__, cookies=cookies))
+            login_result = self.client.post(url_for('{0}.{0}'.format(login.__name__, cookies=cookies)))
             # Check the status code
             self.assertEqual(302, login_result.status_code, "status code didn't match")
             # Check if we're redirected to index page
