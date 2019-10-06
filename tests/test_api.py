@@ -1,5 +1,7 @@
 from flask import url_for
 from flask_testing import TestCase
+from model import User
+from utils.misc import generate_random_person
 from app import db, create_app
 
 
@@ -8,8 +10,16 @@ class APITest(TestCase):
     def create_app(self):
         return create_app('test')
 
+    def _add_user_with_password(self, password):
+        person = generate_random_person()
+        name, surname, email = person.name(), person.surname(), person.email()
+        user = User(name=name, surname=surname, email=email)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        return email, password
+
     def setUp(self) -> None:
-        self.client = self.app.test_client()
         db.session.close()
         db.drop_all()
         db.create_all()
@@ -26,3 +36,29 @@ class APITest(TestCase):
         for data in bad_request_data:
             result = self.client.post(url, data=data)
             self.assertEqual(400, result.status_code)
+
+    def test_incorrect_login(self):
+        from views import login
+        url = url_for(login.__name__)
+        email, password = self._add_user_with_password('1234')
+        login_result = self.client.post(url,
+                                        data={'email': email, 'password': password + '1'})
+        # Check if we're redirected to login page
+        self.assertTrue(login_result.headers.get('Location')
+                        .endswith(url_for(login.__name__)))
+
+    def test_login_user(self):
+        from views import login, index
+        # Create user
+        email, password = self._add_user_with_password('1234')
+        url = url_for(login.__name__)
+        result = self.client.post(url, data={'email': email, 'password': password})
+        cookies = result.headers['Set-Cookie']
+        with self.subTest('We get cookies'):
+            self.assertTrue(len(cookies) > 0)
+        with self.subTest('We can login with cookies'):
+            login_result = self.client.post(url_for(login.__name__, cookies=cookies))
+            # Check the status code
+            self.assertEqual(302, login_result.status_code, "status code didn't match")
+            # Check if we're redirected to index page
+            self.assertTrue(login_result.headers.get('Location').endswith(index.__name__), "redirect URL didn't match")

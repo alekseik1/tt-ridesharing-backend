@@ -1,5 +1,6 @@
-from app import db, ma
+from app import db, ma, login
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 MAX_NAME_LENGTH = 40
 MAX_SURNAME_LENGTH = 40
@@ -7,7 +8,7 @@ MAX_EMAIL_LENGTH = 256
 MAX_URL_LENGTH = 2000
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(MAX_NAME_LENGTH), nullable=False)
@@ -22,6 +23,14 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+
+@login.user_loader
+def load_user(id):
+    user = User.query.get(int(id))
+    if not user:
+        return None
+    return user
 
 
 class UserSchema(ma.ModelSchema):
