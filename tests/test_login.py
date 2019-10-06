@@ -25,19 +25,6 @@ class APITest(TestCase):
         db.drop_all()
         db.create_all()
 
-    def test_register_incorrect_user(self):
-        from views import register_user
-        url = url_for('.'+register_user.__name__)
-        bad_request_data = [
-            {'name': 'aleks'},
-            {'surname': 'kozh'},
-            {'email': 'a@mail.ru'},
-            {'name': 'aleks', 'surname': 'kozh'},
-        ]
-        for data in bad_request_data:
-            result = self.client.post(url, data=data)
-            self.assertEqual(400, result.status_code)
-
     def test_incorrect_login(self):
         from views import login
         url = url_for('.'+login.__name__)
