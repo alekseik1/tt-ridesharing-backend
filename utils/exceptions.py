@@ -2,6 +2,7 @@ class ResponseExamples:
 
     INCORRECT_LOGIN = {'name': 'Invalid login or password', 'value': ''}
     USER_ID = {'user_id': 36}
+    EMAIL_IS_BUSY = {'name': 'Email is already registered', 'value': 'm.smith@mail.ru'}
 
 
 class InvalidData(Exception):
