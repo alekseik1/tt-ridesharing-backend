@@ -1,6 +1,7 @@
 from app import db, ma, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from marshmallow import fields
 
 MAX_NAME_LENGTH = 40
 MAX_SURNAME_LENGTH = 40
@@ -35,7 +36,7 @@ def load_user(id):
 class RegisterUserSchema(ma.ModelSchema):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'password')
+    password = fields.String(required=True)
 
 
 class Driver(User):
