@@ -1,3 +1,9 @@
+class ResponseExamples:
+
+    INCORRECT_LOGIN = {'name': 'Invalid login or password', 'value': ''}
+    USER_ID = {'user_id': 36}
+
+
 class InvalidData(Exception):
     status_code = 400
 

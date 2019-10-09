@@ -3,9 +3,10 @@ from flask_testing import TestCase
 from model import User
 from utils.misc import generate_random_person
 from app import db, create_app
+from utils.exceptions import ResponseExamples
 
 
-class APITest(TestCase):
+class LoginTests(TestCase):
 
     def create_app(self):
         return create_app('test')
@@ -32,11 +33,10 @@ class APITest(TestCase):
         login_result = self.client.post(url,
                                         data={'email': email,
                                               # Here we add extra char
-                                              'password': password + '1'}
-                                        )
-        # Check if we're redirected to login page
-        self.assertTrue(login_result.headers.get('Location')
-                        .endswith(url_for('.'+login.__name__)))
+                                              'password': password + '1'})
+        correct_answer = ResponseExamples.INCORRECT_LOGIN
+        self.assert400(login_result)
+        self.assertEqual(login_result.get_json(), correct_answer)
 
     def test_user_gets_cookies_after_login(self):
         from views import login
@@ -47,25 +47,18 @@ class APITest(TestCase):
         cookies = result.headers['Set-Cookie']
         self.assertTrue(len(cookies) > 0, "Didn't receive any cookies")
 
-    def test_user_is_redirected_to_index_page_after_login(self):
-        from views import login, index
-        # Create user
-        email, password = self._add_user_with_password('1234')
+    def test_correct_login_status_code(self):
+        from views import login
         url = url_for('.'+login.__name__)
-        result = self.client.post(url, data={'email': email, 'password': password})
-        self.assertEqual(302, result.status_code, "status code didn't match")
-        self.assertTrue(result.headers.get('Location')
-                        .endswith(url_for('.'+index.__name__)), "No redirect to index page")
+        email, password = self._add_user_with_password('1234')
+        login_result = self.client.post(url, data={'email': email, 'password': password})
+        self.assert200(login_result)
 
-    def test_authenticated_user_is_redirected_to_index_page_after_accessing_login_page(self):
-        from views import login, index
-        # Create user
-        email, password = self._add_user_with_password('1234')
+    def test_correct_login_returns_user_id(self):
+        from views import login
         url = url_for('.'+login.__name__)
-        result = self.client.post(url, data={'email': email, 'password': password})
-        cookies = result.headers['Set-Cookie']
-        login_result = self.client.post(url_for('.'+login.__name__))
-        # Check the status code
-        self.assertEqual(302, login_result.status_code, "status code didn't match")
-        # Check if we're redirected to index page
-        self.assertTrue(login_result.headers.get('Location').endswith(index.__name__), "No redirect to index page")
+        email, password = self._add_user_with_password('1234')
+        login_result = self.client.post(url, data={'email': email, 'password': password})
+        correct_answer = ResponseExamples.USER_ID
+        self.assertEqual(login_result.get_json(), correct_answer)
+
