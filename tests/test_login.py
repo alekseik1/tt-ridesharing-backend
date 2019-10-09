@@ -13,8 +13,8 @@ class LoginTests(TestCase):
 
     def _add_user_with_password(self, password):
         person = generate_random_person()
-        name, surname, email = person.name(), person.surname(), person.email()
-        user = User(name=name, surname=surname, email=email)
+        first_name, last_name, email = person.name(), person.surname(), person.email()
+        user = User(first_name=first_name, last_name=last_name, email=email)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
@@ -25,42 +25,43 @@ class LoginTests(TestCase):
         db.session.close()
         db.drop_all()
         db.create_all()
+        from views import login
+        self.url = url_for('.'+login.__name__)
+        self.email, self.password = self._add_user_with_password('1234')
 
     def test_incorrect_login(self):
-        from views import login
-        url = url_for('.'+login.__name__)
-        email, password = self._add_user_with_password('1234')
-        login_result = self.client.post(url,
-                                        data={'email': email,
-                                              # Here we add extra char
-                                              'password': password + '1'})
+        login_result = self.client.post(self.url, json={
+            'login': self.email,
+            # Here we add extra char
+            'password': self.password + '1'
+        })
         correct_answer = ResponseExamples.INCORRECT_LOGIN
         self.assert400(login_result)
         self.assertEqual(login_result.get_json(), correct_answer)
 
     def test_user_gets_cookies_after_login(self):
-        from views import login
-        # Create user
-        email, password = self._add_user_with_password('1234')
-        url = url_for('.'+login.__name__)
-        result = self.client.post(url, data={'email': email, 'password': password})
+        result = self.client.post(self.url, json={
+            'login': self.email,
+            'password': self.password
+        })
         cookies = result.headers['Set-Cookie']
         self.assertTrue(len(cookies) > 0, "Didn't receive any cookies")
 
-    def test_correct_login_status_code(self):
-        from views import login
-        url = url_for('.'+login.__name__)
-        email, password = self._add_user_with_password('1234')
-        login_result = self.client.post(url, data={'email': email, 'password': password})
-        self.assert200(login_result)
-
-    def test_correct_login_returns_user_id(self):
-        from views import login
-        url = url_for('.'+login.__name__)
-        email, password = self._add_user_with_password('1234')
-        user_id = db.session.query(User).filter(User.email == email).first().id
-        login_result = self.client.post(url, data={'email': email, 'password': password})
-        correct_answer = ResponseExamples.USER_ID
-        correct_answer['user_id'] = user_id
-        self.assertEqual(login_result.get_json(), correct_answer)
-
+    def test_correct_login(self):
+        login_result = self.client.post(self.url, json={
+            'login': self.email,
+            'password': self.password
+        })
+        with self.subTest('correct status code'):
+            self.assert200(login_result)
+        with self.subTest('response is {user_id: ##}'):
+            # True user ID
+            user_id = db.session.query(User).filter(User.email == self.email).first().id
+            login_result = self.client.post(self.url, json={
+                'login': self.email,
+                'password': self.password
+            })
+            # Form expected result
+            correct_answer = ResponseExamples.USER_ID
+            correct_answer['user_id'] = user_id
+            self.assertEqual(login_result.get_json(), correct_answer)
