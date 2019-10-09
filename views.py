@@ -22,8 +22,9 @@ def index():
 def register_user():
     user_schema = RegisterUserSchema()
     errors = user_schema.validate(request.json)
-    for column, error in errors.items():
-        raise InvalidData(f'Error at `{column}` -- {error[0]}')
+    if errors:
+        error = ResponseExamples.some_params_are_invalid(list(errors.keys()))
+        return jsonify(error), 400
     data = request.get_json()
     user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'])
     user.set_password(password=data['password'])
