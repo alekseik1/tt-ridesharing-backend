@@ -57,11 +57,21 @@ class LoginTests(TestCase):
         with self.subTest('response is {user_id: ##}'):
             # True user ID
             user_id = db.session.query(User).filter(User.email == self.email).first().id
-            login_result = self.client.post(self.url, json={
-                'login': self.email,
-                'password': self.password
-            })
             # Form expected result
             correct_answer = ResponseExamples.USER_ID
             correct_answer['user_id'] = user_id
             self.assertEqual(login_result.get_json(), correct_answer)
+
+    def test_return_error_when_already_logged_in(self):
+        login_result = self.client.post(self.url, json={
+            'login': self.email,
+            'password': self.password
+        })
+        second_request = self.client.post(self.url, json={
+            'login': self.email,
+            'password': self.password
+        })
+        with self.subTest('correct status code'):
+            self.assert400(second_request)
+        with self.subTest('correct error'):
+            self.assertEqual(ResponseExamples.ALREADY_LOGGED_IN, second_request.get_json())

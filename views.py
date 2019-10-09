@@ -40,14 +40,19 @@ def register_user():
 
 @api.route('/api/login', methods=['GET', 'POST'])
 def login():
+    # Check if current user is authenticated
     if current_user.is_authenticated:
-        return redirect(url_for('.'+index.__name__))
-    email = request.values.get('email')
-    password = request.values.get('password')
-    user = User.query.filter_by(email=email).first()
+        error = ResponseExamples.ALREADY_LOGGED_IN
+        return error, 400
+    data = request.get_json()
+    login = data.get('login')
+    password = data.get('password')
+    # We login only via email for now
+    user = User.query.filter_by(email=login).first()
     if user is None or not user.check_password(password):
-        flash('Invalid email or password')
-        # BUG: we infinitely redirect to the same page
-        return redirect(url_for('.'+login.__name__))
+        error = ResponseExamples.INCORRECT_LOGIN
+        return error, 400
     login_user(user, remember=True)
-    return redirect(url_for('.'+index.__name__))
+    response = ResponseExamples.USER_ID
+    response['user_id'] = user.id
+    return response, 200
