@@ -3,6 +3,7 @@ flask_sqlalchemy
 flask_script
 flask_migrate
 flask_testing
+flask_marshmallow
 marshmallow-sqlalchemy
 marshmallow
 flask_login
