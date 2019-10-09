@@ -32,8 +32,37 @@ class RegisterUserTests(TestCase):
             self.assertEqual(400, result.status_code)
 
     def test_incorrect_register_error_details(self):
-        # TODO: check for `incorrect_fields` in response
-        pass
+        from itertools import combinations
+        correct_data = {
+            'first_name': 'Martin',
+            'last_name': 'Smith',
+            'email': 'm.smith@mail.ru',
+            'password': '12345qwerty'
+        }
+
+        def _test_routine(params):
+            params = list(params)
+            tmp = correct_data.copy()
+            for p in params:
+                tmp.pop(p)
+            response = self.client.post(self.url, json=tmp)
+            correct_response = ResponseExamples.some_params_are_invalid(params)
+            with self.subTest(f'status code: {params}'):
+                self.assert400(response)
+            with self.subTest(f'correct error raised: {params}'):
+                response = response.get_json()
+                self.assertEqual(
+                    correct_response['name'], response['name'])
+                self.assertEqual(
+                    sorted(correct_response['value']), sorted(response['value']))
+
+        keys = list(correct_data.keys())
+        # Допускаем выкинуть сначала 1, потом 2 и т.д. элементов запроса
+        for i in range(1, len(keys) + 1):
+            # Состовляем все возможные способы выкинуть i элементов
+            for combo in combinations(keys, i):
+                # И прогоняем тест
+                _test_routine(combo)
 
     def test_register_correct_user(self):
         person = generate_random_person()
