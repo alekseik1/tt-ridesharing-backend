@@ -31,14 +31,14 @@ def create_app(config_name):
     from views import api
     app.register_blueprint(api)
 
-    # register error handler
+    # register handler for uncaught errors
     # TODO: maybe move error handler to different module?
-    def handle_invalid_data_error(error):
+    def handle_uncaught_error(error):
         response = jsonify(error.to_dict())
         response.status_code = error.status_code
         return response, error.status_code
 
-    app.register_error_handler(InvalidData, handle_invalid_data_error)
+    app.register_error_handler(Exception, handle_uncaught_error)
 
     return app
 
