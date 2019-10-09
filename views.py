@@ -1,7 +1,9 @@
-from flask import request, url_for, redirect, flash, Blueprint
+from flask import request, url_for, redirect, flash, Blueprint, jsonify
 from flask_login import current_user, login_user
-from model import UserSchema, User
-from utils.exceptions import InvalidData
+from model import RegisterUserSchema, User
+from sqlalchemy.exc import IntegrityError
+from utils.exceptions import InvalidData, ResponseExamples
+from app import db
 
 api = Blueprint('api', __name__)
 
@@ -18,11 +20,21 @@ def index():
 
 @api.route('/api/register_user', methods=['GET', 'POST'])
 def register_user():
-    user_schema = UserSchema()
-    errors = user_schema.validate(request.form)
+    user_schema = RegisterUserSchema()
+    errors = user_schema.validate(request.json)
     for column, error in errors.items():
         raise InvalidData(f'Error at `{column}` -- {error[0]}')
-    return 'Not implemented'
+    data = request.get_json()
+    user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'])
+    user.set_password(password=data['password'])
+    db.session.add(user)
+    try:
+        db.session.commit()
+    except IntegrityError as e:
+        error = ResponseExamples.EMAIL_IS_BUSY
+        error['value'] = data['email']
+        return jsonify(error), 400
+    return jsonify(user_id=user.id)
 
 
 @api.route('/api/login', methods=['GET', 'POST'])

@@ -11,11 +11,10 @@ MAX_URL_LENGTH = 2000
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(MAX_NAME_LENGTH), nullable=False)
-    surname = db.Column(db.String(MAX_SURNAME_LENGTH), nullable=False)
-    email = db.Column(db.String(MAX_EMAIL_LENGTH), nullable=False)
+    first_name = db.Column(db.String(MAX_NAME_LENGTH), nullable=False)
+    last_name = db.Column(db.String(MAX_SURNAME_LENGTH), nullable=False)
+    email = db.Column(db.String(MAX_EMAIL_LENGTH), nullable=False, unique=True)
     photo = db.Column(db.String(MAX_URL_LENGTH))
-    is_trusful = db.Column(db.Boolean)
     password_hash = db.Column(db.String(94))
 
     def set_password(self, password):
@@ -33,9 +32,10 @@ def load_user(id):
     return user
 
 
-class UserSchema(ma.ModelSchema):
+class RegisterUserSchema(ma.ModelSchema):
     class Meta:
         model = User
+        fields = ('first_name', 'last_name', 'email', 'password')
 
 
 class Driver(User):
