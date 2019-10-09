@@ -58,7 +58,9 @@ class LoginTests(TestCase):
         from views import login
         url = url_for('.'+login.__name__)
         email, password = self._add_user_with_password('1234')
+        user_id = db.session.query(User).filter(User.email == email).first().id
         login_result = self.client.post(url, data={'email': email, 'password': password})
         correct_answer = ResponseExamples.USER_ID
+        correct_answer['user_id'] = user_id
         self.assertEqual(login_result.get_json(), correct_answer)
 
