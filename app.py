@@ -29,7 +29,7 @@ def create_app(config_name):
     login.init_app(app)
     # register all Blueprints
     from views import api
-    app.register_blueprint(api)
+    app.register_blueprint(api, url_prefix='/api')
 
     # register handler for uncaught errors
     # TODO: maybe move error handler to different module?

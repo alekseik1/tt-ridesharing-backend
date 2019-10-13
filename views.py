@@ -18,7 +18,7 @@ def index():
     return 'Welcome to our service!'
 
 
-@api.route('/api/register_user', methods=['GET', 'POST'])
+@api.route('/register_user', methods=['GET', 'POST'])
 def register_user():
     user_schema = RegisterUserSchema()
     errors = user_schema.validate(request.json)
@@ -38,7 +38,7 @@ def register_user():
     return jsonify(user_id=user.id)
 
 
-@api.route('/api/login', methods=['GET', 'POST'])
+@api.route('/login', methods=['GET', 'POST'])
 def login():
     # Check if current user is authenticated
     if current_user.is_authenticated:
