@@ -20,17 +20,6 @@ class RegisterUserTests(TestCase):
         from views import register_user
         self.url = url_for('.'+register_user.__name__)
 
-    def test_incorrect_register_status_code(self):
-        bad_request_data = [
-            {'first_name': 'aleks'},
-            {'last_name': 'kozh'},
-            {'email': 'a@mail.ru'},
-            {'first_name': 'aleks', 'last_name': 'kozh'},
-        ]
-        for data in bad_request_data:
-            result = self.client.post(self.url, json=data)
-            self.assertEqual(400, result.status_code)
-
     def test_incorrect_register_error_details(self):
         from itertools import combinations
         correct_data = {
