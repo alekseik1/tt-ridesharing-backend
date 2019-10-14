@@ -102,5 +102,82 @@ class RegisterUserTests(TestCase):
             self.assertEqual(correct_error, result2.get_json())
 
 
+class RegisterDriverTests(TestCase):
+
+    def create_app(self):
+        return create_app('test')
+
+    def setUp(self) -> None:
+        self.app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = False
+        db.session.close()
+        db.drop_all()
+        db.create_all()
+        from views import register_driver
+        self.url = url_for('.'+register_driver.__name__)
+        self.correct_data = {
+            'user_id': '0',
+            'passport_url_1': 'https://gdrive.com/photo1.png',
+            'passport_url_2': 'https://gdrive.com/photo1.png',
+            'passport_url_selfie': 'https://gdrive.com/photo1.png',
+            'license_1': 'https://gdrive.com/photo1.png',
+            'license_2': 'https://gdrive.com/photo1.png',
+        }
+
+    def test_incorrect_register_error_details(self):
+        from itertools import combinations
+
+        def _test_routine(params):
+            params = list(params)
+            tmp = self.correct_data.copy()
+            for p in params:
+                tmp.pop(p)
+            response = self.client.post(self.url, json=tmp)
+            correct_response = ResponseExamples.some_params_are_invalid(params)
+            with self.subTest(f'status code: {params}'):
+                self.assert400(response)
+            with self.subTest(f'correct error raised: {params}'):
+                response = response.get_json()
+                self.assertEqual(
+                    correct_response['name'], response['name'])
+                self.assertEqual(
+                    sorted(correct_response['value']), sorted(response['value']))
+
+        keys = list(self.correct_data.keys())
+        # Допускаем выкинуть сначала 1, потом 2 и т.д. элементов запроса
+        for i in range(1, len(keys) + 1):
+            # Состовляем все возможные способы выкинуть i элементов
+            for combo in combinations(keys, i):
+                # И прогоняем тест
+                _test_routine(combo)
+
+    def test_incorrect_user_id(self):
+        incorrect_data = self.correct_data.copy()
+        invalid_id = '9999'
+        incorrect_data['user_id'] = invalid_id
+        response = self.client.post(self.url, json=incorrect_data)
+        with self.subTest('Return code is 400'):
+            self.assert400(response)
+        with self.subTest('Error message is correct'):
+            correct_error = ResponseExamples.INVALID_USER_WITH_ID
+            correct_error['value'] = invalid_id
+            self.assertEqual(correct_error, response.get_json())
+
+    def test_correct_register_driver(self):
+        # Add user
+        user = User(first_name='Martin', last_name='Smith', email='m.smith@gmail.com')
+        user.set_password('12345')
+        db.session.add(user)
+        db.session.commit()
+
+        self.correct_data['user_id'] = user.id
+        response = self.client.post(self.url, json=self.correct_data)
+        with self.subTest('correct status code'):
+            self.assert200(response)
+        with self.subTest('correct `user_id` in response'):
+            correct_response = ResponseExamples.USER_ID
+            correct_response['user_id'] = user.id
+            self.assertEqual(correct_response, response.get_json())
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -4,6 +4,8 @@ class ResponseExamples:
     USER_ID = {'user_id': 36}
     EMAIL_IS_BUSY = {'name': 'Email is already registered', 'value': 'm.smith@mail.ru'}
     ALREADY_LOGGED_IN = {'name': 'Already logged-in', 'value': ''}
+    INVALID_USER_WITH_ID = {'name': 'Invalid user with id', 'value': 28}
+    UNHANDLED_ERROR = {'name': 'Unhandled error', 'value': ''}
 
     @staticmethod
     def some_params_are_invalid(params):
