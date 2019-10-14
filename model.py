@@ -39,13 +39,22 @@ class RegisterUserSchema(ma.ModelSchema):
     password = fields.String(required=True)
 
 
-class Driver(User):
+class Driver(db.Model):
     id = db.Column(db.Integer, db.ForeignKey(User.__tablename__ + '.id'), primary_key=True)
     passport_1 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
     passport_2 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
     passport_selfie = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
     driver_license_1 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
     driver_license_2 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
+
+
+class RegisterDriverSchema(ma.ModelSchema):
+    user_id = fields.Integer(required=True)
+    passport_url_1 = fields.String(required=True)
+    passport_url_2 = fields.String(required=True)
+    passport_url_selfie = fields.String(required=True)
+    license_1 = fields.String(required=True)
+    license_2 = fields.String(required=True)
 
 
 class DriverSchema(ma.ModelSchema):
