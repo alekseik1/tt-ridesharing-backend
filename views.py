@@ -1,5 +1,5 @@
 from flask import request, url_for, redirect, flash, Blueprint, jsonify
-from flask_login import current_user, login_user, login_required
+from flask_login import current_user, login_user, login_required, logout_user
 from model import RegisterUserSchema, User, RegisterDriverSchema, Driver
 from sqlalchemy.exc import IntegrityError
 from utils.exceptions import InvalidData, ResponseExamples
@@ -85,3 +85,31 @@ def login():
     response = ResponseExamples.USER_ID
     response['user_id'] = user.id
     return response, 200
+
+
+@api.route('/logout', methods=['POST'])
+def logout():
+    # Check if current user is authenticated
+    if not current_user.is_authenticated:
+        error = ResponseExamples.AUTHORIZATION_REQUIRED
+        return error, 400
+    logout_user()
+    return '', 200
+
+
+@api.route('/get_user_data', methods=['GET'])
+@login_required
+def get_user_data():
+    data = request.args
+    user = db.session.query(User).filter_by(email=data['email']).first()
+    if user is None:
+        error = ResponseExamples.INVALID_USER_WITH_EMAIL
+        error['value'] = data['email']
+        return jsonify(error), 400
+    response = ResponseExamples.USER_INFO
+    response['user_id'] = user.id
+    response['first_name'] = user.first_name
+    response['last_name'] = user.last_name
+    response['email'] = user.email
+    response['photo_url'] = user.photo
+    return jsonify(response), 200

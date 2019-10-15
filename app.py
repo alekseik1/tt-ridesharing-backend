@@ -4,6 +4,8 @@ from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from flask_login import LoginManager
 from instance.config import configs
+from utils.exceptions import ResponseExamples
+from werkzeug.exceptions import Unauthorized
 from utils.exceptions import InvalidData
 
 
@@ -34,11 +36,14 @@ def create_app(config_name):
     # register handler for uncaught errors
     # TODO: maybe move error handler to different module?
     def handle_uncaught_error(error):
-        response = jsonify(error.to_dict())
-        response.status_code = error.status_code
-        return response, error.status_code
+        return error
+
+    # TODO: make all views in `views.py` raise `Unauthorized` instead of handling it on their own
+    def handle_unauthorized(error):
+        return ResponseExamples.AUTHORIZATION_REQUIRED, 401
 
     app.register_error_handler(Exception, handle_uncaught_error)
+    app.register_error_handler(Unauthorized, handle_unauthorized)
 
     return app
 
