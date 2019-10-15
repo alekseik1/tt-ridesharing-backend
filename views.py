@@ -38,6 +38,7 @@ def register_user():
 
 
 @api.route('/register_driver', methods=['POST'])
+@login_required
 def register_driver():
     data = request.get_json()
     user_id = data.get('user_id')
