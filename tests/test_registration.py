@@ -3,7 +3,7 @@ from app import create_app, db
 from flask import url_for, jsonify
 from utils.misc import generate_random_person
 from utils.exceptions import ResponseExamples
-from model import User
+from model import User, Driver
 import unittest
 
 
@@ -177,6 +177,13 @@ class RegisterDriverTests(TestCase):
             correct_response = ResponseExamples.USER_ID
             correct_response['user_id'] = user.id
             self.assertEqual(correct_response, response.get_json())
+        with self.subTest('user is added to `Driver` table with correct info'):
+            driver = db.session.query(Driver).filter_by(id=user.id).first()
+            self.assertEqual(self.correct_data['passport_url_1'], driver.passport_1)
+            self.assertEqual(self.correct_data['passport_url_2'], driver.passport_2)
+            self.assertEqual(self.correct_data['passport_url_selfie'], driver.passport_selfie)
+            self.assertEqual(self.correct_data['license_1'], driver.driver_license_1)
+            self.assertEqual(self.correct_data['license_2'], driver.driver_license_2)
 
 
 if __name__ == '__main__':
