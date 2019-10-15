@@ -19,7 +19,7 @@ def index():
     return 'Welcome to our service!'
 
 
-@api.route('/register_user', methods=['GET', 'POST'])
+@api.route('/register_user', methods=['POST'])
 def register_user():
     data = request.get_json()
     errors = validate_all([validate_params_with_schema(RegisterUserSchema(), data)])
@@ -66,7 +66,7 @@ def register_driver():
     return jsonify(user_id=driver.id)
 
 
-@api.route('/login', methods=['GET', 'POST'])
+@api.route('/login', methods=['POST'])
 def login():
     # Check if current user is authenticated
     if current_user.is_authenticated:
