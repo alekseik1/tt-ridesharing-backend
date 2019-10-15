@@ -1,8 +1,9 @@
 from flask import request, url_for, redirect, flash, Blueprint, jsonify
-from flask_login import current_user, login_user
+from flask_login import current_user, login_user, login_required
 from model import RegisterUserSchema, User, RegisterDriverSchema, Driver
 from sqlalchemy.exc import IntegrityError
 from utils.exceptions import InvalidData, ResponseExamples
+from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all
 from app import db
 
 api = Blueprint('api', __name__)
@@ -40,18 +41,15 @@ def register_user():
 
 @api.route('/register_driver', methods=['POST'])
 def register_driver():
-    driver_schema = RegisterDriverSchema()
-    errors = driver_schema.validate(request.json)
-    if errors:
-        error = ResponseExamples.some_params_are_invalid(list(errors.keys()))
-        return jsonify(error), 400
     data = request.get_json()
-    user_id = data['user_id']
-    user = db.session.query(User).filter_by(id=user_id).first()
-    if user is None:
-        error = ResponseExamples.INVALID_USER_WITH_ID
-        error['value'] = user_id
-        return jsonify(error), 400
+    user_id = data.get('user_id')
+    errors = validate_all([
+        validate_params_with_schema(RegisterDriverSchema(), data=data),
+        validate_is_in_db(db, user_id),
+        validate_is_authorized_with_id(user_id, current_user),
+    ])
+    if errors:
+        return errors
     driver = Driver(
         id=int(user_id),
         passport_1=data['passport_url_1'],

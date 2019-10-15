@@ -112,8 +112,9 @@ class RegisterDriverTests(TestCase):
         db.session.close()
         db.drop_all()
         db.create_all()
-        from views import register_driver
+        from views import register_driver, login
         self.url = url_for('.'+register_driver.__name__)
+        self.login_url = url_for('.'+login.__name__)
         self.correct_data = {
             'user_id': '0',
             'passport_url_1': 'https://gdrive.com/photo1.png',
@@ -122,6 +123,17 @@ class RegisterDriverTests(TestCase):
             'license_1': 'https://gdrive.com/photo1.png',
             'license_2': 'https://gdrive.com/photo1.png',
         }
+        # Add two users
+        self.user1 = User(first_name='Martin', last_name='Smith', email='m.smith@gmail.com')
+        self.user1.set_password('12345')
+        db.session.add(self.user1)
+        db.session.commit()
+        self.user2 = User(first_name='User2', last_name='User2', email='user2@gmail.com')
+        self.user2.set_password('12345')
+        db.session.add(self.user2)
+        db.session.commit()
+        # Login user1
+        self.client.post(self.login_url, json={'login': self.user1.email, 'password': '12345'})
 
     def test_incorrect_register_error_details(self):
         from itertools import combinations
@@ -162,23 +174,29 @@ class RegisterDriverTests(TestCase):
             correct_error['value'] = invalid_id
             self.assertEqual(correct_error, response.get_json())
 
-    def test_correct_register_driver(self):
-        # Add user
-        user = User(first_name='Martin', last_name='Smith', email='m.smith@gmail.com')
-        user.set_password('12345')
-        db.session.add(user)
-        db.session.commit()
+    def test_cannot_register_another_user_as_driver(self):
+        incorrect_data = self.correct_data.copy()
+        incorrect_data['user_id'] = self.user2.id
+        response = self.client.post(self.url, json=incorrect_data)
+        with self.subTest('Return code is 403'):
+            self.assert403(response)
+        with self.subTest('Error message is correct'):
+            correct_error = ResponseExamples.NO_PERMISSION_FOR_USER
+            correct_error['value'] = self.user2.id
+            self.assertEqual(correct_error, response.get_json())
 
-        self.correct_data['user_id'] = user.id
+    def test_correct_register_driver(self):
+
+        self.correct_data['user_id'] = self.user1.id
         response = self.client.post(self.url, json=self.correct_data)
         with self.subTest('correct status code'):
             self.assert200(response)
         with self.subTest('correct `user_id` in response'):
             correct_response = ResponseExamples.USER_ID
-            correct_response['user_id'] = user.id
+            correct_response['user_id'] = self.user1.id
             self.assertEqual(correct_response, response.get_json())
         with self.subTest('user is added to `Driver` table with correct info'):
-            driver = db.session.query(Driver).filter_by(id=user.id).first()
+            driver = db.session.query(Driver).filter_by(id=self.user1.id).first()
             self.assertEqual(self.correct_data['passport_url_1'], driver.passport_1)
             self.assertEqual(self.correct_data['passport_url_2'], driver.passport_2)
             self.assertEqual(self.correct_data['passport_url_selfie'], driver.passport_selfie)
