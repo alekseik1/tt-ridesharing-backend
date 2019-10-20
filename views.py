@@ -116,6 +116,7 @@ def get_user_data():
     return jsonify(response), 200
 
 
+# TODO: tests
 @api.route('/get_all_rides', methods=['GET'])
 @login_required
 def get_all_rides():
@@ -137,6 +138,7 @@ def get_all_rides():
     return jsonify(response), 200
 
 
+# TODO: tests
 @api.route('/create_ride', methods=['POST'])
 @login_required
 def create_ride():
