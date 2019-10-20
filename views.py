@@ -161,3 +161,11 @@ def create_ride():
     db.session.add(ride)
     db.session.commit()
     return jsonify({'ride_id': ride.id}), 200
+
+
+@api.route('/get_all_organizations', methods=['GET'])
+@login_required
+def get_all_organizations():
+    organization_schema = OrganizationSchema(many=True)
+    result = organization_schema.dump(db.session.query(Organization).all())
+    return result, 200
