@@ -30,7 +30,7 @@ def create_app(config_name):
     migrate.init_app(app, db)
     ma.init_app(app)
     # Enable CORS for any ports, any origins
-    CORS(app)
+    CORS(app, supports_credentials=True)
     login.init_app(app)
     # register all Blueprints
     from views import api
