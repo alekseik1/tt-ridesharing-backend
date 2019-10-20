@@ -1,6 +1,7 @@
 from flask import request, url_for, redirect, flash, Blueprint, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
-from model import RegisterUserSchema, User, RegisterDriverSchema, Driver, Ride, Organization, OrganizationSchema, UserSchema
+from model import RegisterUserSchema, User, RegisterDriverSchema, Driver, Ride, Organization, \
+    OrganizationSchema, UserSchema, CreateRideSchema
 from sqlalchemy.exc import IntegrityError
 from utils.exceptions import InvalidData, ResponseExamples
 from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all
@@ -134,3 +135,27 @@ def get_all_rides():
         ride_info['passengers'] = user_schema.dump(ride.passengers)
         response.append(ride_info)
     return jsonify(response), 200
+
+
+@api.route('/create_ride', methods=['POST'])
+@login_required
+def create_ride():
+    data = request.get_json()
+    # 1. Валидация параметров
+    errors = validate_all([validate_params_with_schema(CreateRideSchema(), data)])
+    if errors:
+        return errors
+    user_id = data.get('host_driver_id')
+    # 2. Пользователь должен быть водителем
+    if not db.session.query(Driver).filter_by(id=user_id).first():
+        error = ResponseExamples.IS_NOT_DRIVER
+        error['value'] = user_id
+        return error, 401
+    ride = Ride(
+        start_organization_id=data.get('start_organization_id'),
+        stop_organization_id=data.get('stop_organization_id'),
+        start_time=data.get('start_time')
+    )
+    db.session.add(ride)
+    db.session.commit()
+    return jsonify({'ride_id': ride.id}), 200

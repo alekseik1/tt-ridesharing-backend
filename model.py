@@ -98,3 +98,9 @@ class Organization(db.Model):
 class OrganizationSchema(ma.ModelSchema):
     class Meta:
         model = Organization
+
+
+class CreateRideSchema(ma.ModelSchema):
+    start_organization_id = fields.Integer(required=True)
+    stop_organization_id = fields.Integer(required=True)
+    start_time = fields.String(required=True)
