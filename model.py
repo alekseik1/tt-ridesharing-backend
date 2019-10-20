@@ -60,3 +60,31 @@ class RegisterDriverSchema(ma.ModelSchema):
 class DriverSchema(ma.ModelSchema):
     class Meta:
         model = Driver
+
+
+class Ride(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    start_organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
+    stop_organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
+    host_driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
+    estimated_time = db.Column(db.Time)
+
+
+class RideSchema(ma.ModelSchema):
+    class Meta:
+        model = Ride
+
+
+class Organization(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200))
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+
+
+class OrganizationSchema(ma.ModelSchema):
+    class Meta:
+        model = Organization
+
+
