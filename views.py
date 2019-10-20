@@ -1,6 +1,6 @@
 from flask import request, url_for, redirect, flash, Blueprint, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
-from model import RegisterUserSchema, User, RegisterDriverSchema, Driver
+from model import RegisterUserSchema, User, RegisterDriverSchema, Driver, Ride, Organization, OrganizationSchema, UserSchema
 from sqlalchemy.exc import IntegrityError
 from utils.exceptions import InvalidData, ResponseExamples
 from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all
@@ -112,4 +112,25 @@ def get_user_data():
     response['last_name'] = user.last_name
     response['email'] = user.email
     response['photo_url'] = user.photo
+    return jsonify(response), 200
+
+
+@api.route('/get_all_rides', methods=['GET'])
+@login_required
+def get_all_rides():
+    rides = db.session.query(Ride).all()
+    response = []
+    organization_schema = OrganizationSchema()
+    user_schema = UserSchema(many=True)
+    for ride in rides:
+        ride_info = ResponseExamples.RIDE_INFO
+        start_organization = db.session.query(Organization).filter_by(id=ride.start_organization_id).first()
+        stop_organization = db.session.query(Organization).filter_by(id=ride.stop_organization_id).first()
+        ride_info['start_organization'] = organization_schema.dump(start_organization)
+        ride_info['stop_organization'] = organization_schema.dump(stop_organization)
+        ride_info['start_time'] = ride.start_time
+        ride_info['host_driver_ID'] = ride.host_driver_id
+        ride_info['estimated_time'] = ride.estimated_time
+        ride_info['passengers'] = user_schema.dump(ride.passengers)
+        response.append(ride_info)
     return jsonify(response), 200

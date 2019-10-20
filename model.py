@@ -8,6 +8,12 @@ MAX_SURNAME_LENGTH = 40
 MAX_EMAIL_LENGTH = 256
 MAX_URL_LENGTH = 2000
 
+association_user_ride = db.Table(
+    'association_user_ride', db.metadata,
+    db.Column('left_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('right_id', db.Integer, db.ForeignKey('ride.id'))
+)
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -23,6 +29,11 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+
+class UserSchema(ma.ModelSchema):
+    class Meta:
+        model = User
 
 
 @login.user_loader
@@ -69,6 +80,7 @@ class Ride(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     host_driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
     estimated_time = db.Column(db.Time)
+    passengers = db.relationship('User', secondary=association_user_ride, backref='all_rides')
 
 
 class RideSchema(ma.ModelSchema):
@@ -86,5 +98,3 @@ class Organization(db.Model):
 class OrganizationSchema(ma.ModelSchema):
     class Meta:
         model = Organization
-
-

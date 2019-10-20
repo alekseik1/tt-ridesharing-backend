@@ -11,6 +11,10 @@ class ResponseExamples:
     USER_INFO = {'user_id': 28, 'first_name': 'Martin', 'last_name': 'Smith',
                  'email': 'm.smith@gmail.com', 'photo_url': ''}
 
+    RIDE_INFO = {'start_organization': None,
+                 'stop_organization': None, 'start_time': '', 'host_driver_ID': 36,
+                 'estimated_time': '', 'passengers': []}
+
     AUTHORIZATION_REQUIRED = {'name': 'Authorization required', 'value': ''}
 
     @staticmethod
