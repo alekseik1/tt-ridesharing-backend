@@ -10,3 +10,4 @@ flask_login
 cryptography
 mimesis
 psycopg2
+flask_cors

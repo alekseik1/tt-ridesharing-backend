@@ -7,6 +7,7 @@ from instance.config import configs
 from utils.exceptions import ResponseExamples
 from werkzeug.exceptions import Unauthorized
 from utils.exceptions import InvalidData
+from flask_cors import CORS
 
 
 db = SQLAlchemy()
@@ -28,6 +29,8 @@ def create_app(config_name):
     db.init_app(app)
     migrate.init_app(app, db)
     ma.init_app(app)
+    # Enable CORS for any ports, any origins
+    CORS(app)
     login.init_app(app)
     # register all Blueprints
     from views import api
