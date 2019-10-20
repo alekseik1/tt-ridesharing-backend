@@ -6,13 +6,15 @@ class ResponseExamples:
     ALREADY_LOGGED_IN = {'name': 'Already logged-in', 'value': ''}
     INVALID_USER_WITH_ID = {'name': 'Invalid user with id', 'value': 28}
     INVALID_USER_WITH_EMAIL = {'name': 'Email not found', 'value': 'm.mm@mm.ru'}
-    NO_PERMISSION_FOR_USER = {'name': 'No permission to change user', 'value': 28}
+    NO_PERMISSION_FOR_USER = {'name': 'No permission for user', 'value': 28}
     UNHANDLED_ERROR = {'name': 'Unhandled error', 'value': ''}
     USER_INFO = {'user_id': 28, 'first_name': 'Martin', 'last_name': 'Smith',
                  'email': 'm.smith@gmail.com', 'photo_url': ''}
 
+    IS_NOT_DRIVER = {'name': 'User with ID is not a driver', 'value': 0}
+
     RIDE_INFO = {'start_organization': None,
-                 'stop_organization': None, 'start_time': '', 'host_driver_ID': 36,
+                 'stop_organization': None, 'start_time': '', 'host_driver_id': 36,
                  'estimated_time': '', 'passengers': []}
 
     AUTHORIZATION_REQUIRED = {'name': 'Authorization required', 'value': ''}

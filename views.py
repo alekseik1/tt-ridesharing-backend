@@ -129,7 +129,7 @@ def get_all_rides():
         ride_info['start_organization'] = organization_schema.dump(start_organization)
         ride_info['stop_organization'] = organization_schema.dump(stop_organization)
         ride_info['start_time'] = ride.start_time
-        ride_info['host_driver_ID'] = ride.host_driver_id
+        ride_info['host_driver_id'] = ride.host_driver_id
         ride_info['estimated_time'] = ride.estimated_time
         ride_info['passengers'] = user_schema.dump(ride.passengers)
         response.append(ride_info)
