@@ -101,12 +101,7 @@ def logout():
 @api.route('/get_user_data', methods=['GET'])
 @login_required
 def get_user_data():
-    data = request.args
-    user = db.session.query(User).filter_by(email=data['email']).first()
-    if user is None:
-        error = ResponseExamples.INVALID_USER_WITH_EMAIL
-        error['value'] = data['email']
-        return jsonify(error), 400
+    user = db.session.query(User).filter_by(id=current_user.id).first()
     response = ResponseExamples.USER_INFO
     response['user_id'] = user.id
     response['first_name'] = user.first_name
