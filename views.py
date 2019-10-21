@@ -111,7 +111,6 @@ def get_user_data():
     return jsonify(response), 200
 
 
-# TODO: tests
 @api.route('/get_all_rides', methods=['GET'])
 @login_required
 def get_all_rides():
@@ -125,7 +124,7 @@ def get_all_rides():
         stop_organization = db.session.query(Organization).filter_by(id=ride.stop_organization_id).first()
         ride_info['start_organization'] = organization_schema.dump(start_organization)
         ride_info['stop_organization'] = organization_schema.dump(stop_organization)
-        ride_info['start_time'] = ride.start_time
+        ride_info['start_time'] = str(ride.start_time)
         ride_info['host_driver_id'] = ride.host_driver_id
         ride_info['estimated_time'] = ride.estimated_time
         ride_info['passengers'] = user_schema.dump(ride.passengers)
