@@ -36,6 +36,14 @@ def create_app(config_name):
     from views import api
     app.register_blueprint(api)
 
+    from model import User
+    @login.user_loader
+    def load_user(id):
+        user = User.query.get(int(id))
+        if not user:
+            return None
+        return user
+
     # register handler for uncaught errors
     # TODO: maybe move error handler to different module?
     def handle_uncaught_error(error):

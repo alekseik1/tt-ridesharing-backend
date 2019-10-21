@@ -36,14 +36,6 @@ class UserSchema(ma.ModelSchema):
         model = User
 
 
-@login.user_loader
-def load_user(id):
-    user = User.query.get(int(id))
-    if not user:
-        return None
-    return user
-
-
 class RegisterUserSchema(ma.ModelSchema):
     class Meta:
         model = User
