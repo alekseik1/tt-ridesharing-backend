@@ -2,6 +2,7 @@ class ResponseExamples:
 
     INCORRECT_LOGIN = {'name': 'Invalid login or password', 'value': ''}
     USER_ID = {'user_id': 36}
+    RIDE_ID = {'ride_id': 36}
     EMAIL_IS_BUSY = {'name': 'Email is already registered', 'value': 'm.smith@mail.ru'}
     ALREADY_LOGGED_IN = {'name': 'Already logged-in', 'value': ''}
     INVALID_USER_WITH_ID = {'name': 'Invalid user with id', 'value': 28}
@@ -16,6 +17,7 @@ class ResponseExamples:
     RIDE_INFO = {'start_organization': None,
                  'stop_organization': None, 'start_time': '', 'host_driver_id': 36,
                  'estimated_time': '', 'passengers': []}
+    INVALID_RIDE_WITH_ID = {'name': 'Invalid ride with id', 'value': 37}
 
     AUTHORIZATION_REQUIRED = {'name': 'Authorization required', 'value': ''}
 

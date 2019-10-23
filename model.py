@@ -80,6 +80,10 @@ class RideSchema(ma.ModelSchema):
         model = Ride
 
 
+class JoinRideSchema(ma.ModelSchema):
+    ride_id = fields.Integer(required=True)
+
+
 class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))

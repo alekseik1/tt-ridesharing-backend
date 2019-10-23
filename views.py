@@ -1,7 +1,7 @@
 from flask import request, url_for, redirect, flash, Blueprint, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from model import RegisterUserSchema, User, RegisterDriverSchema, Driver, Ride, Organization, \
-    OrganizationSchema, UserSchema, CreateRideSchema
+    OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema
 from sqlalchemy.exc import IntegrityError
 from utils.exceptions import InvalidData, ResponseExamples
 from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all
@@ -163,3 +163,29 @@ def get_all_organizations():
     organization_schema = OrganizationSchema(many=True)
     result = organization_schema.dump(db.session.query(Organization).all())
     return result, 200
+
+
+# TODO: better tests
+@api.route('/join_ride', methods=['POST'])
+@login_required
+def join_ride():
+    data = request.get_json()
+    # 1. Валидация параметров
+    errors = validate_all([validate_params_with_schema(JoinRideSchema(), data)])
+    if errors:
+        return errors
+    ride_id = data['ride_id']
+    # 2. Поездка должна существовать
+    ride = db.session.query(Ride).filter_by(id=ride_id).first()
+    if not ride:
+        error = ResponseExamples.INVALID_RIDE_WITH_ID
+        error['value'] = ride_id
+        return error, 400
+    # 3. Вроде, все ок. Можно добавлять в поездку
+    ride.passengers.append(current_user)
+    db.session.commit()
+    response = ResponseExamples.RIDE_ID
+    response['ride_id'] = ride.id
+    return jsonify(response), 200
+
+

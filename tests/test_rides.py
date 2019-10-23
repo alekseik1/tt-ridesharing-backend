@@ -7,7 +7,7 @@ from tests.test_get_info import BaseTest
 from utils.exceptions import ResponseExamples
 
 
-class GetAllRidesTests(BaseTest):
+class RidesBaseTest(BaseTest):
 
     def setUp(self) -> None:
         super().setUp()
@@ -34,6 +34,9 @@ class GetAllRidesTests(BaseTest):
         # Login user1
         self.client.post(self.login_url, json={'login': self.user1.email, 'password': '12345'})
 
+
+class GetAllRidesTests(RidesBaseTest):
+
     def test_correct_response(self):
         response = self.client.get(self.get_all_rides_url)
         organization_schema = OrganizationSchema()
@@ -56,6 +59,21 @@ class GetAllRidesTests(BaseTest):
             self.assert401(response)
         with self.subTest('correct error'):
             self.assertEqual(correct_response, response.get_json())
+
+
+class JoinRideTests(RidesBaseTest):
+
+    def test_simple_join(self):
+        request_data = ResponseExamples.RIDE_ID
+        request_data['ride_id'] = self.ride1.id
+        response = self.client.post(self.join_ride_url, json=request_data)
+        with self.subTest('correct status code'):
+            self.assert200(response)
+        with self.subTest('correct return data'):
+            self.assertEqual(request_data, response.get_json())
+        with self.subTest('user is in passengers'):
+            passengers = db.session.query(Ride).filter_by(id=self.ride1.id).first().passengers
+            self.assertTrue(self.user1 in passengers)
 
 
 if __name__ == '__main__':
