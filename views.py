@@ -137,6 +137,7 @@ def get_all_rides():
 @login_required
 def create_ride():
     data = request.get_json()
+    response = ResponseExamples.RIDE_ID
     # 1. Валидация параметров
     errors = validate_all([validate_params_with_schema(CreateRideSchema(), data)])
     if errors:
@@ -154,7 +155,8 @@ def create_ride():
     )
     db.session.add(ride)
     db.session.commit()
-    return jsonify({'ride_id': ride.id}), 200
+    response['ride_id'] = ride.id
+    return jsonify(response), 200
 
 
 @api.route('/get_all_organizations', methods=['GET'])
