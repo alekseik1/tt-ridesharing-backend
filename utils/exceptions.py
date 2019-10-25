@@ -1,6 +1,7 @@
 class ResponseExamples:
 
     INCORRECT_LOGIN = {'name': 'Invalid login or password', 'value': ''}
+    INVALID_ORGANIZATION_ID = {'name': 'Invalid organization with id', 'value': ''}
     USER_ID = {'user_id': 36}
     RIDE_ID = {'ride_id': 36}
     EMAIL_IS_BUSY = {'name': 'Email is already registered', 'value': 'm.smith@mail.ru'}

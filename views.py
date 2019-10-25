@@ -123,7 +123,8 @@ def get_all_rides():
         start_organization = db.session.query(Organization).filter_by(id=ride.start_organization_id).first()
         stop_organization = db.session.query(Organization).filter_by(id=ride.stop_organization_id).first()
         ride_info['start_organization'] = organization_schema.dump(start_organization)
-        ride_info['stop_organization'] = organization_schema.dump(stop_organization)
+        ride_info['stop_latitude'] = ride.stop_latitude
+        ride_info['stop_longitude'] = ride.stop_longitude
         ride_info['start_time'] = str(ride.start_time)
         ride_info['host_driver_id'] = ride.host_driver_id
         ride_info['estimated_time'] = ride.estimated_time
@@ -148,10 +149,19 @@ def create_ride():
         error = ResponseExamples.IS_NOT_DRIVER
         error['value'] = user_id
         return error, 401
+    # 3. Организация должна существовать
+    organization = db.session.query(Organization).filter_by(id=data['start_organization_id']).first()
+    if not organization:
+        error = ResponseExamples.INVALID_ORGANIZATION_ID
+        error['value'] = data['start_organization_id']
+        return error, 400
     ride = Ride(
-        start_organization_id=data.get('start_organization_id'),
-        stop_organization_id=data.get('stop_organization_id'),
-        start_time=data.get('start_time')
+        start_organization_id=organization.id,
+        start_organization=organization,
+        stop_latitude=data['stop_latitude'],
+        stop_longitude=data['stop_longitude'],
+        start_time=data.get('start_time'),
+        host_driver_id=user_id
     )
     db.session.add(ride)
     db.session.commit()
