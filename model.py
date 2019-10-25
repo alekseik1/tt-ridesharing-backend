@@ -65,10 +65,24 @@ class DriverSchema(ma.ModelSchema):
         model = Driver
 
 
+class Organization(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200))
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+
+
+class OrganizationSchema(ma.ModelSchema):
+    class Meta:
+        model = Organization
+
+
 class Ride(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     start_organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
+    start_organization = db.relationship('Organization', backref='is_start_for', foreign_keys=[start_organization_id])
     stop_organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
+    stop_organization = db.relationship('Organization', backref='is_stop_for', foreign_keys=[stop_organization_id])
     start_time = db.Column(db.DateTime, nullable=False)
     host_driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
     estimated_time = db.Column(db.Time)
@@ -83,18 +97,6 @@ class RideSchema(ma.ModelSchema):
 
 class JoinRideSchema(ma.ModelSchema):
     ride_id = fields.Integer(required=True)
-
-
-class Organization(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200))
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
-
-
-class OrganizationSchema(ma.ModelSchema):
-    class Meta:
-        model = Organization
 
 
 class CreateRideSchema(ma.ModelSchema):
