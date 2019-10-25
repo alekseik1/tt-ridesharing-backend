@@ -1,11 +1,12 @@
 from flask import request, url_for, redirect, flash, Blueprint, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from model import RegisterUserSchema, User, RegisterDriverSchema, Driver, Ride, Organization, \
-    OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema
+    OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema
 from sqlalchemy.exc import IntegrityError
 from utils.exceptions import InvalidData, ResponseExamples
 from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all
 from app import db
+from utils.ride_matcher import find_best_rides
 
 api = Blueprint('api', __name__)
 
@@ -198,6 +199,26 @@ def join_ride():
     db.session.commit()
     response = ResponseExamples.RIDE_ID
     response['ride_id'] = ride.id
+    return jsonify(response), 200
+
+
+@api.route('/find_best_rides', methods=['POST'])
+@login_required
+def find_best_rides():
+    """
+    Здесь как раз будут все данные: откуда, id организации отправления, куда -- геокоординаты
+
+    :return:
+    """
+    data = request.get_json()
+    errors = validate_all([validate_params_with_schema(FindBestRidesSchema(), data)])
+    if errors:
+        return errors
+    start_organization_id = data['start_organization_id']
+    destination_gps = (data['destination_latitude'], data['destination_longitude'])
+    matching_results = find_best_rides(start_organization_id, destination_gps)
+    response = ResponseExamples.MATCHING_RESULTS
+    response['top'] = matching_results
     return jsonify(response), 200
 
 

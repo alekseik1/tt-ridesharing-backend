@@ -105,3 +105,10 @@ class CreateRideSchema(ma.ModelSchema):
     stop_longitude = fields.Float(required=True)
     stop_organization_id = fields.Integer(required=True)
     start_time = fields.String(required=True)
+
+
+class FindBestRidesSchema(ma.ModelSchema):
+    start_date = fields.DateTime(required=False)
+    start_organization_id = fields.Integer(required=True)
+    destination_latitude = fields.Integer(required=True)
+    destination_longitude = fields.Integer(required=True)

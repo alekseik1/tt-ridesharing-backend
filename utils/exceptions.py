@@ -22,6 +22,8 @@ class ResponseExamples:
 
     AUTHORIZATION_REQUIRED = {'name': 'Authorization required', 'value': ''}
 
+    MATCHING_RESULTS = {'top': []}
+
     @staticmethod
     def some_params_are_invalid(params):
         return {'name': 'Some of required fields are invalid', 'value': params}
