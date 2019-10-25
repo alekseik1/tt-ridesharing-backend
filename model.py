@@ -72,6 +72,7 @@ class Ride(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     host_driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
     estimated_time = db.Column(db.Time)
+    is_available = db.Column(db.Boolean, nullable=False, default=True)
     passengers = db.relationship('User', secondary=association_user_ride, backref='all_rides')
 
 

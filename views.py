@@ -114,7 +114,7 @@ def get_user_data():
 @api.route('/get_all_rides', methods=['GET'])
 @login_required
 def get_all_rides():
-    rides = db.session.query(Ride).all()
+    rides = db.session.query(Ride).filter_by(is_available=True).all()
     response = []
     organization_schema = OrganizationSchema()
     user_schema = UserSchema(many=True)
