@@ -277,3 +277,12 @@ def leave_organization():
     response = ResponseExamples.ORGANIZATION_ID
     response['value'] = organization_id
     return jsonify(response), 200
+
+
+@api.route('/am_i_driver', methods=['GET'])
+@login_required
+def am_i_driver():
+    driver = db.session.query(Driver).filter_by(id=current_user.id).first()
+    if driver:
+        return jsonify(is_driver=True), 200
+    return jsonify(is_driver=False)
