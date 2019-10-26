@@ -124,7 +124,6 @@ def get_all_rides():
     for ride in rides:
         ride_info = ResponseExamples.RIDE_INFO
         start_organization = db.session.query(Organization).filter_by(id=ride.start_organization_id).first()
-        stop_organization = db.session.query(Organization).filter_by(id=ride.stop_organization_id).first()
         ride_info['start_organization'] = organization_schema.dump(start_organization)
         ride_info['stop_latitude'] = ride.stop_latitude
         ride_info['stop_longitude'] = ride.stop_longitude
