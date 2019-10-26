@@ -25,7 +25,8 @@ class RidesBaseTest(BaseTest):
         self.start_time = datetime.now()
         self.ride1 = Ride(
             start_organization_id=self.org1.id,
-            stop_organization_id=self.org2.id,
+            stop_longitude=0.0,
+            stop_latitude=0.0,
             start_time=self.start_time,
             host_driver_id=self.driver1.id,
         )
