@@ -17,8 +17,8 @@ class BaseTest(TestCase):
         db.drop_all()
         db.create_all()
 
-        from views import get_user_data, login, logout, get_all_rides, get_all_organizations, join_ride
-        self.get_user_data_url = url_for('.' + get_user_data.__name__)
+        from views import get_user_info, login, logout, get_all_rides, get_all_organizations, join_ride
+        self.get_user_data_url = url_for('.' + get_user_info.__name__)
         self.get_all_rides_url = url_for('.' + get_all_rides.__name__)
         self.get_all_organizations_url = url_for('.' + get_all_organizations.__name__)
         self.join_ride_url = url_for('.' + join_ride.__name__)

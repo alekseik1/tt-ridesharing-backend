@@ -101,9 +101,9 @@ def logout():
     return '', 200
 
 
-@api.route('/get_user_data', methods=['GET'])
+@api.route('/get_user_info', methods=['GET'])
 @login_required
-def get_user_data():
+def get_user_info():
     user = db.session.query(User).filter_by(id=current_user.id).first()
     response = ResponseExamples.USER_INFO
     response['user_id'] = user.id
