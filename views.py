@@ -176,7 +176,7 @@ def create_ride():
 @login_required
 def get_all_organizations():
     organization_schema = OrganizationSchema(many=True)
-    result = organization_schema.dump(db.session.query(Organization).all())
+    result = organization_schema.dump(db.session.query(Organization).all(), many=True)
     return result, 200
 
 
