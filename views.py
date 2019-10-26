@@ -1,7 +1,7 @@
 from flask import request, url_for, redirect, flash, Blueprint, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from model import RegisterUserSchema, User, RegisterDriverSchema, Driver, Ride, Organization, \
-    OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema
+    OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema, JoinOrganizationSchema
 from sqlalchemy.exc import IntegrityError
 from utils.exceptions import InvalidData, ResponseExamples
 from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all
@@ -9,6 +9,8 @@ from app import db
 from utils.ride_matcher import _find_best_rides
 
 api = Blueprint('api', __name__)
+# TODO: перенести это в конфиг
+MAX_ORGANIZATIONS_PER_USER = 5
 
 
 @api.route('/', methods=['GET', 'POST'])
@@ -222,3 +224,30 @@ def find_best_rides():
     return jsonify(response), 200
 
 
+@api.route('/join_organization', methods=['POST'])
+@login_required
+def join_organization():
+    """
+    {'organization_id": 34}
+
+    :return:
+    """
+    data = request.get_json()
+    errors = validate_all([validate_params_with_schema(JoinOrganizationSchema(), data)])
+    if errors:
+        return errors
+    if len(current_user.organizations) >= MAX_ORGANIZATIONS_PER_USER:
+        error = ResponseExamples.ORGANIZATION_LIMIT
+        return jsonify(error), 400
+    data_organization_id = data['organization_id']
+    organization = db.session.query(Organization).filter_by(id=data_organization_id).first()
+    if not organization:
+        error = ResponseExamples.INVALID_ORGANIZATION_ID
+        error['value'] = data_organization_id
+        return jsonify(error), 400
+    current_user.organizations.append(organization)
+    db.session.commit()
+    # TODO: сделать его
+    response = ResponseExamples.ORGANIZATION_ID
+    response['organization_id'] = organization.id
+    return jsonify(response), 200

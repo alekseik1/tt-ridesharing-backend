@@ -22,6 +22,9 @@ class ResponseExamples:
 
     AUTHORIZATION_REQUIRED = {'name': 'Authorization required', 'value': ''}
 
+    ORGANIZATION_LIMIT = {'name': 'Organization limit exceeded', 'value': ''}
+    ORGANIZATION_ID = {'organization_id': 36}
+
     MATCHING_RESULTS = {'top': []}
 
     @staticmethod

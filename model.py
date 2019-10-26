@@ -14,6 +14,12 @@ association_user_ride = db.Table(
     db.Column('right_id', db.Integer, db.ForeignKey('ride.id'))
 )
 
+association_user_organization = db.Table(
+    'association_user_organization', db.metadata,
+    db.Column('left_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('right_id', db.Integer, db.ForeignKey('organization.id'))
+)
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -70,6 +76,7 @@ class Organization(db.Model):
     name = db.Column(db.String(200))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+    users = db.relationship('User', secondary=association_user_organization, backref='organizations')
 
 
 class OrganizationSchema(ma.ModelSchema):
@@ -112,3 +119,7 @@ class FindBestRidesSchema(ma.ModelSchema):
     start_organization_id = fields.Integer(required=True)
     destination_latitude = fields.Integer(required=True)
     destination_longitude = fields.Integer(required=True)
+
+
+class JoinOrganizationSchema(ma.ModelSchema):
+    organization_id = fields.Integer(required=True)
