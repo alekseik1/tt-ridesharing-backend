@@ -217,8 +217,7 @@ def find_best_rides():
     start_organization_id = data['start_organization_id']
     destination_gps = (data['destination_latitude'], data['destination_longitude'])
     matching_results = _find_best_rides(start_organization_id, destination_gps)
-    response = ResponseExamples.MATCHING_RESULTS
-    response['top'] = matching_results
+    response = matching_results
     return jsonify(response), 200
 
 
