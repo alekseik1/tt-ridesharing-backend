@@ -130,7 +130,7 @@ def get_all_rides():
         ride_info['start_time'] = str(ride.start_time)
         ride_info['host_driver_id'] = ride.host_driver_id
         ride_info['estimated_time'] = ride.estimated_time
-        ride_info['passengers'] = user_schema.dump(ride.passengers)
+        ride_info['passengers'] = user_schema.dump(ride.passengers, many=True)
         response.append(ride_info)
     return jsonify(response), 200
 
