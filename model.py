@@ -121,5 +121,5 @@ class FindBestRidesSchema(ma.ModelSchema):
     destination_longitude = fields.Integer(required=True)
 
 
-class JoinOrganizationSchema(ma.ModelSchema):
+class OrganizationIDSchema(ma.ModelSchema):
     organization_id = fields.Integer(required=True)

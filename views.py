@@ -1,7 +1,7 @@
 from flask import request, url_for, redirect, flash, Blueprint, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from model import RegisterUserSchema, User, RegisterDriverSchema, Driver, Ride, Organization, \
-    OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema, JoinOrganizationSchema
+    OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema, OrganizationIDSchema
 from sqlalchemy.exc import IntegrityError
 from utils.exceptions import InvalidData, ResponseExamples
 from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all
@@ -233,7 +233,7 @@ def join_organization():
     :return:
     """
     data = request.get_json()
-    errors = validate_all([validate_params_with_schema(JoinOrganizationSchema(), data)])
+    errors = validate_all([validate_params_with_schema(OrganizationIDSchema(), data)])
     if errors:
         return errors
     if len(current_user.organizations) >= MAX_ORGANIZATIONS_PER_USER:
@@ -250,4 +250,33 @@ def join_organization():
     # TODO: сделать его
     response = ResponseExamples.ORGANIZATION_ID
     response['organization_id'] = organization.id
+    return jsonify(response), 200
+
+
+@api.route('/leave_organization', methods=['POST'])
+@login_required
+def leave_organization():
+    """
+    {'organization_id': 36}
+
+    :return:
+    """
+    data = request.get_json()
+    errors = validate_all([validate_params_with_schema(OrganizationIDSchema(), data)])
+    if errors:
+        return errors
+    organization_id = data['organization_id']
+    organization_to_leave = db.session.query(Organization).filter_by(id=organization_id).first()
+    if not organization_to_leave:
+        error = ResponseExamples.INVALID_ORGANIZATION_ID
+        error['value'] = organization_id
+        return jsonify(organization_id), 400
+    if organization_to_leave not in current_user.organizations:
+        error = ResponseExamples.ERROR_NOT_IN_ORGANIZATION
+        error['value'] = organization_id
+        return jsonify(error), 400
+    current_user.organizations.remove(organization_to_leave)
+    db.session.commit()
+    response = ResponseExamples.ORGANIZATION_ID
+    response['value'] = organization_id
     return jsonify(response), 200
