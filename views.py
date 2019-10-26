@@ -76,7 +76,7 @@ def login():
     # Check if current user is authenticated
     if current_user.is_authenticated:
         error = ResponseExamples.ALREADY_LOGGED_IN
-        return error, 400
+        return jsonify(error), 400
     data = request.get_json()
     login = data.get('login')
     password = data.get('password')
@@ -84,11 +84,11 @@ def login():
     user = User.query.filter_by(email=login).first()
     if user is None or not user.check_password(password):
         error = ResponseExamples.INCORRECT_LOGIN
-        return error, 400
+        return jsonify(error), 400
     login_user(user, remember=True)
     response = ResponseExamples.USER_ID
     response['user_id'] = user.id
-    return response, 200
+    return jsonify(response), 200
 
 
 @api.route('/logout', methods=['POST'])
@@ -96,7 +96,7 @@ def logout():
     # Check if current user is authenticated
     if not current_user.is_authenticated:
         error = ResponseExamples.AUTHORIZATION_REQUIRED
-        return error, 400
+        return jsonify(error), 400
     logout_user()
     return '', 200
 
@@ -151,13 +151,13 @@ def create_ride():
     if not db.session.query(Driver).filter_by(id=user_id).first():
         error = ResponseExamples.IS_NOT_DRIVER
         error['value'] = user_id
-        return error, 401
+        return jsonify(error), 401
     # 3. Организация должна существовать
     organization = db.session.query(Organization).filter_by(id=data['start_organization_id']).first()
     if not organization:
         error = ResponseExamples.INVALID_ORGANIZATION_ID
         error['value'] = data['start_organization_id']
-        return error, 400
+        return jsonify(error), 400
     ride = Ride(
         start_organization_id=organization.id,
         start_organization=organization,
@@ -177,7 +177,7 @@ def create_ride():
 def get_all_organizations():
     organization_schema = OrganizationSchema(many=True)
     result = organization_schema.dump(db.session.query(Organization).all(), many=True)
-    return result, 200
+    return jsonify(result), 200
 
 
 # TODO: better tests
@@ -195,7 +195,7 @@ def join_ride():
     if not ride:
         error = ResponseExamples.INVALID_RIDE_WITH_ID
         error['value'] = ride_id
-        return error, 400
+        return jsonify(error), 400
     # 3. Вроде, все ок. Можно добавлять в поездку
     ride.passengers.append(current_user)
     db.session.commit()
