@@ -7,6 +7,7 @@ from instance.config import configs
 from utils.exceptions import ResponseExamples
 from werkzeug.exceptions import Unauthorized
 from utils.exceptions import InvalidData
+import logging
 from flask_cors import CORS
 
 
@@ -47,7 +48,8 @@ def create_app(config_name):
     # register handler for uncaught errors
     # TODO: maybe move error handler to different module?
     def handle_uncaught_error(error):
-        return error
+        logging.error(error)
+        return jsonify({'name': 'uncaught error', 'value': 'see flask errors for more info'})
 
     # TODO: make all views in `views.py` raise `Unauthorized` instead of handling it on their own
     def handle_unauthorized(error):
