@@ -104,13 +104,12 @@ def logout():
 @api.route('/get_user_info', methods=['GET'])
 @login_required
 def get_user_info():
-    user = db.session.query(User).filter_by(id=current_user.id).first()
     response = ResponseExamples.USER_INFO
-    response['user_id'] = user.id
-    response['first_name'] = user.first_name
-    response['last_name'] = user.last_name
-    response['email'] = user.email
-    response['photo_url'] = user.photo
+    response['user_id'] = current_user.id
+    response['first_name'] = current_user.first_name
+    response['last_name'] = current_user.last_name
+    response['email'] = current_user.email
+    response['photo_url'] = current_user.photo
     return jsonify(response), 200
 
 
