@@ -6,7 +6,7 @@ from geopy.distance import great_circle
 
 # TODO: for now, `organizations` is ignored
 # TODO: Optimization! Don't take all rides, use more filters
-def find_best_rides(start_organization_id, destination_gps):
+def _find_best_rides(start_organization_id, destination_gps):
     # Get all rides starting from exact organization and are available
     all_rides = db.session.query(Ride)\
         .filter_by(start_organization_id=start_organization_id)\

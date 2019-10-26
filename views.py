@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from utils.exceptions import InvalidData, ResponseExamples
 from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all
 from app import db
-from utils.ride_matcher import find_best_rides
+from utils.ride_matcher import _find_best_rides
 
 api = Blueprint('api', __name__)
 
@@ -216,7 +216,7 @@ def find_best_rides():
         return errors
     start_organization_id = data['start_organization_id']
     destination_gps = (data['destination_latitude'], data['destination_longitude'])
-    matching_results = find_best_rides(start_organization_id, destination_gps)
+    matching_results = _find_best_rides(start_organization_id, destination_gps)
     response = ResponseExamples.MATCHING_RESULTS
     response['top'] = matching_results
     return jsonify(response), 200
