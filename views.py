@@ -151,6 +151,7 @@ def create_ride():
         stop_latitude=data['stop_latitude'],
         stop_longitude=data['stop_longitude'],
         start_time=data.get('start_time'),
+        description=data.get('description'),
         host_driver_id=user_id
     )
     db.session.add(ride)

@@ -95,6 +95,7 @@ class Ride(db.Model):
     estimated_time = db.Column(db.Time)
     is_available = db.Column(db.Boolean, nullable=False, default=True)
     passengers = db.relationship('User', secondary=association_user_ride, backref='all_rides')
+    description = db.Column(db.String(600))
 
 
 class RideSchema(ma.ModelSchema):
@@ -113,6 +114,7 @@ class CreateRideSchema(ma.ModelSchema):
     stop_longitude = fields.Float(required=True)
     stop_organization_id = fields.Integer(required=True)
     start_time = fields.String(required=True)
+    description = fields.String(required=False)
 
 
 class FindBestRidesSchema(ma.ModelSchema):
