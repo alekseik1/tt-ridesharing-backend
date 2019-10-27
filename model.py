@@ -100,6 +100,7 @@ class Ride(db.Model):
 class RideSchema(ma.ModelSchema):
     class Meta:
         model = Ride
+        include_fk = True
 
 
 class JoinRideSchema(ma.ModelSchema):
