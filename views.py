@@ -1,7 +1,7 @@
 from flask import request, url_for, redirect, flash, Blueprint, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from model import RegisterUserSchema, User, RegisterDriverSchema, Driver, Ride, Organization, \
-    OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema, OrganizationIDSchema
+    OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema, OrganizationIDSchema, RideSchema
 from sqlalchemy.exc import IntegrityError
 from utils.exceptions import InvalidData, ResponseExamples
 from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all
@@ -118,19 +118,8 @@ def get_user_info():
 def get_all_rides():
     rides = db.session.query(Ride).filter_by(is_available=True).all()
     response = []
-    organization_schema = OrganizationSchema()
-    user_schema = UserSchema(many=True)
-    for ride in rides:
-        ride_info = ResponseExamples.RIDE_INFO
-        start_organization = db.session.query(Organization).filter_by(id=ride.start_organization_id).first()
-        ride_info['start_organization'] = start_organization.id
-        ride_info['stop_latitude'] = ride.stop_latitude
-        ride_info['stop_longitude'] = ride.stop_longitude
-        ride_info['start_time'] = str(ride.start_time)
-        ride_info['host_driver_id'] = ride.host_driver_id
-        ride_info['estimated_time'] = ride.estimated_time
-        ride_info['passengers'] = user_schema.dump(ride.passengers, many=True)
-        response.append(ride_info)
+    ride_schema = RideSchema(many=True)
+    response = ride_schema.dump(rides)
     return jsonify(response), 200
 
 
