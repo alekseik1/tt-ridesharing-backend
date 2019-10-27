@@ -40,6 +40,7 @@ class User(UserMixin, db.Model):
 class UserSchema(ma.ModelSchema):
     class Meta:
         model = User
+        exclude = ['password_hash']
 
 
 class RegisterUserSchema(ma.ModelSchema):
