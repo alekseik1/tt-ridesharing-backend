@@ -276,3 +276,24 @@ def am_i_driver():
     if driver:
         return jsonify(is_driver=True), 200
     return jsonify(is_driver=False)
+
+
+@api.route('/get_my_organization_members', methods=['GET'])
+@login_required
+def get_my_organization_members():
+    data = request.args
+    user_schema = UserSchema(many=True)
+    id = data.get('organization_id')
+    try:
+        id = int(id)
+    except:
+        error = ResponseExamples.INVALID_ORGANIZATION_ID
+        error['value'] = id
+        return jsonify(error), 400
+    organization = db.session.query(Organization).filter_by(id=id).first()
+    if organization not in current_user.organizations:
+        error = ResponseExamples.NO_PERMISSION_FOR_USER
+        error['value'] = current_user.id
+        return jsonify(error), 403
+    response = user_schema.dump(organization.users)
+    return jsonify(response), 200
