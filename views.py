@@ -133,7 +133,7 @@ def create_ride():
     errors = validate_all([validate_params_with_schema(CreateRideSchema(), data)])
     if errors:
         return errors
-    user_id = data.get('host_driver_id')
+    user_id = current_user.id
     # 2. Пользователь должен быть водителем
     if not db.session.query(Driver).filter_by(id=user_id).first():
         error = ResponseExamples.IS_NOT_DRIVER
