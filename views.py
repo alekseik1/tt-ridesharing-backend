@@ -299,8 +299,3 @@ def get_my_organization_members():
         return jsonify(error), 403
     response = user_schema.dump(organization.users)
     return jsonify(response), 200
-
-
-@api.route('/is_authenticated')
-def is_authenticated():
-    return jsonify(current_user.login_fresh()), 200
