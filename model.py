@@ -86,6 +86,7 @@ class Ride(db.Model):
     stop_latitude = db.Column(db.Float, nullable=False)
     stop_longitude = db.Column(db.Float, nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
+    total_seats = db.Column(db.Integer, server_default='4', nullable=False)
     host_driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
     estimated_time = db.Column(db.Time)
     is_available = db.Column(db.Boolean, nullable=False, default=True)
@@ -109,6 +110,7 @@ class CreateRideSchema(ma.ModelSchema):
     stop_longitude = fields.Float(required=True)
     start_time = fields.String(required=True)
     description = fields.String(required=False)
+    total_seats = fields.Integer(required=True)
 
 
 class FindBestRidesSchema(ma.ModelSchema):

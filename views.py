@@ -148,6 +148,7 @@ def create_ride():
         stop_latitude=data['stop_latitude'],
         stop_longitude=data['stop_longitude'],
         start_time=data.get('start_time'),
+        total_seats=data.get('total_seats'),
         description=data.get('description'),
         host_driver_id=user_id
     )
@@ -177,12 +178,15 @@ def join_ride():
     ride_id = data['ride_id']
     # 2. Поездка должна существовать
     ride = db.session.query(Ride).filter_by(id=ride_id).first()
-    if not ride:
+    if not ride or not ride.is_available:
         error = ResponseExamples.INVALID_RIDE_WITH_ID
         error['value'] = ride_id
         return jsonify(error), 400
-    # 3. Вроде, все ок. Можно добавлять в поездку
+    # 4. Вроде, все ок. Можно добавлять в поездку
     ride.passengers.append(current_user)
+    # Если все места заняты, то сделать поездку недоступной
+    if ride.total_seats == len(ride.passengers):
+        ride.is_available = False
     db.session.commit()
     response = ResponseExamples.RIDE_ID
     response['ride_id'] = ride.id
