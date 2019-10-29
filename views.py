@@ -55,9 +55,6 @@ def register_driver():
         return errors
     driver = Driver(
         id=int(user_id),
-        passport_1=data['passport_url_1'],
-        passport_2=data['passport_url_2'],
-        passport_selfie=data['passport_url_selfie'],
         driver_license_1=data['license_1'],
         driver_license_2=data['license_2']
     )
