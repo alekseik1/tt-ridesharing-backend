@@ -113,7 +113,6 @@ class CreateRideSchema(ma.ModelSchema):
     start_organization_id = fields.Integer(required=True)
     stop_latitude = fields.Float(required=True)
     stop_longitude = fields.Float(required=True)
-    stop_organization_id = fields.Integer(required=True)
     start_time = fields.String(required=True)
     description = fields.String(required=False)
 
