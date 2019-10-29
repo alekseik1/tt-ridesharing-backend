@@ -1,5 +1,5 @@
 from flask import request, url_for, redirect, flash, Blueprint, jsonify
-from flask_login import current_user, login_user, login_required, logout_user
+from flask_login import current_user, login_user, login_required, logout_user, login_fresh
 from model import RegisterUserSchema, User, RegisterDriverSchema, Driver, Ride, Organization, \
     OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema, OrganizationIDSchema, RideSchema
 from sqlalchemy.exc import IntegrityError
@@ -303,4 +303,4 @@ def get_my_organization_members():
 
 @api.route('/is_authenticated', methods=['GET'])
 def is_authenticated():
-    return jsonify(current_user.login_fresh()), 200
+    return jsonify(login_fresh()), 200
