@@ -145,6 +145,7 @@ def create_ride():
     ride = Ride(
         start_organization_id=organization.id,
         start_organization=organization,
+        cost=data.get('cost'),
         stop_latitude=data['stop_latitude'],
         stop_longitude=data['stop_longitude'],
         start_time=data.get('start_time'),
