@@ -301,6 +301,6 @@ def get_my_organization_members():
     return jsonify(response), 200
 
 
-@api.route('/is_authenticated', methods=['GET'])
+@api.route('/is_authenticated')
 def is_authenticated():
     return jsonify(current_user.login_fresh()), 200
