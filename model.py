@@ -1,7 +1,7 @@
 from app import db, ma, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from marshmallow import fields
+from marshmallow import fields, validates, ValidationError
 
 MAX_NAME_LENGTH = 40
 MAX_SURNAME_LENGTH = 40
@@ -113,6 +113,11 @@ class CreateRideSchema(ma.ModelSchema):
     description = fields.String(required=False)
     total_seats = fields.Integer(required=True)
     cost = fields.Float(required=False)
+
+    @validates('start_time')
+    def is_not_empty(self, value):
+        if len(value) == 0:
+            raise ValidationError('Should not be empty string')
 
 
 class FindBestRidesSchema(ma.ModelSchema):
