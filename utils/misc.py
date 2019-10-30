@@ -2,6 +2,7 @@ from mimesis import Person
 from model import User
 from flask import jsonify
 from utils.exceptions import ResponseExamples
+from datetime import datetime
 
 
 def generate_random_person(locale='ru'):
@@ -31,6 +32,13 @@ def validate_is_authorized_with_id(id, current_user):
         error['value'] = id
         return jsonify(error), 403
     return None
+
+
+def format_time(list_response):
+    for x in list_response:
+        dt = datetime.fromisoformat(x['start_time'])
+        x['start_time'] = dt.strftime('%d %B %H:%M')
+    return list_response
 
 
 def validate_all(validation_results):
