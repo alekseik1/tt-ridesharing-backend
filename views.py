@@ -9,7 +9,6 @@ from utils.misc import validate_is_in_db, validate_params_with_schema, validate_
 from app import db
 from utils.ride_matcher import _find_best_rides
 from datetime import datetime
-import reverse_geocoder as rg
 
 api = Blueprint('api', __name__)
 # TODO: перенести это в конфиг
