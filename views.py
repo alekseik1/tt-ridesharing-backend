@@ -320,5 +320,6 @@ def get_ride_info():
         return jsonify(error), 400
     ride = db.session.query(Ride).filter_by(id=id).first()
     response = ride_schema.dump(ride)
+    response = format_time([response])[0]
     response['host_driver_info'] = _get_user_info(ride.host_driver_id)
     return jsonify(response), 200
