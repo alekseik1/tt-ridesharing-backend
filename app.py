@@ -55,7 +55,7 @@ def create_app(config_name):
     def handle_unauthorized(error):
         return ResponseExamples.AUTHORIZATION_REQUIRED, 401
 
-    app.register_error_handler(Exception, handle_uncaught_error)
+    #app.register_error_handler(Exception, handle_uncaught_error)
     app.register_error_handler(Unauthorized, handle_unauthorized)
 
     return app
