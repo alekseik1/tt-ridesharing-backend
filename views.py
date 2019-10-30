@@ -117,9 +117,12 @@ def get_user_info():
 @login_required
 def get_all_rides():
     rides = db.session.query(Ride).filter_by(is_available=True).all()
-    response = []
     ride_schema = RideSchema(many=True)
+    user_schema = UserSchema()
     response = ride_schema.dump(rides)
+    for x in response:
+        user = db.session.query(User).filter_by(id=x['host_driver_id']).first()
+        x['host_driver_info'] = user_schema.dump(user)
     # Форматируем время
     response = format_time(response)
     return jsonify(response), 200
