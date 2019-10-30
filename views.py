@@ -152,6 +152,7 @@ def create_ride():
         cost=data.get('cost'),
         stop_latitude=data['stop_latitude'],
         stop_longitude=data['stop_longitude'],
+        stop_address=data.get('stop_address'),
         start_time=data.get('start_time'),
         total_seats=data.get('total_seats'),
         description=data.get('description'),
