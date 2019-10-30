@@ -7,7 +7,7 @@ from utils.exceptions import InvalidData, ResponseExamples
 from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all, \
     format_time
 from app import db
-from utils.ride_matcher import _find_best_rides
+from utils.ride_matcher import _find_best_rides, _get_user_info
 from datetime import datetime
 
 api = Blueprint('api', __name__)
@@ -117,11 +117,9 @@ def get_user_info():
 def get_all_rides():
     rides = db.session.query(Ride).filter_by(is_available=True).all()
     ride_schema = RideSchema(many=True)
-    user_schema = UserSchema()
     response = ride_schema.dump(rides)
     for x in response:
-        user = db.session.query(User).filter_by(id=x['host_driver_id']).first()
-        x['host_driver_info'] = user_schema.dump(user)
+        x['host_driver_info'] = _get_user_info(x['host_driver_id'])
     # Форматируем время
     response = format_time(response)
     return jsonify(response), 200
@@ -305,4 +303,22 @@ def get_my_organization_members():
         error['value'] = current_user.id
         return jsonify(error), 403
     response = user_schema.dump(organization.users)
+    return jsonify(response), 200
+
+
+@api.route('/get_ride_info', methods=['GET'])
+@login_required
+def get_ride_info():
+    data = request.args
+    ride_schema = RideSchema()
+    id = data.get('ride_id')
+    try:
+        id = int(id)
+    except:
+        error = ResponseExamples.INVALID_RIDE_WITH_ID
+        error['value'] = id
+        return jsonify(error), 400
+    ride = db.session.query(Ride).filter_by(id=id).first()
+    response = ride_schema.dump(ride)
+    response['host_driver_info'] = _get_user_info(ride.host_driver_id)
     return jsonify(response), 200
