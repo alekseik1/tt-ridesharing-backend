@@ -71,6 +71,8 @@ class Organization(db.Model):
     name = db.Column(db.String(200))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+    address = db.Column(db.String(600))
+    description = db.Column(db.String(600))
     users = db.relationship('User', secondary=association_user_organization, backref='organizations')
 
 
