@@ -37,12 +37,6 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
 
-class UserSchema(ma.ModelSchema):
-    class Meta:
-        model = User
-        exclude = ['password_hash']
-
-
 class RegisterUserSchema(ma.ModelSchema):
     class Meta:
         model = User
@@ -79,6 +73,14 @@ class Organization(db.Model):
 class OrganizationSchema(ma.ModelSchema):
     class Meta:
         model = Organization
+
+
+class UserSchema(ma.ModelSchema):
+    class Meta:
+        model = User
+        include_fk = True
+        exclude = ['password_hash']
+    organizations = fields.Nested(OrganizationSchema, many=True)
 
 
 class Ride(db.Model):

@@ -103,12 +103,8 @@ def logout():
 @api.route('/get_user_info', methods=['GET'])
 @login_required
 def get_user_info():
-    response = ResponseExamples.USER_INFO
-    response['user_id'] = current_user.id
-    response['first_name'] = current_user.first_name
-    response['last_name'] = current_user.last_name
-    response['email'] = current_user.email
-    response['photo_url'] = current_user.photo
+    user_schema = UserSchema()
+    response = user_schema.dump(current_user)
     return jsonify(response), 200
 
 
