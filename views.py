@@ -188,7 +188,15 @@ def join_ride():
         error = ResponseExamples.INVALID_RIDE_WITH_ID
         error['value'] = ride_id
         return jsonify(error), 400
-    # 3. Пользователь не хост поездки и не состоит в поездке
+    # 3. Пользователь уже в поездке
+    if current_user in ride.passengers:
+        error = ResponseExamples.ERROR_ALREADY_IN_RIDE
+        error['value'] = current_user.id
+        return jsonify(error), 400
+    if current_user.id == ride.host_driver_id:
+        error = ResponseExamples.ERROR_IS_RIDE_HOST
+        error['value'] = current_user.id
+        return jsonify(error), 400
     # 4. Вроде, все ок. Можно добавлять в поездку
     ride.passengers.append(current_user)
     # Если все места заняты, то сделать поездку недоступной
