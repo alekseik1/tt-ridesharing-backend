@@ -188,6 +188,7 @@ def join_ride():
         error = ResponseExamples.INVALID_RIDE_WITH_ID
         error['value'] = ride_id
         return jsonify(error), 400
+    # 3. Пользователь не хост поездки и не состоит в поездке
     # 4. Вроде, все ок. Можно добавлять в поездку
     ride.passengers.append(current_user)
     # Если все места заняты, то сделать поездку недоступной
@@ -322,4 +323,5 @@ def get_ride_info():
     response = ride_schema.dump(ride)
     response = format_time([response])[0]
     response['host_driver_info'] = _get_user_info(ride.host_driver_id)
+    response['seats_available'] = ride.total_seats - len(ride.passengers)
     return jsonify(response), 200
