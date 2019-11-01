@@ -44,13 +44,14 @@ class RideSchema(ma.ModelSchema):
 class OrganizationSchema(ma.ModelSchema):
     class Meta:
         model = Organization
+        exclude = ['is_start_for']
 
 
 class UserSchema(ma.ModelSchema):
     class Meta:
         model = User
         include_fk = True
-        exclude = ['password_hash']
+        exclude = ['password_hash', 'all_rides']
     organizations = fields.Nested(OrganizationSchema, many=True)
 
 
