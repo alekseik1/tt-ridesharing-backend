@@ -329,3 +329,21 @@ def get_ride_info():
     response['host_driver_info'] = _get_user_info(ride.host_driver_id)
     response['seats_available'] = ride.total_seats - len(ride.passengers)
     return jsonify(response), 200
+
+
+@api.route('/finish_ride', methods=['POST'])
+@login_required
+def finish_ride():
+    data = request.get_json()
+    ride_id = data.get('ride_id')
+    if not ride_id:
+        error = ResponseExamples.INVALID_RIDE_WITH_ID
+        error['value'] = ride_id
+        return jsonify(error), 400
+    ride = db.session.query(Ride).filter_by(id=ride_id).first()
+    # is_finished -- только для того, чтобы отделить историю
+    ride.is_finished = True
+    # is_available -- более общий флаг. По нему и стоит судить, доступна ли поездка.
+    ride.is_available = False
+    db.session.commit()
+    return jsonify(ride.id), 200
