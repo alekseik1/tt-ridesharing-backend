@@ -1,5 +1,6 @@
 from app import db
-from model import Ride, RideSchema, UserSchema, User
+from model import Ride, User
+from main_app.schemas import RideSchema, UserSchema
 import operator
 from geopy.distance import great_circle
 from utils.misc import format_time

@@ -1,7 +1,6 @@
-from app import db, ma, login
+from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from marshmallow import fields, validates, ValidationError
 
 MAX_NAME_LENGTH = 40
 MAX_SURNAME_LENGTH = 40
@@ -37,27 +36,10 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
 
-class RegisterUserSchema(ma.ModelSchema):
-    class Meta:
-        model = User
-    password = fields.String(required=True)
-
-
 class Driver(db.Model):
     id = db.Column(db.Integer, db.ForeignKey(User.__tablename__ + '.id'), primary_key=True)
     driver_license_1 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
     driver_license_2 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
-
-
-class RegisterDriverSchema(ma.ModelSchema):
-    user_id = fields.Integer(required=True)
-    license_1 = fields.String(required=True)
-    license_2 = fields.String(required=True)
-
-
-class DriverSchema(ma.ModelSchema):
-    class Meta:
-        model = Driver
 
 
 class Organization(db.Model):
@@ -68,19 +50,6 @@ class Organization(db.Model):
     address = db.Column(db.String(600))
     description = db.Column(db.String(600))
     users = db.relationship('User', secondary=association_user_organization, backref='organizations')
-
-
-class OrganizationSchema(ma.ModelSchema):
-    class Meta:
-        model = Organization
-
-
-class UserSchema(ma.ModelSchema):
-    class Meta:
-        model = User
-        include_fk = True
-        exclude = ['password_hash']
-    organizations = fields.Nested(OrganizationSchema, many=True)
 
 
 class Ride(db.Model):
@@ -101,40 +70,3 @@ class Ride(db.Model):
     passengers = db.relationship('User', secondary=association_user_ride, backref='all_rides')
     cost = db.Column(db.Float)
     description = db.Column(db.String(600))
-
-
-class RideSchema(ma.ModelSchema):
-    class Meta:
-        model = Ride
-        include_fk = True
-
-
-class JoinRideSchema(ma.ModelSchema):
-    ride_id = fields.Integer(required=True)
-
-
-class CreateRideSchema(ma.ModelSchema):
-    start_organization_id = fields.Integer(required=True)
-    stop_latitude = fields.Float(required=True)
-    stop_longitude = fields.Float(required=True)
-    stop_address = fields.String(required=False)
-    start_time = fields.String(required=True)
-    description = fields.String(required=False)
-    total_seats = fields.Integer(required=True)
-    cost = fields.Float(required=False)
-
-    @validates('start_time')
-    def is_not_empty(self, value):
-        if len(value) == 0:
-            raise ValidationError('Should not be empty string')
-
-
-class FindBestRidesSchema(ma.ModelSchema):
-    start_date = fields.DateTime(required=False)
-    start_organization_id = fields.Integer(required=True)
-    destination_latitude = fields.Integer(required=True)
-    destination_longitude = fields.Integer(required=True)
-
-
-class OrganizationIDSchema(ma.ModelSchema):
-    organization_id = fields.Integer(required=True)
