@@ -1,7 +1,8 @@
-from utils.misc import generate_random_person
+from flask_testing import TestCase
+
 from app import db, create_app
 from main_app.model import User, Driver
-from flask_testing import TestCase
+from utils.misc import generate_random_person
 
 
 class ModelTest(TestCase):

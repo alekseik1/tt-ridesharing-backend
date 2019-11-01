@@ -1,14 +1,15 @@
+import logging
+
 from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_marshmallow import Marshmallow
+from flask_cors import CORS
 from flask_login import LoginManager
+from flask_marshmallow import Marshmallow
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.exceptions import Unauthorized
+
 from instance.config import configs
 from utils.exceptions import ResponseExamples
-from werkzeug.exceptions import Unauthorized
-import logging
-from flask_cors import CORS
-
 
 db = SQLAlchemy()
 migrate = Migrate()

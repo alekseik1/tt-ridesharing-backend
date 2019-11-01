@@ -1,13 +1,14 @@
 from flask import request, url_for, redirect, Blueprint, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
+from sqlalchemy.exc import IntegrityError
+
+from app import db
 from main_app.model import User, Driver, Ride, Organization
 from main_app.schemas import FindBestRidesSchema, OrganizationIDSchema, CreateRideSchema, JoinRideSchema, RideSchema, \
     UserSchema, OrganizationSchema, RegisterDriverSchema, RegisterUserSchema
-from sqlalchemy.exc import IntegrityError
 from utils.exceptions import ResponseExamples
 from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all, \
     format_time
-from app import db
 from utils.ride_matcher import _find_best_rides, _get_user_info
 
 api = Blueprint('api', __name__)

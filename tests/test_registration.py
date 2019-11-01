@@ -1,10 +1,12 @@
-from flask_testing import TestCase
-from app import create_app, db
-from flask import url_for
-from utils.misc import generate_random_person
-from utils.exceptions import ResponseExamples
-from main_app.model import User, Driver
 import unittest
+
+from flask import url_for
+from flask_testing import TestCase
+
+from app import create_app, db
+from main_app.model import User, Driver
+from utils.exceptions import ResponseExamples
+from utils.misc import generate_random_person
 
 
 class RegisterUserTests(TestCase):

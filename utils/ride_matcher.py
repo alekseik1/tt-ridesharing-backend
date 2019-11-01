@@ -1,8 +1,10 @@
+import operator
+
+from geopy.distance import great_circle
+
 from app import db
 from main_app.model import Ride, User
 from main_app.schemas import RideSchema, UserSchema
-import operator
-from geopy.distance import great_circle
 from utils.misc import format_time
 
 

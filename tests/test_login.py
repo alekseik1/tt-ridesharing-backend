@@ -1,9 +1,10 @@
 from flask import url_for
 from flask_testing import TestCase
-from main_app.model import User
-from utils.misc import generate_random_person
+
 from app import db, create_app
+from main_app.model import User
 from utils.exceptions import ResponseExamples
+from utils.misc import generate_random_person
 
 
 class LoginTests(TestCase):

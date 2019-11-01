@@ -1,5 +1,6 @@
-from app import create_app
 from flask_migrate import MigrateCommand, Manager
+
+from app import create_app
 
 manager = Manager(create_app)
 manager.add_option('-c', '--config', dest='config_name', required=True)

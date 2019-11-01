@@ -1,9 +1,11 @@
-from flask_testing import TestCase
-from app import create_app, db
-from flask import url_for
-from utils.exceptions import ResponseExamples
-from main_app.model import User
 import unittest
+
+from flask import url_for
+from flask_testing import TestCase
+
+from app import create_app, db
+from main_app.model import User
+from utils.exceptions import ResponseExamples
 
 
 class BaseTest(TestCase):

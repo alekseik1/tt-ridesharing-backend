@@ -1,8 +1,10 @@
-from mimesis import Person
-from main_app.model import User
-from flask import jsonify
-from utils.exceptions import ResponseExamples
 from datetime import datetime
+
+from flask import jsonify
+from mimesis import Person
+
+from main_app.model import User
+from utils.exceptions import ResponseExamples
 
 
 def generate_random_person(locale='ru'):
