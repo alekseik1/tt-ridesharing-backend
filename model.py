@@ -97,6 +97,7 @@ class Ride(db.Model):
     estimated_time = db.Column(db.Time)
     is_available = db.Column(db.Boolean, nullable=False, default=True)
     is_finished = db.Column(db.Boolean, server_default='false', nullable=False, default=False)
+    # TODO: Возможно, пользователю не обязательно иметь поле `all_rides`. Тем более, что поездки еще арихвируются
     passengers = db.relationship('User', secondary=association_user_ride, backref='all_rides')
     cost = db.Column(db.Float)
     description = db.Column(db.String(600))
