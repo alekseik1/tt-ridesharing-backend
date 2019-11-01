@@ -34,3 +34,10 @@ class SwaggerResponses:
     @staticmethod
     def some_params_are_invalid(params):
         return {'name': 'Some of required fields are invalid', 'value': params}
+
+
+def build_error(error_dict, value=None):
+    result = error_dict
+    if value:
+        result['value'] = value
+    return result

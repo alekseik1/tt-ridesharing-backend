@@ -6,7 +6,7 @@ from app import db
 from main_app.model import User
 from main_app.schemas import RegisterUserSchema
 from main_app.views import api
-from main_app.responses import SwaggerResponses
+from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, validate_all
 
 
@@ -14,7 +14,7 @@ from main_app.controller import validate_params_with_schema, validate_all
 def logout():
     # Check if current user is authenticated
     if not current_user.is_authenticated:
-        error = SwaggerResponses.AUTHORIZATION_REQUIRED
+        error = build_error(SwaggerResponses.AUTHORIZATION_REQUIRED)
         return jsonify(error), 400
     logout_user()
     return '', 200
@@ -24,7 +24,7 @@ def logout():
 def login():
     # Check if current user is authenticated
     if current_user.is_authenticated:
-        error = SwaggerResponses.ALREADY_LOGGED_IN
+        error = build_error(SwaggerResponses.ALREADY_LOGGED_IN)
         return jsonify(error), 400
     data = request.get_json()
     login = data.get('login')
@@ -32,7 +32,7 @@ def login():
     # We login only via email for now
     user = User.query.filter_by(email=login).first()
     if user is None or not user.check_password(password):
-        error = SwaggerResponses.INCORRECT_LOGIN
+        error = build_error(SwaggerResponses.INCORRECT_LOGIN)
         return jsonify(error), 400
     login_user(user, remember=True)
     response = SwaggerResponses.USER_ID
@@ -52,7 +52,6 @@ def register_user():
     try:
         db.session.commit()
     except IntegrityError as e:
-        error = SwaggerResponses.EMAIL_IS_BUSY
-        error['value'] = data['email']
+        error = build_error(SwaggerResponses.EMAIL_IS_BUSY, data['email'])
         return jsonify(error), 400
     return jsonify(user_id=user.id)

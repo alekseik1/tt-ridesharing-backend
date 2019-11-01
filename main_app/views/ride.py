@@ -8,7 +8,7 @@ from app import db
 from main_app.model import Ride, Driver, Organization
 from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema
 from main_app.views import api
-from main_app.responses import SwaggerResponses
+from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, format_time, validate_all
 from main_app.views.user import _get_user_info
 
@@ -39,14 +39,12 @@ def create_ride():
     user_id = current_user.id
     # 2. Пользователь должен быть водителем
     if not db.session.query(Driver).filter_by(id=user_id).first():
-        error = SwaggerResponses.IS_NOT_DRIVER
-        error['value'] = user_id
+        error = build_error(SwaggerResponses.IS_NOT_DRIVER, user_id)
         return jsonify(error), 401
     # 3. Организация должна существовать
     organization = db.session.query(Organization).filter_by(id=data['start_organization_id']).first()
     if not organization:
-        error = SwaggerResponses.INVALID_ORGANIZATION_ID
-        error['value'] = data['start_organization_id']
+        error = build_error(SwaggerResponses.INVALID_ORGANIZATION_ID, data['start_organization_id'])
         return jsonify(error), 400
     ride = Ride(
         start_organization_id=organization.id,
@@ -79,22 +77,19 @@ def join_ride():
     # Поездка должна существовать
     ride = db.session.query(Ride).filter_by(id=ride_id).first()
     if not ride or not ride.is_available:
-        error = SwaggerResponses.INVALID_RIDE_WITH_ID
-        error['value'] = ride_id
+        error = build_error(SwaggerResponses.INVALID_RIDE_WITH_ID, ride_id)
         return jsonify(error), 400
     # Поездка должна быть доступна
     if not ride.is_available:
-        error = SwaggerResponses.ERROR_RIDE_UNAVAILABLE
-        error['value'] = ride_id
+        error = build_error(SwaggerResponses.ERROR_RIDE_UNAVAILABLE, ride_id)
+        return jsonify(error), 400
     # Пользователь не должен быть уже в поездке
     if current_user in ride.passengers:
-        error = SwaggerResponses.ERROR_ALREADY_IN_RIDE
-        error['value'] = current_user.id
+        error = build_error(SwaggerResponses.ERROR_ALREADY_IN_RIDE, current_user.id)
         return jsonify(error), 400
     # Пользователь не должен быть хостом поездки
     if current_user.id == ride.host_driver_id:
-        error = SwaggerResponses.ERROR_IS_RIDE_HOST
-        error['value'] = current_user.id
+        error = build_error(SwaggerResponses.ERROR_IS_RIDE_HOST, current_user.id)
         return jsonify(error), 400
     # Вроде, все ок. Можно добавлять в поездку
     ride.passengers.append(current_user)
@@ -135,12 +130,13 @@ def get_ride_info():
     try:
         id = int(id)
     except:
-        error = SwaggerResponses.INVALID_RIDE_WITH_ID
-        error['value'] = id
+        error = build_error(SwaggerResponses.INVALID_RIDE_WITH_ID, id)
         return jsonify(error), 400
     ride = db.session.query(Ride).filter_by(id=id).first()
     response = ride_schema.dump(ride)
     response = format_time([response])[0]
+    # Дополнительные поля, не вошедшие в схему
+    # TODO: мб как-то дополнить схему?
     response['host_driver_info'] = _get_user_info(ride.host_driver_id)
     response['seats_available'] = ride.total_seats - len(ride.passengers)
     return jsonify(response), 200
@@ -152,8 +148,7 @@ def finish_ride():
     data = request.get_json()
     ride_id = data.get('ride_id')
     if not ride_id:
-        error = SwaggerResponses.INVALID_RIDE_WITH_ID
-        error['value'] = ride_id
+        error = build_error(SwaggerResponses.INVALID_RIDE_WITH_ID, ride_id)
         return jsonify(error), 400
     ride = db.session.query(Ride).filter_by(id=ride_id).first()
     # is_finished -- только для того, чтобы отделить историю
@@ -170,16 +165,14 @@ def leave_ride():
     data = request.get_json()
     ride_id = data.get('ride_id')
     if not ride_id:
-        error = SwaggerResponses.INVALID_RIDE_WITH_ID
-        error['value'] = ride_id
+        error = build_error(SwaggerResponses.INVALID_RIDE_WITH_ID, ride_id)
         return jsonify(error), 400
     # Мы сразу отбираем те поездки, которые не закончены
     ride = db.session.query(Ride).filter_by(id=ride_id).\
         filter_by(is_finished=False).first()
     # Если никаких таких поездок не нашлось
     if not ride:
-        error = SwaggerResponses.INVALID_RIDE_WITH_ID
-        error['value'] = ride_id
+        error = build_error(SwaggerResponses.INVALID_RIDE_WITH_ID, ride_id)
         return jsonify(error), 400
     # Иначе, убираем пользователя из поездки
     ride.passengers.remove(current_user)
