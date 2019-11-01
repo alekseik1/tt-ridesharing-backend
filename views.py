@@ -1,7 +1,8 @@
 from flask import request, url_for, redirect, flash, Blueprint, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from model import RegisterUserSchema, User, RegisterDriverSchema, Driver, Ride, Organization, \
-    OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema, OrganizationIDSchema, RideSchema
+    OrganizationSchema, UserSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema, OrganizationIDSchema, RideSchema, \
+    association_user_ride
 from sqlalchemy.exc import IntegrityError
 from utils.exceptions import InvalidData, ResponseExamples
 from utils.misc import validate_is_in_db, validate_params_with_schema, validate_is_authorized_with_id, validate_all, \
@@ -377,4 +378,12 @@ def leave_ride():
     ride.is_available = True
     db.session.commit()
     response = ResponseExamples.RIDE_ID
+    return jsonify(response), 200
+
+
+@api.route('/get_my_rides', methods=['GET'])
+@login_required
+def get_my_rides():
+    ride_schema = RideSchema(many=True)
+    response = ride_schema.dump(current_user.all_rides)
     return jsonify(response), 200
