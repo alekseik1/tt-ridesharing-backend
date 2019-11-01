@@ -5,7 +5,6 @@ from app import db
 from main_app.model import Driver
 from main_app.schemas import RegisterDriverSchema
 from main_app.views import api
-from main_app.responses import SwaggerResponses
 from main_app.controller import validate_params_with_schema, validate_is_in_db, validate_is_authorized_with_id, \
     validate_all
 
@@ -28,10 +27,5 @@ def register_driver():
         driver_license_2=data['license_2']
     )
     db.session.add(driver)
-    try:
-        db.session.commit()
-    except Exception as e:
-        error = SwaggerResponses.UNHANDLED_ERROR
-        error['value'] = e.args
-        return jsonify(error), 400
-    return jsonify(user_id=driver.id)
+    db.session.commit()
+    return jsonify(user_id=driver.id), 200
