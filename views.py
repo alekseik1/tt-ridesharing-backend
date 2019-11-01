@@ -173,27 +173,32 @@ def get_all_organizations():
 @login_required
 def join_ride():
     data = request.get_json()
-    # 1. Валидация параметров
+    # Валидация параметров
     errors = validate_all([validate_params_with_schema(JoinRideSchema(), data)])
     if errors:
         return errors
     ride_id = data['ride_id']
-    # 2. Поездка должна существовать
+    # Поездка должна существовать
     ride = db.session.query(Ride).filter_by(id=ride_id).first()
     if not ride or not ride.is_available:
         error = ResponseExamples.INVALID_RIDE_WITH_ID
         error['value'] = ride_id
         return jsonify(error), 400
-    # 3. Пользователь уже в поездке
+    # Поездка должна быть доступна
+    if not ride.is_available:
+        error = ResponseExamples.ERROR_RIDE_UNAVAILABLE
+        error['value'] = ride_id
+    # Пользователь не должен быть уже в поездке
     if current_user in ride.passengers:
         error = ResponseExamples.ERROR_ALREADY_IN_RIDE
         error['value'] = current_user.id
         return jsonify(error), 400
+    # Пользователь не должен быть хостом поездки
     if current_user.id == ride.host_driver_id:
         error = ResponseExamples.ERROR_IS_RIDE_HOST
         error['value'] = current_user.id
         return jsonify(error), 400
-    # 4. Вроде, все ок. Можно добавлять в поездку
+    # Вроде, все ок. Можно добавлять в поездку
     ride.passengers.append(current_user)
     # Если все места заняты, то сделать поездку недоступной
     if ride.total_seats == len(ride.passengers):
