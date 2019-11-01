@@ -352,3 +352,29 @@ def finish_ride():
     ride.is_available = False
     db.session.commit()
     return jsonify(ride.id), 200
+
+
+@api.route('/leave_ride', methods=['POST'])
+@login_required
+def leave_ride():
+    data = request.get_json()
+    ride_id = data.get('ride_id')
+    if not ride_id:
+        error = ResponseExamples.INVALID_RIDE_WITH_ID
+        error['value'] = ride_id
+        return jsonify(error), 400
+    # Мы сразу отбираем те поездки, которые не закончены
+    ride = db.session.query(Ride).filter_by(id=ride_id).\
+        filter_by(is_finished=False).first()
+    # Если никаких таких поездок не нашлось
+    if not ride:
+        error = ResponseExamples.INVALID_RIDE_WITH_ID
+        error['value'] = ride_id
+        return jsonify(error), 400
+    # Иначе, убираем пользователя из поездки
+    ride.passengers.remove(current_user)
+    # Обновим поездку
+    ride.is_available = True
+    db.session.commit()
+    response = ResponseExamples.RIDE_ID
+    return jsonify(response), 200
