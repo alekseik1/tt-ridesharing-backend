@@ -6,7 +6,6 @@ from flask_login import LoginManager
 from instance.config import configs
 from utils.exceptions import ResponseExamples
 from werkzeug.exceptions import Unauthorized
-from utils.exceptions import InvalidData
 import logging
 from flask_cors import CORS
 
@@ -34,10 +33,10 @@ def create_app(config_name):
     CORS(app, supports_credentials=True)
     login.init_app(app)
     # register all Blueprints
-    from views import api
+    from main_app.views import api
     app.register_blueprint(api)
 
-    from model import User
+    from main_app.model import User
     @login.user_loader
     def load_user(id):
         user = User.query.get(int(id))

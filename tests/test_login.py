@@ -1,6 +1,6 @@
 from flask import url_for
 from flask_testing import TestCase
-from model import User
+from main_app.model import User
 from utils.misc import generate_random_person
 from app import db, create_app
 from utils.exceptions import ResponseExamples
@@ -25,7 +25,7 @@ class LoginTests(TestCase):
         db.session.close()
         db.drop_all()
         db.create_all()
-        from views import login
+        from main_app.views import login
         self.url = url_for('.'+login.__name__)
         self.email, self.password = self._add_user_with_password('1234')
 

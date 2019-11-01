@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 
 from app import db
-from model import Driver, Organization, Ride
+from main_app.model import Driver, Organization, Ride
 from main_app.schemas import OrganizationSchema
 from tests.test_get_info import BaseTest
 from utils.exceptions import ResponseExamples

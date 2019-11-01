@@ -1,7 +1,7 @@
 from marshmallow import fields, validates, ValidationError
 
 from app import ma
-from model import Ride, User, Organization, Driver
+from main_app.model import Ride, User, Organization, Driver
 
 
 class FindBestRidesSchema(ma.ModelSchema):

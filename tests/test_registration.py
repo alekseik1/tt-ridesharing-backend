@@ -1,9 +1,9 @@
 from flask_testing import TestCase
 from app import create_app, db
-from flask import url_for, jsonify
+from flask import url_for
 from utils.misc import generate_random_person
 from utils.exceptions import ResponseExamples
-from model import User, Driver
+from main_app.model import User, Driver
 import unittest
 
 
@@ -17,7 +17,7 @@ class RegisterUserTests(TestCase):
         db.session.close()
         db.drop_all()
         db.create_all()
-        from views import register_user
+        from main_app.views import register_user
         self.url = url_for('.'+register_user.__name__)
 
     def test_incorrect_register_error_details(self):
@@ -112,7 +112,7 @@ class RegisterDriverTests(TestCase):
         db.session.close()
         db.drop_all()
         db.create_all()
-        from views import register_driver, login
+        from main_app.views import register_driver, login
         self.url = url_for('.'+register_driver.__name__)
         self.login_url = url_for('.'+login.__name__)
         self.correct_data = {

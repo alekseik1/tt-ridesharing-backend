@@ -2,7 +2,7 @@ from flask_testing import TestCase
 from app import create_app, db
 from flask import url_for
 from utils.exceptions import ResponseExamples
-from model import User
+from main_app.model import User
 import unittest
 
 
@@ -17,7 +17,7 @@ class BaseTest(TestCase):
         db.drop_all()
         db.create_all()
 
-        from views import get_user_info, login, logout, get_all_rides, get_all_organizations, join_ride
+        from main_app.views import get_user_info, login, logout, get_all_rides, get_all_organizations, join_ride
         self.get_user_data_url = url_for('.' + get_user_info.__name__)
         self.get_all_rides_url = url_for('.' + get_all_rides.__name__)
         self.get_all_organizations_url = url_for('.' + get_all_organizations.__name__)

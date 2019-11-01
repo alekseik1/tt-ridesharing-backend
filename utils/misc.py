@@ -1,5 +1,5 @@
 from mimesis import Person
-from model import User
+from main_app.model import User
 from flask import jsonify
 from utils.exceptions import ResponseExamples
 from datetime import datetime

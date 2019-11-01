@@ -1,6 +1,6 @@
 from utils.misc import generate_random_person
 from app import db, create_app
-from model import User, Driver
+from main_app.model import User, Driver
 from flask_testing import TestCase
 
 
