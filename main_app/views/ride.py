@@ -1,5 +1,8 @@
+import operator
+
 from flask import jsonify, request
 from flask_login import login_required, current_user
+from geopy.distance import great_circle
 
 from app import db
 from main_app.model import Ride, Driver, Organization
@@ -7,7 +10,7 @@ from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, FindB
 from main_app.views import api
 from utils.exceptions import ResponseExamples
 from utils.misc import format_time, validate_all, validate_params_with_schema
-from utils.ride_matcher import _get_user_info, _find_best_rides
+from main_app.views.user import _get_user_info
 
 
 @api.route('/get_all_rides', methods=['GET'])
@@ -193,3 +196,27 @@ def get_my_rides():
     ride_schema = RideSchema(many=True)
     response = ride_schema.dump(current_user.all_rides)
     return jsonify(response), 200
+
+
+# TODO: for now, `organizations` is ignored
+# TODO: Optimization! Don't take all rides, use more filters
+def _find_best_rides(start_organization_id, destination_gps):
+    # Get all rides starting from exact organization and are available
+    ride_schema = RideSchema()
+    all_rides = db.session.query(Ride)\
+        .filter_by(start_organization_id=start_organization_id)\
+        .filter_by(is_available=True).all()
+    # For each ride, find distance to `gps`
+    # We make top based on  destination point
+    result_top = []
+    for ride in all_rides:
+        distance = great_circle(
+            (ride.stop_latitude, ride.stop_longitude),
+            destination_gps
+        ).kilometers
+        ride_info = ride_schema.dump(ride)
+        ride_info['host_driver_info'] = _get_user_info(ride.host_driver_id)
+        ride_info = format_time([ride_info])[0]
+        result_top.append((ride_info, distance))
+    result_top.sort(key=operator.itemgetter(1))
+    return result_top
