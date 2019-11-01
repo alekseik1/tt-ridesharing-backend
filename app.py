@@ -35,6 +35,7 @@ def create_app(config_name):
     login.init_app(app)
     # register all Blueprints
     from main_app.views import api
+    from main_app.views import auth, driver, organization, ride, user
     app.register_blueprint(api)
 
     from main_app.model import User
