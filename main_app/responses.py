@@ -1,4 +1,4 @@
-class ResponseExamples:
+class SwaggerResponses:
 
     INCORRECT_LOGIN = {'name': 'Invalid login or password', 'value': ''}
     INVALID_ORGANIZATION_ID = {'name': 'Invalid organization with id', 'value': ''}
@@ -34,19 +34,3 @@ class ResponseExamples:
     @staticmethod
     def some_params_are_invalid(params):
         return {'name': 'Some of required fields are invalid', 'value': params}
-
-
-class InvalidData(Exception):
-    status_code = 400
-
-    def __init__(self, message, status_code=None, payload=None):
-        Exception.__init__(self)
-        self.message = message
-        if status_code is not None:
-            self.status_code = status_code
-        self.payload = payload
-
-    def to_dict(self):
-        rv = dict(self.payload or ())
-        rv['message'] = self.message
-        return rv

@@ -5,8 +5,9 @@ from app import db
 from main_app.model import Driver
 from main_app.schemas import RegisterDriverSchema
 from main_app.views import api
-from utils.exceptions import ResponseExamples
-from utils.misc import validate_all, validate_params_with_schema, validate_is_in_db, validate_is_authorized_with_id
+from main_app.responses import SwaggerResponses
+from main_app.controller import validate_params_with_schema, validate_is_in_db, validate_is_authorized_with_id, \
+    validate_all
 
 
 @api.route('/register_driver', methods=['POST'])
@@ -30,7 +31,7 @@ def register_driver():
     try:
         db.session.commit()
     except Exception as e:
-        error = ResponseExamples.UNHANDLED_ERROR
+        error = SwaggerResponses.UNHANDLED_ERROR
         error['value'] = e.args
         return jsonify(error), 400
     return jsonify(user_id=driver.id)

@@ -5,8 +5,8 @@ from app import db
 from main_app.model import Organization
 from main_app.schemas import OrganizationIDSchema, UserSchema, OrganizationSchema
 from main_app.views import api, MAX_ORGANIZATIONS_PER_USER
-from utils.exceptions import ResponseExamples
-from utils.misc import validate_all, validate_params_with_schema
+from main_app.responses import SwaggerResponses
+from main_app.controller import validate_params_with_schema, validate_all
 
 
 @api.route('/leave_organization', methods=['POST'])
@@ -24,16 +24,16 @@ def leave_organization():
     organization_id = data['organization_id']
     organization_to_leave = db.session.query(Organization).filter_by(id=organization_id).first()
     if not organization_to_leave:
-        error = ResponseExamples.INVALID_ORGANIZATION_ID
+        error = SwaggerResponses.INVALID_ORGANIZATION_ID
         error['value'] = organization_id
         return jsonify(organization_id), 400
     if organization_to_leave not in current_user.organizations:
-        error = ResponseExamples.ERROR_NOT_IN_ORGANIZATION
+        error = SwaggerResponses.ERROR_NOT_IN_ORGANIZATION
         error['value'] = organization_id
         return jsonify(error), 400
     current_user.organizations.remove(organization_to_leave)
     db.session.commit()
-    response = ResponseExamples.ORGANIZATION_ID
+    response = SwaggerResponses.ORGANIZATION_ID
     response['value'] = organization_id
     return jsonify(response), 200
 
@@ -51,18 +51,18 @@ def join_organization():
     if errors:
         return errors
     if len(current_user.organizations) >= MAX_ORGANIZATIONS_PER_USER:
-        error = ResponseExamples.ORGANIZATION_LIMIT
+        error = SwaggerResponses.ORGANIZATION_LIMIT
         return jsonify(error), 400
     data_organization_id = data['organization_id']
     organization = db.session.query(Organization).filter_by(id=data_organization_id).first()
     if not organization:
-        error = ResponseExamples.INVALID_ORGANIZATION_ID
+        error = SwaggerResponses.INVALID_ORGANIZATION_ID
         error['value'] = data_organization_id
         return jsonify(error), 400
     current_user.organizations.append(organization)
     db.session.commit()
     # TODO: сделать его
-    response = ResponseExamples.ORGANIZATION_ID
+    response = SwaggerResponses.ORGANIZATION_ID
     response['organization_id'] = organization.id
     return jsonify(response), 200
 
@@ -76,12 +76,12 @@ def get_my_organization_members():
     try:
         id = int(id)
     except:
-        error = ResponseExamples.INVALID_ORGANIZATION_ID
+        error = SwaggerResponses.INVALID_ORGANIZATION_ID
         error['value'] = id
         return jsonify(error), 400
     organization = db.session.query(Organization).filter_by(id=id).first()
     if organization not in current_user.organizations:
-        error = ResponseExamples.NO_PERMISSION_FOR_USER
+        error = SwaggerResponses.NO_PERMISSION_FOR_USER
         error['value'] = current_user.id
         return jsonify(error), 403
     response = user_schema.dump(organization.users)

@@ -5,7 +5,7 @@ from flask_testing import TestCase
 
 from app import create_app, db
 from main_app.model import User
-from utils.exceptions import ResponseExamples
+from main_app.responses import SwaggerResponses
 
 
 class BaseTest(TestCase):
@@ -47,7 +47,7 @@ class GetUserDataTests(BaseTest):
             self.assert200(response)
         with self.subTest('correct data in response'):
             # TODO: validation via marshmallow lib
-            correct_response = ResponseExamples.USER_INFO
+            correct_response = SwaggerResponses.USER_INFO
             correct_response['user_id'] = self.user1.id
             correct_response['first_name'] = self.user1.first_name
             correct_response['last_name'] = self.user1.last_name
@@ -62,7 +62,7 @@ class GetUserDataTests(BaseTest):
         with self.subTest('correct status code'):
             self.assert401(response)
         with self.subTest('correct error message'):
-            self.assertEqual(ResponseExamples.AUTHORIZATION_REQUIRED, response.get_json())
+            self.assertEqual(SwaggerResponses.AUTHORIZATION_REQUIRED, response.get_json())
 
 
 if __name__ == '__main__':

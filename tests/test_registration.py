@@ -5,7 +5,7 @@ from flask_testing import TestCase
 
 from app import create_app, db
 from main_app.model import User, Driver
-from utils.exceptions import ResponseExamples
+from main_app.responses import SwaggerResponses
 from utils.misc import generate_random_person
 
 
@@ -37,7 +37,7 @@ class RegisterUserTests(TestCase):
             for p in params:
                 tmp.pop(p)
             response = self.client.post(self.url, json=tmp)
-            correct_response = ResponseExamples.some_params_are_invalid(params)
+            correct_response = SwaggerResponses.some_params_are_invalid(params)
             with self.subTest(f'status code: {params}'):
                 self.assert400(response)
             with self.subTest(f'correct error raised: {params}'):
@@ -70,7 +70,7 @@ class RegisterUserTests(TestCase):
         with self.subTest('User is added to database'):
             self.assertIsNotNone(user)
         with self.subTest('user_id is in response'):
-            correct_response = ResponseExamples.USER_ID
+            correct_response = SwaggerResponses.USER_ID
             correct_response['user_id'] = user.id
             self.assertEqual(result.get_json(), correct_response)
         with self.subTest("User's password, name and surname are correct"):
@@ -99,7 +99,7 @@ class RegisterUserTests(TestCase):
         with self.subTest('status code is 400'):
             self.assert400(result2)
         with self.subTest('correct error'):
-            correct_error = ResponseExamples.EMAIL_IS_BUSY
+            correct_error = SwaggerResponses.EMAIL_IS_BUSY
             correct_error['value'] = email
             self.assertEqual(correct_error, result2.get_json())
 
@@ -146,7 +146,7 @@ class RegisterDriverTests(TestCase):
             for p in params:
                 tmp.pop(p)
             response = self.client.post(self.url, json=tmp)
-            correct_response = ResponseExamples.some_params_are_invalid(params)
+            correct_response = SwaggerResponses.some_params_are_invalid(params)
             with self.subTest(f'status code: {params}'):
                 self.assert400(response)
             with self.subTest(f'correct error raised: {params}'):
@@ -172,7 +172,7 @@ class RegisterDriverTests(TestCase):
         with self.subTest('Return code is 400'):
             self.assert400(response)
         with self.subTest('Error message is correct'):
-            correct_error = ResponseExamples.INVALID_USER_WITH_ID
+            correct_error = SwaggerResponses.INVALID_USER_WITH_ID
             correct_error['value'] = invalid_id
             self.assertEqual(correct_error, response.get_json())
 
@@ -183,7 +183,7 @@ class RegisterDriverTests(TestCase):
         with self.subTest('Return code is 403'):
             self.assert403(response)
         with self.subTest('Error message is correct'):
-            correct_error = ResponseExamples.NO_PERMISSION_FOR_USER
+            correct_error = SwaggerResponses.NO_PERMISSION_FOR_USER
             correct_error['value'] = self.user2.id
             self.assertEqual(correct_error, response.get_json())
 
@@ -194,7 +194,7 @@ class RegisterDriverTests(TestCase):
         with self.subTest('correct status code'):
             self.assert200(response)
         with self.subTest('correct `user_id` in response'):
-            correct_response = ResponseExamples.USER_ID
+            correct_response = SwaggerResponses.USER_ID
             correct_response['user_id'] = self.user1.id
             self.assertEqual(correct_response, response.get_json())
         with self.subTest('user is added to `Driver` table with correct info'):

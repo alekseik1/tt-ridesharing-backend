@@ -3,7 +3,7 @@ from flask_testing import TestCase
 
 from app import db, create_app
 from main_app.model import User
-from utils.exceptions import ResponseExamples
+from main_app.responses import SwaggerResponses
 from utils.misc import generate_random_person
 
 
@@ -36,7 +36,7 @@ class LoginTests(TestCase):
             # Here we add extra char
             'password': self.password + '1'
         })
-        correct_answer = ResponseExamples.INCORRECT_LOGIN
+        correct_answer = SwaggerResponses.INCORRECT_LOGIN
         self.assert400(login_result)
         self.assertEqual(login_result.get_json(), correct_answer)
 
@@ -59,7 +59,7 @@ class LoginTests(TestCase):
             # True user ID
             user_id = db.session.query(User).filter(User.email == self.email).first().id
             # Form expected result
-            correct_answer = ResponseExamples.USER_ID
+            correct_answer = SwaggerResponses.USER_ID
             correct_answer['user_id'] = user_id
             self.assertEqual(login_result.get_json(), correct_answer)
 
@@ -75,4 +75,4 @@ class LoginTests(TestCase):
         with self.subTest('correct status code'):
             self.assert400(second_request)
         with self.subTest('correct error'):
-            self.assertEqual(ResponseExamples.ALREADY_LOGGED_IN, second_request.get_json())
+            self.assertEqual(SwaggerResponses.ALREADY_LOGGED_IN, second_request.get_json())

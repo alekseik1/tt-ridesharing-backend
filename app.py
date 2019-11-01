@@ -9,7 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import Unauthorized
 
 from instance.config import configs
-from utils.exceptions import ResponseExamples
+from main_app.responses import SwaggerResponses
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -34,8 +34,8 @@ def create_app(config_name):
     CORS(app, supports_credentials=True)
     login.init_app(app)
     # register all Blueprints
-    from main_app.views import api
     from main_app.views import auth, driver, organization, ride, user
+    from main_app.views import api
     app.register_blueprint(api)
 
     from main_app.model import User
@@ -54,7 +54,7 @@ def create_app(config_name):
 
     # TODO: make all views in `views.py` raise `Unauthorized` instead of handling it on their own
     def handle_unauthorized(error):
-        return ResponseExamples.AUTHORIZATION_REQUIRED, 401
+        return SwaggerResponses.AUTHORIZATION_REQUIRED, 401
 
     #app.register_error_handler(Exception, handle_uncaught_error)
     app.register_error_handler(Unauthorized, handle_unauthorized)
