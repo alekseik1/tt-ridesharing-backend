@@ -10,7 +10,7 @@ from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, FindB
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, format_time, validate_all
-from main_app.views.user import _get_user_info
+from main_app.views.user_and_driver import _get_user_info
 
 
 @api.route('/get_all_rides', methods=['GET'])
