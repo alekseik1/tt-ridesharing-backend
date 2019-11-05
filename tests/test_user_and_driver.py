@@ -15,7 +15,6 @@ class TestUserAndDriver(BaseTest):
         super().setUp()
         self.get_user_info_url = url_for(f'api.{get_user_info.__name__}')
         self.am_i_driver_url = url_for(f'api.{am_i_driver.__name__}')
-        self.register_driver_url = url_for(f'api.{register_driver.__name__}')
         self.user_schema = UserSchema()
 
     def test_get_user_info(self):
@@ -45,6 +44,15 @@ class TestUserAndDriver(BaseTest):
                     )
                     self.assertEqual(correct_response, response.get_json())
 
+
+class TestDriverMethods(BaseTest):
+
+    def setUp(self):
+        from main_app.views.user_and_driver import register_driver
+        super().setUp()
+        self.register_driver_url = url_for(f'api.{register_driver.__name__}')
+        self.user = self.single_users[0]
+
     def test_register_driver_correct_request(self):
         user = self.single_users[0]
         with self.login_as(user):
@@ -73,6 +81,28 @@ class TestUserAndDriver(BaseTest):
         correct_request = dict(id=user.id, license_1='l1', license_2='l2')
         with self.login_as(user):
             self.routine_invalid_parameters_for(self.register_driver_url, correct_request)
+
+
+class TestUserRegistration(BaseTest):
+
+    def setUp(self):
+        super().setUp()
+        from main_app.views.auth import register_user
+        self.register_user_url = url_for(f'api.{register_user.__name__}')
+        self.correct_request = dict(
+            first_name='Aleksei',
+            last_name='Testovksy',
+            email='a.testovsky@gmail.com',
+            password='12345'
+        )
+
+    def test_register_user_incorrect_parameters(self):
+        self.routine_invalid_parameters_for(self.register_user_url, self.correct_request)
+
+    def test_register_user_correct_request(self):
+        response = self.client.post(self.register_user_url, json=self.correct_request)
+        self.assert200(response)
+        self.assertIsNotNone(response.get_json().get('user_id'))
 
 
 if __name__ == '__main__':
