@@ -4,7 +4,7 @@ from flask_testing import TestCase
 from mimesis import Person, Address
 
 from app import create_app, db
-from main_app.model import User, Organization
+from main_app.model import User, Organization, Driver
 
 
 def add_users(number=2):
@@ -62,9 +62,29 @@ def add_users_to_organizations(users: list, organizations: list):
     """
     result = []
     for i, user in enumerate(users):
-        organization_for_user = organizations[i % len(organizations)]
+        # 1, 2 идут в 1 организацию, 3, 4 идут во второую орг. и зациклить по организациям
+        organization_for_user = organizations[i // 2 % len(organizations)]
         user.organizations.append(organization_for_user)
         result.append((user, organization_for_user))
+    db.session.commit()
+    return result
+
+
+def register_drivers(users_to_register: list):
+    """
+    Регает водителей на основе <User>
+    :param users_to_register: List <User>
+    :return: List <Driver>
+    """
+    result = []
+    for user in users_to_register:
+        driver = Driver(
+            id=user.id,
+            driver_license_1='',
+            driver_license_2='',
+        )
+        db.session.add(driver)
+        result.append(driver)
     db.session.commit()
     return result
 
@@ -83,6 +103,8 @@ class BaseTest(TestCase):
         self.users = add_users(number=10)
         self.organizations = add_organizations(number=2)
         self.user_organizations = add_users_to_organizations(self.users, self.organizations)
+        # Каждого второго сделаем водителем. У каждой организации как минимум 1 водитель и 1 пассажир
+        self.drivers = register_drivers(self.users[::2])
 
     @contextmanager
     def login_as(self, user):
