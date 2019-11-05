@@ -5,6 +5,7 @@ from mimesis import Person, Address
 
 from app import create_app, db
 from main_app.model import User, Organization, Driver
+from main_app.responses import SwaggerResponses
 
 
 def add_users(number=2):
@@ -105,6 +106,8 @@ class BaseTest(TestCase):
         self.user_organizations = add_users_to_organizations(self.users, self.organizations)
         # Каждого второго сделаем водителем. У каждой организации как минимум 1 водитель и 1 пассажир
         self.drivers = register_drivers(self.users[::2])
+        # Не-водители
+        self.single_users = self.users[1::2]
 
     @contextmanager
     def login_as(self, user):
@@ -118,3 +121,25 @@ class BaseTest(TestCase):
         yield user
         # Log out in the end
         self.client.post(url_for(f'api.{logout.__name__}'))
+
+    @staticmethod
+    def invalid_parameters_generator(correct_data):
+        from itertools import combinations
+        keys = list(correct_data.keys())
+        # Допускаем взять 1..N-1 ключей запроса
+        for i in range(1, len(keys)):
+            # Состовляем все возможные способы выкинуть i элементов
+            for keys_combo in combinations(keys, i):
+                # Возвращаем их
+                yield {key: correct_data[key] for key in keys_combo}
+
+    def routine_invalid_parameters_for(self, endpoint, correct_request):
+        for incorrect_request in self.invalid_parameters_generator(correct_request):
+            response = self.client.post(endpoint, json=incorrect_request)
+            removed_keys = sorted(list(set(correct_request.keys()) - set(incorrect_request.keys())))
+            with self.subTest(f'Removed {removed_keys}'):
+                self.assert400(response)
+                self.assertEqual(
+                    SwaggerResponses.some_params_are_invalid(removed_keys),
+                    response.get_json()
+                )

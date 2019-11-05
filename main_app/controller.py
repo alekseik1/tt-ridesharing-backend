@@ -9,7 +9,7 @@ from main_app.responses import SwaggerResponses
 def validate_params_with_schema(schema, data):
     errors = schema.validate(data)
     if errors:
-        error = SwaggerResponses.some_params_are_invalid(list(errors.keys()))
+        error = SwaggerResponses.some_params_are_invalid(sorted(list(errors.keys())))
         return jsonify(error), 400
     return None
 
