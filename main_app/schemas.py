@@ -61,7 +61,7 @@ class DriverSchema(ma.ModelSchema):
 
 
 class RegisterDriverSchema(ma.ModelSchema):
-    user_id = fields.Integer(required=True)
+    id = fields.Integer(required=True)
     license_1 = fields.String(required=True)
     license_2 = fields.String(required=True)
 

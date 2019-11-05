@@ -11,10 +11,11 @@ from tests import BaseTest
 class TestGetUserInfo(BaseTest):
 
     def setUp(self):
-        from main_app.views.user_and_driver import get_user_info, am_i_driver
+        from main_app.views.user_and_driver import get_user_info, am_i_driver, register_driver
         super().setUp()
         self.get_user_info_url = url_for(f'api.{get_user_info.__name__}')
         self.am_i_driver_url = url_for(f'api.{am_i_driver.__name__}')
+        self.register_driver_url = url_for(f'api.{register_driver.__name__}')
         self.user_schema = UserSchema()
 
     def test_get_user_info(self):
@@ -43,6 +44,20 @@ class TestGetUserInfo(BaseTest):
                         is_driver=db.session.query(Driver).filter_by(id=user.id).first() is not None
                     )
                     self.assertEqual(correct_response, response.get_json())
+
+    def test_register_driver(self):
+        # Try to register users[0] as driver
+        with self.subTest('With correct request'):
+            user = list(set(self.users) - set(self.drivers))[0]
+            with self.login_as(user):
+                response = self.client.post(self.register_driver_url, json=dict(
+                    id=user.id,
+                    license_1='license_1',
+                    license_2='license_2',
+                ))
+                self.assert200(response, message=response.get_json())
+                correct_response = dict(user_id=user.id)
+                self.assertEqual(correct_response, response.get_json())
 
 
 if __name__ == '__main__':

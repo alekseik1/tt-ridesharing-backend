@@ -36,7 +36,7 @@ def _get_user_info(user_id):
 @login_required
 def register_driver():
     data = request.get_json()
-    user_id = data.get('user_id')
+    user_id = data.get('id')
     errors = validate_all([
         validate_params_with_schema(RegisterDriverSchema(), data=data),
         validate_is_in_db(db, user_id),
