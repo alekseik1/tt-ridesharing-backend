@@ -39,8 +39,8 @@ class User(UserMixin, db.Model):
 
 class Driver(db.Model):
     id = db.Column(db.Integer, db.ForeignKey(User.__tablename__ + '.id'), primary_key=True)
-    driver_license_1 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
-    driver_license_2 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
+    license_1 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
+    license_2 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
 
 
 class Organization(db.Model):

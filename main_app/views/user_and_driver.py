@@ -37,18 +37,15 @@ def _get_user_info(user_id):
 def register_driver():
     data = request.get_json()
     user_id = data.get('id')
+    schema = RegisterDriverSchema()
     errors = validate_all([
-        validate_params_with_schema(RegisterDriverSchema(), data=data),
+        validate_params_with_schema(schema, data=data),
         validate_is_in_db(db, user_id),
         validate_is_authorized_with_id(user_id, current_user),
     ])
     if errors:
         return errors
-    driver = Driver(
-        id=int(user_id),
-        driver_license_1=data['license_1'],
-        driver_license_2=data['license_2']
-    )
+    driver = Driver(**schema.dump(data))
     db.session.add(driver)
     db.session.commit()
     return jsonify(user_id=driver.id), 200

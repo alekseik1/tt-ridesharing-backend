@@ -80,8 +80,8 @@ def register_drivers(users_to_register: list):
     for user in users_to_register:
         driver = Driver(
             id=user.id,
-            driver_license_1='',
-            driver_license_2='',
+            license_1='',
+            license_2='',
         )
         db.session.add(driver)
         result.append(driver)
