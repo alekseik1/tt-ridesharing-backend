@@ -28,6 +28,7 @@ class SwaggerResponses:
     ERROR_IS_RIDE_HOST = {'name': 'User is ride host with user_id', 'value': 36}
     ERROR_RIDE_UNAVAILABLE = {'name': 'Ride is unavailable with ride_id', 'value': 36}
     ORGANIZATION_ID = {'organization_id': 36}
+    INVALID_DRIVER_WITH_ID = {'name': 'Invalid driver with id', 'value': 36}
 
     MATCHING_RESULTS = {'top': []}
 

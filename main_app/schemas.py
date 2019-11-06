@@ -1,7 +1,9 @@
 from marshmallow import fields, validates, ValidationError
+from flask import jsonify
 
-from app import ma
-from main_app.model import Ride, User, Organization, Driver
+from app import ma, db
+from main_app.model import Ride, User, Organization, Driver, Car
+from main_app.responses import SwaggerResponses
 
 
 class FindBestRidesSchema(ma.ModelSchema):
@@ -70,3 +72,25 @@ class RegisterUserSchema(ma.ModelSchema):
     class Meta:
         model = User
     password = fields.String(required=True)
+
+
+class CarSchema(ma.ModelSchema):
+    class Meta:
+        model = Car
+
+
+class RegisterCarForDriverSchema(ma.ModelSchema):
+    class Meta:
+        model = Car
+    owner_id = fields.Integer(required=True)
+
+    @validates('owner_id')
+    def owner_exists(self, owner_id):
+        if db.session.query(Driver).filter_by(id=owner_id).first() is None:
+            error = SwaggerResponses.INVALID_DRIVER_WITH_ID
+            error['value'] = owner_id
+            return jsonify(error), 400
+
+
+class CarIdSchema(ma.ModelSchema):
+    car_id = fields.Integer(required=True)

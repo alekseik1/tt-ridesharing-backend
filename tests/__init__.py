@@ -1,10 +1,10 @@
 from flask_login import login_user, logout_user
 from contextlib import contextmanager
 from flask_testing import TestCase
-from mimesis import Person, Address
+from mimesis import Person, Address, Transport, Text
 
 from app import create_app, db
-from main_app.model import User, Organization, Driver
+from main_app.model import User, Organization, Driver, Car
 from main_app.responses import SwaggerResponses
 
 
@@ -71,6 +71,31 @@ def add_users_to_organizations(users: list, organizations: list):
     return result
 
 
+def _generate_car_number():
+    import random
+    gen_char = lambda: chr(random.randint(ord('А'), ord('Я')))
+    return '{s1}{number}{s2} {code}{country}'.format(
+        s1=gen_char(),
+        number=random.randint(100, 999),
+        s2=f'{gen_char()}{gen_char()}',
+        code=random.randint(10, 777),
+        country='RUS'
+    )
+
+
+def add_cars_to_drivers(drivers):
+    result = []
+    for i in range(len(drivers)):
+        car_model = Transport().car()
+        car_number = _generate_car_number()
+        car_color = Text(locale='ru').color()
+        car = Car(model=car_model, color=car_color, registry_number=car_number, owner=drivers[i])
+        db.session.add(car)
+        result.append(car)
+    db.session.commit()
+    return result
+
+
 def register_drivers(users_to_register: list):
     """
     Регает водителей на основе <User>
@@ -106,6 +131,8 @@ class BaseTest(TestCase):
         self.user_organizations = add_users_to_organizations(self.users, self.organizations)
         # Каждого второго сделаем водителем. У каждой организации как минимум 1 водитель и 1 пассажир
         self.drivers = register_drivers(self.users[::2])
+        # На каждого водителя - по автомобилю
+        self.cars = add_cars_to_drivers(self.drivers)
         # Не-водители
         self.single_users = self.users[1::2]
 

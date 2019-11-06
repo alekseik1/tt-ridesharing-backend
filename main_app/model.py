@@ -71,3 +71,12 @@ class Ride(db.Model):
     passengers = db.relationship('User', secondary=association_user_ride, backref='all_rides')
     cost = db.Column(db.Float)
     description = db.Column(db.String(600))
+
+
+class Car(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    model = db.Column(db.String(100), nullable=False)
+    color = db.Column(db.String(100), nullable=False)
+    registry_number = db.Column(db.String(20), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
+    owner = db.relationship('Driver', backref='cars')
