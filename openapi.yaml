@@ -1,0 +1,1208 @@
+openapi: 3.0.0
+info:
+  title: Ridesharing API
+  description: This is main API for our small ridesharing project
+  contact:
+    email: 1alekseik1@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: ref
+servers:
+- url: /
+security:
+- cookieAuth: []
+tags:
+- name: user
+  description: API для простых юзеров
+- name: anonymous
+  description: API для незареганных посетителей
+paths:
+  /register_user:
+    post:
+      tags:
+      - anonymous
+      summary: Зарегать пользователя
+      description: Регает пользователя, без авы.
+      requestBody:
+        $ref: '#/components/requestBodies/registerUser'
+      responses:
+        200:
+          description: успех, пользователь создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userID'
+              examples:
+                main:
+                  $ref: '#/components/examples/userID'
+        400:
+          description: Каких-то данных не хватает, либо email уже занят
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+              examples:
+                missing one parameter:
+                  $ref: '#/components/examples/errorMissingOneParameter'
+                missing two parameters:
+                  $ref: '#/components/examples/errorMissingTwoParameters'
+                email is already registered:
+                  value:
+                    name: Email is already registered
+                    value: m.smith@mail.ru
+  /register_driver:
+    post:
+      tags:
+      - user
+      summary: Зарегать драйвера на основе пользователя
+      description: Нужна авторизация. Создает аккаунт водителя на основе пользовательского
+        акка.
+      requestBody:
+        $ref: '#/components/requestBodies/registerDriver'
+      responses:
+        200:
+          description: Успех
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userID'
+              examples:
+                main:
+                  $ref: '#/components/examples/userID'
+        400:
+          description: Если каких-то данных не хватает, либо User с таким ID не существует.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                missing one parameter:
+                  $ref: '#/components/examples/errorMissingOneParameter'
+                missing two parameters:
+                  $ref: '#/components/examples/errorMissingTwoParameters'
+                no such user:
+                  $ref: '#/components/examples/errorInvalidUser'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+        403:
+          description: Если пытаемся зарегать не свой userID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                not your ID:
+                  $ref: '#/components/examples/errorNoPermissionForUser'
+      security:
+      - cookieAuth: []
+  /join_ride:
+    post:
+      tags:
+      - user
+      summary: Присоединиться к поездке по ID поездки
+      description: Нужна авторизация. Присоединяет пользователя к поездке. ПОКА НЕ
+        НУЖНО ПОДТВЕРЖДЕНИЕ СО СТОРОНЫ ВОДИТЕЛЯ
+      requestBody:
+        $ref: '#/components/requestBodies/joinRide'
+      responses:
+        200:
+          description: Успех. Теперь пользователь числится в пассажирах поездки
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rideID'
+              examples:
+                main:
+                  $ref: '#/components/examples/rideID'
+        400:
+          description: Если каких-то данных не хватает, либо поездки с таким ID не
+            существует, либо пользователь уже в поездке, либо пользователь является
+            водителем этой поездки
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                missing one parameter:
+                  $ref: '#/components/examples/errorMissingOneParameter'
+                missing two parameters:
+                  $ref: '#/components/examples/errorMissingTwoParameters'
+                no such ride:
+                  $ref: '#/components/examples/errorInvalidRide'
+                already in ride:
+                  $ref: '#/components/examples/errorAlreadyInRide'
+                is ride host:
+                  $ref: '#/components/examples/errorIsRideHost'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+      - cookieAuth: []
+  /find_best_rides:
+    post:
+      tags:
+      - user
+      summary: Найти лучшую поездку на основе GPS
+      description: Нужно обязательно передать GPS. _Да меня вообще кто-то читает?_
+        Вернет список вида `({Ride}, distance)`, где `Ride` - это в объект поездки
+        в формате __JSON__
+      requestBody:
+        $ref: '#/components/requestBodies/findBestRides'
+      responses:
+        200:
+          description: Все ок, возвращаем отсортированный список поездок
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rideAndDistance'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+      - cookieAuth: []
+  /join_organization:
+    post:
+      tags:
+      - user
+      summary: Присоединиться к организации
+      requestBody:
+        $ref: '#/components/requestBodies/organizationID'
+      responses:
+        200:
+          description: Успех, пользователь добавлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organizationID'
+        400:
+          description: Либо лимит организаций, либо нет такой организации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                organization limit:
+                  $ref: '#/components/examples/errorOrganizationLimit'
+                organization invalid:
+                  $ref: '#/components/examples/errorOrganizationInvalid'
+      security:
+      - cookieAuth: []
+  /leave_organization:
+    post:
+      tags:
+      - user
+      summary: Присоединиться к организации
+      requestBody:
+        $ref: '#/components/requestBodies/organizationID'
+      responses:
+        200:
+          description: Успех, пользователь покинул организацию
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organizationID'
+        400:
+          description: Либо пользователь не состоит, либо нет такой организации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                not in organization:
+                  $ref: '#/components/examples/errorNotInOrganization'
+                organization invalid:
+                  $ref: '#/components/examples/errorOrganizationInvalid'
+      security:
+      - cookieAuth: []
+  /get_all_rides:
+    get:
+      tags:
+      - user
+      summary: Список ВСЕХ доступных поездок
+      description: Получить список всех доступных поездок.
+      responses:
+        200:
+          description: Проблем нет, возвращаем список поездок.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/rideInfo'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+      - cookieAuth: []
+  /create_ride:
+    post:
+      tags:
+      - driver
+      summary: Создать поездку
+      description: Создает поездку, нужно быть водителем.
+      requestBody:
+        $ref: '#/components/requestBodies/createRide'
+      responses:
+        200:
+          description: успех, поездка создана.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rideID'
+              examples:
+                main:
+                  $ref: '#/components/examples/rideID'
+        400:
+          description: Каких-то данных не хватает
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+              examples:
+                missing one parameter:
+                  $ref: '#/components/examples/errorMissingOneParameter'
+                missing two parameters:
+                  $ref: '#/components/examples/errorMissingTwoParameters'
+        401:
+          description: Нужна авторизация, либо пользователь пытается создать поездку
+            не от своего имени, либо пользователь не является водителем
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                authorization required:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+                is not a driver:
+                  $ref: '#/components/examples/errorIsNotDriver'
+                host_id mismatch:
+                  $ref: '#/components/examples/errorNoPermissionForUser'
+      security:
+      - cookieAuth: []
+
+  /register_car_for_driver:
+    post:
+      tags:
+        - user
+        - driver
+      summary: Регает машину и объявляет пользователя ее владельцем
+      description: Нужно передать _id_ пользователя
+      requestBody:
+        $ref: '#/components/requestBodies/registerCarForDriver'
+      responses:
+        200:
+          description: Успех, возвращаем `car_id`
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - car_id
+                properties:
+                  car_id:
+                    type: integer
+                    description: id созданной машины
+        400:
+          description: 'Какой-то из параметров не верен.
+          В `value` будут не `first_name`, а нормальные значения.
+          Это просто я хреново пишу примеры'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorBase'
+              examples:
+                one parameter missing:
+                  $ref: '#/components/examples/errorMissingOneParameter'
+                two or more parameters missing:
+                  $ref: '#/components/examples/errorMissingTwoParameters'
+        401:
+          description: Пользователь не залогинен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                not logged in:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+
+  /get_my_cars:
+    get:
+      tags:
+        - user
+        - driver
+      summary: Получить список всех моих машин
+      description: Распарсивает их в JSON
+      responses:
+        200:
+          description: Успех, возвращаем список
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/car'
+        401:
+          description: Пользователь не залогинен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                not logged in:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+
+  /login:
+    post:
+      tags:
+      - anonymous
+      summary: Залогиниться в пользователя
+      description: Логинит пользователя и в ответе присылает кукисы через `Set-Cookie`
+        header.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login'
+            examples:
+              email:
+                $ref: '#/components/examples/loginEmail'
+      responses:
+        200:
+          description: Успех
+          headers:
+            Set-Cookie:
+              description: Супер секретные кукисы
+              style: simple
+              explode: false
+              schema:
+                $ref: '#/components/securitySchemes/cookieAuth'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userID'
+              examples:
+                main:
+                  $ref: '#/components/examples/userID'
+        400:
+          description: Неверный логин или пароль, либо пользователь уже залогинен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                incorrect login or password:
+                  $ref: '#/components/examples/errorInvalidLogin'
+                already logged-in:
+                  $ref: '#/components/examples/errorAlreadyLoggedIn'
+  /logout:
+    post:
+      tags:
+      - user
+      summary: Разлогинить пользователя
+      description: Разлогинивает пользователя
+      responses:
+        200:
+          description: Успех
+          headers:
+            Set-Cookie:
+              description: Там как-то уничтожит куки (ПОГУГЛИТЕ КАК)
+              style: simple
+              explode: false
+              schema:
+                $ref: '#/components/securitySchemes/cookieAuth'
+        401:
+          description: Пользователь не залогинен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                not logged in:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+      - cookieAuth: []
+  /get_all_organizations:
+    get:
+      tags:
+      - user
+      - driver
+      summary: Список ВСЕХ организация
+      description: Получить список всех организаций
+      responses:
+        200:
+          description: Проблем нет, возвращаем список организаций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/organizationInfo'
+              examples:
+                main:
+                  $ref: '#/components/examples/organizationInfo'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+      - cookieAuth: []
+  /get_my_organization_members:
+    get:
+      tags:
+      - user
+      summary: Список всех членов моей организации
+      parameters:
+      - name: organization_id
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Проблем нет, возвращаем список людей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/userID'
+                  - $ref: '#/components/schemas/userBase'
+                  - $ref: '#/components/schemas/userExtra'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+      - cookieAuth: []
+  /get_ride_info:
+    get:
+      tags:
+      - user
+      summary: Информация об одной поездке
+      parameters:
+      - name: ride_id
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Проблем нет, возвращаем инфу о поездке
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        400:
+          description: Нет такой поездки
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                invalid ride ID:
+                  $ref: '#/components/examples/errorInvalidRide'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+      - cookieAuth: []
+  /am_i_driver:
+    get:
+      tags:
+      - user
+      summary: Водитель ли я
+      responses:
+        200:
+          description: Все ок, инфа прогружена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+      - cookieAuth: []
+  /get_my_rides:
+    get:
+      tags:
+      - user
+      summary: Список всех моих поездок
+      responses:
+        200:
+          description: Все ок, список готов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/rideInfo'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+      - cookieAuth: []
+  /get_user_info:
+    get:
+      tags:
+      - user
+      summary: Получить всю инфу о User
+      description: Все поля, кроме пароля. Если пользователь еще и водитель, то данные
+        будут __только__ о пользователе, но не о водителе.
+      responses:
+        200:
+          description: Все ок
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/userID'
+                - $ref: '#/components/schemas/userBase'
+                - $ref: '#/components/schemas/userExtra'
+        400:
+          description: Емэйл не найден
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorEmailNotFound'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+      - cookieAuth: []
+  /get_driver_data:
+    get:
+      tags:
+      - driver
+      summary: Получить всю инфу о Driver
+      description: Все поля __связанные только с водителем__. Если нужна инфа о пользователе,
+        то нужно вызвать `get_user_data`
+      parameters:
+      - name: user_id
+        in: query
+        description: user ID
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+        examples:
+          good:
+            value: 2
+          invalid:
+            value: k3jf
+      responses:
+        200:
+          description: Все ок
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/userID'
+                - $ref: '#/components/schemas/driverBase'
+                - $ref: '#/components/schemas/driverExtra'
+              examples:
+                Martin:
+                  $ref: '#/components/examples/driverData'
+        400:
+          description: Нет такого пользователя, либо пользователь не зареган как водитель
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorBase'
+              examples:
+                noSuchUser:
+                  $ref: '#/components/examples/errorInvalidUser'
+                isNotDriver:
+                  $ref: '#/components/examples/errorIsNotDriver'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+      - cookieAuth: []
+components:
+  schemas:
+
+    rideAndDistance:
+      type: array
+      items:
+        anyOf:
+        - $ref: '#/components/schemas/rideInfo'
+        - $ref: '#/components/schemas/distance'
+
+    distance:
+      type: number
+
+    errorBase:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+
+    organizationID:
+      required:
+      - organization_id
+      type: object
+      properties:
+        organization_id:
+          type: integer
+
+    car:
+      required:
+        - model
+        - color
+        - registry_number
+        - owner_id
+      properties:
+        model:
+          type: string
+        color:
+          type: string
+        registry_number:
+          type: string
+        owner_id:
+          type: integer
+
+    rideID:
+      required:
+      - ride_id
+      type: object
+      properties:
+        ride_id:
+          type: integer
+
+    userID:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+
+    login:
+      required:
+      - login
+      - password
+      type: object
+      properties:
+        login:
+          type: string
+          description: Пока что только email
+        password:
+          type: string
+
+    userBase:
+      required:
+      - email
+      - first_name
+      - last_name
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        organizations:
+          $ref: '#/components/schemas/organizationInfo'
+
+    userExtra:
+      type: object
+      properties:
+        photo:
+          type: string
+          description: URL в хранилище
+
+    driverBase:
+      required:
+      - license_1
+      - license_2
+      type: object
+      properties:
+        license_1:
+          type: string
+          description: Лицевая сторона
+        license_2:
+          type: string
+          description: Тыльная
+
+    driverExtra:
+      type: object
+
+    organizationInfo:
+      required:
+      - id
+      - latitude
+      - longitude
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID в БД
+        name:
+          type: string
+          description: Название организации
+        latitude:
+          type: number
+          description: Координата широты
+        longitude:
+          type: number
+          description: Координата долготы
+        users:
+          type: array
+          description: Массив ID пользователей
+          items:
+            type: number
+        address:
+          type: string
+          description: Адрес организации
+        description:
+          type: string
+          description: Описание организации
+    rideInfo:
+      required:
+      - host_driver_id
+      - host_driver_info
+      - is_available
+      - start_organzation_id
+      - start_time
+      - stop_latitude
+      - stop_longitude
+      - total_seats
+      type: object
+      properties:
+        description:
+          type: string
+          description: Описание (необязательное)
+        estimated_time:
+          type: string
+          description: Оценочное время
+        host_driver_id:
+          type: integer
+          description: ID водителя, который начал поездку
+        host_driver_info:
+          allOf:
+          - $ref: '#/components/schemas/userID'
+          - $ref: '#/components/schemas/userBase'
+          - $ref: '#/components/schemas/userExtra'
+        id:
+          type: integer
+          description: ID поездки
+        is_available:
+          type: boolean
+          description: Доступна или нет
+        passengers:
+          type: array
+          description: Массив из ID всех пассажиров
+          items:
+            type: integer
+            description: ID `User`
+        start_organization:
+          type: integer
+          description: ID организации, откуда выезжаем
+        start_organization_id:
+          type: integer
+          description: ID организации, откуда выезжаем
+        start_time:
+          type: string
+          description: Время отправления
+        stop_latitude:
+          type: number
+          description: Широта пункта назначения
+        stop_longitude:
+          type: number
+          description: Долгота пункта назначения
+        cost:
+          type: string
+          description: Цена поездки
+        total_seats:
+          type: integer
+          description: Всего мест в автомобиле
+        stop_address:
+          type: string
+          description: Адрес пункта назначения
+    inline_response_400:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/errorBase'
+    inline_response_200:
+      required:
+      - seats_available
+      properties:
+        seats_available:
+          type: integer
+    inline_response_200_1:
+      required:
+      - is_driver
+      type: object
+      properties:
+        is_driver:
+          type: boolean
+  parameters:
+    userID:
+      name: user_id
+      in: query
+      description: user ID
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+      examples:
+        good:
+          value: 2
+        invalid:
+          value: k3jf
+    rideID:
+      name: ride_id
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+    organizationID:
+      name: organization_id
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+    userEmail:
+      name: email
+      in: query
+      description: Мэйл пользователя. По нему и будем искать
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+      examples:
+        good:
+          value: m.smith@gmail.com
+        bad:
+          value: 2djit3
+  examples:
+    organizationInfo:
+      value:
+        name: Mail.ru Inc.
+        latitude: 53.1231234
+        longitude: 23.425234
+    errorNotInOrganization:
+      value:
+        name: Not in organization
+        value: 36
+    errorIsRideHost:
+      value:
+        name: User is ride host with user_id
+        value: 36
+    errorAlreadyInRide:
+      value:
+        name: User is already in drive with user_id
+        value: 36
+    errorMissingOneParameter:
+      value:
+        name: Some of required fields are missing
+        value:
+        - first_name
+    errorMissingTwoParameters:
+      value:
+        name: Some of required fields are missing
+        value:
+        - first_name
+        - last_name
+    rideID:
+      value:
+        ride_id: 36
+    rideInfo:
+      value:
+        start_organization:
+          allOf:
+          - $ref: '#/components/schemas/organizationInfo/properties'
+        stop_organization:
+          allOf:
+          - $ref: '#/components/schemas/organizationInfo/properties'
+        start_time: 2019-10-19 17:10:18.156968
+        host_driver_ID: 36
+    errorInvalidLogin:
+      value:
+        name: Invalid login or password
+        value: ""
+    errorAlreadyLoggedIn:
+      value:
+        name: Already logged in
+        value: ""
+    errorInvalidUser:
+      value:
+        name: Invalid user with id
+        value: 28
+    errorInvalidRide:
+      value:
+        name: Invalid ride with id
+        value: 37
+    errorOrganizationInvalid:
+      value:
+        name: Invalid organization with id
+        value: 36
+    errorOrganizationLimit:
+      value:
+        name: Organization limit exceeded
+        value: ""
+    errorEmailNotFound:
+      value:
+        name: Email not found
+        value: mm.mm@mail.ru
+    errorIsNotDriver:
+      value:
+        name: User with ID is not a driver
+        value: 28
+    errorAuthorizationRequred:
+      value:
+        name: Authorization required
+        value: ""
+    errorNoPermissionForUser:
+      value:
+        name: No permission for user
+        value: 2
+    userData:
+      value:
+        user_id: 28
+        first_name: Martin
+        last_name: Smith
+        email: m.smith@mail.ru
+        photo_url: https://gdrive.com/photo.png
+    driverData:
+      value:
+        user_id: 28
+        license_1: https://gdrive.com/photo.png
+        license_2: https://gdrive.com/photo.png
+    userID:
+      value:
+        user_id: 28
+    loginEmail:
+      value:
+        login: a.kozh@mail.ru
+        password: 12334512dsdwdw
+  requestBodies:
+    organizationID:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/organizationID'
+    findBestRides:
+      content:
+        application/json:
+          schema:
+            required:
+            - destination_latitude
+            - destination_longitude
+            - start_date
+            - start_organization_id
+            type: object
+            properties:
+              start_date:
+                type: string
+                description: Дата начала. Лучше потестить фронт и бек и договориться
+                  о формате
+              start_organization_id:
+                type: integer
+              destination_latitude:
+                type: number
+              destination_longitude:
+                type: number
+    gpsJSON:
+      content:
+        application/json:
+          schema:
+            required:
+            - gps
+            type: object
+            properties:
+              gps:
+                type: array
+                example:
+                - 55.9292218
+                - 37.5208155
+                items:
+                  type: number
+
+    registerCarForDriver:
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/car'
+            required:
+              - owner_id
+            properties:
+              owner_id:
+                type: integer
+                description: id владельца
+
+    createRide:
+      content:
+        application/json:
+          schema:
+            required:
+            - start_organization_id
+            - start_time
+            - stop_latitude
+            - stop_longitude
+            - total_seats
+            type: object
+            properties:
+              start_organization_id:
+                type: integer
+                description: ID организации отправления
+              stop_latitude:
+                type: number
+                description: Широта
+              stop_longitude:
+                type: number
+                description: Долгота
+              start_time:
+                type: string
+                description: Время отправления
+              description:
+                type: string
+                description: Описание поездки
+              total_seats:
+                type: integer
+                description: Сколько мест в машине
+              cost:
+                type: number
+                description: Сколько будет стоить
+    registerUser:
+      content:
+        application/json:
+          schema:
+            required:
+            - password
+            properties:
+              password:
+                type: string
+            allOf:
+            - $ref: '#/components/schemas/userBase'
+    registerDriver:
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/userID'
+            - $ref: '#/components/schemas/driverBase'
+    joinRide:
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/rideID'
+    userData:
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/userID'
+            - $ref: '#/components/schemas/userBase'
+            - $ref: '#/components/schemas/userExtra'
+    driverData:
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/userID'
+            - $ref: '#/components/schemas/driverBase'
+            - $ref: '#/components/schemas/driverExtra'
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      description: Session=12d12jds
+      name: session
+      in: cookie
