@@ -121,6 +121,13 @@ class TestUserRegistration(BaseTest):
         self.assert200(response)
         self.assertIsNotNone(response.get_json().get('user_id'))
 
+    def test_register_user_same_email(self):
+        response = self.client.post(self.register_user_url, json=self.correct_request)
+        response = self.client.post(self.register_user_url, json=self.correct_request)
+        self.assert400(response)
+        correct_response = SwaggerResponses.some_params_are_invalid(['email'])
+        self.assertEqual(correct_response, response.get_json())
+
 
 if __name__ == '__main__':
     unittest.main()
