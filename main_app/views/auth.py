@@ -49,9 +49,5 @@ def register_user():
     user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'])
     user.set_password(password=data['password'])
     db.session.add(user)
-    try:
-        db.session.commit()
-    except IntegrityError as e:
-        error = build_error(SwaggerResponses.EMAIL_IS_BUSY, data['email'])
-        return jsonify(error), 400
+    db.session.commit()
     return jsonify(user_id=user.id)

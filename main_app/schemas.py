@@ -73,6 +73,13 @@ class RegisterUserSchema(ma.ModelSchema):
         model = User
     password = fields.String(required=True)
 
+    @validates('email')
+    def email_is_not_in_db(self, email):
+        user = db.session.query(User).filter_by(email=email).first()
+        if user:
+            raise ValidationError('Email is already registered')
+        return email
+
 
 class CarSchema(ma.ModelSchema):
     class Meta:
