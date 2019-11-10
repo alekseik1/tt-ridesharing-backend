@@ -67,6 +67,13 @@ class RegisterDriverSchema(ma.ModelSchema):
     license_1 = fields.String(required=True)
     license_2 = fields.String(required=True)
 
+    @validates('id')
+    def id_is_not_in_db(self, id):
+        driver = db.session.query(Driver).filter_by(id=id).first()
+        if driver:
+            raise ValidationError('Driver is already registered')
+        return driver
+
 
 class RegisterUserSchema(ma.ModelSchema):
     class Meta:

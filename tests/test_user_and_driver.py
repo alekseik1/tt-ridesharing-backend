@@ -26,12 +26,13 @@ class TestUserAndDriver(BaseTest):
                     self.assert200(response)
                     correct_response = self.user_schema.dump(user)
                     self.assertEqual(correct_response, response.get_json())
+
+    def test_get_user_info_anonymous_user(self):
         # No anonymous users
         # Request outside 'login_as' context
-        with self.subTest('Anonymous user'):
-            response = self.client.get(self.get_user_info_url)
-            self.assert401(response)
-            self.assertEqual(SwaggerResponses.AUTHORIZATION_REQUIRED, response.get_json())
+        response = self.client.get(self.get_user_info_url)
+        self.assert401(response)
+        self.assertEqual(SwaggerResponses.AUTHORIZATION_REQUIRED, response.get_json())
 
     def test_am_i_driver(self):
         for user in self.users:
@@ -54,21 +55,19 @@ class TestDriverMethods(BaseTest):
         self.user = self.single_users[0]
 
     def test_register_driver_correct_request(self):
-        user = self.single_users[0]
-        with self.login_as(user):
+        with self.login_as(self.user):
             response = self.client.post(self.register_driver_url, json=dict(
-                id=user.id,
+                id=self.user.id,
                 license_1='license_1',
                 license_2='license_2',
             ))
             self.assert200(response, message=response.get_json())
-            correct_response = dict(user_id=user.id)
+            correct_response = dict(user_id=self.user.id)
             self.assertEqual(correct_response, response.get_json())
 
     def test_register_driver_anonymous_user(self):
-        user = self.single_users[0]
         response = self.client.post(self.register_driver_url, json=dict(
-            id=user.id,
+            id=self.user.id,
             license_1='license_1',
             license_2='license_2',
         ))
@@ -77,10 +76,28 @@ class TestDriverMethods(BaseTest):
         self.assertEqual(correct_response, response.get_json())
 
     def test_register_driver_incorrect_parameters(self):
-        user = self.single_users[0]
-        correct_request = dict(id=user.id, license_1='l1', license_2='l2')
-        with self.login_as(user):
+        correct_request = dict(id=self.user.id, license_1='l1', license_2='l2')
+        with self.login_as(self.user):
             self.routine_invalid_parameters_for(self.register_driver_url, correct_request)
+
+    def test_register_driver_two_times(self):
+        request = dict(id=self.user.id, license_1='l1', license_2='l2')
+        with self.login_as(self.user):
+            response = self.client.post(self.register_driver_url, json=request)
+            response = self.client.post(self.register_driver_url, json=request)
+            self.assert400(response)
+            correct_response = SwaggerResponses.some_params_are_invalid(['id'])
+            self.assertEqual(correct_response, response.get_json())
+
+    def test_register_driver_another_user(self):
+        fake_id = self.users[-1].id
+        request = dict(id=fake_id, license_1='l1', license_2='l2')
+        with self.login_as(self.user):
+            response = self.client.post(self.register_driver_url, json=request)
+            self.assert403(response)
+            correct_response = SwaggerResponses.NO_PERMISSION_FOR_USER
+            correct_response['value'] = fake_id
+            self.assertEqual(correct_response, response.get_json())
 
 
 class TestUserRegistration(BaseTest):
