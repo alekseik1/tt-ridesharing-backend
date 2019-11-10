@@ -70,6 +70,7 @@ class Ride(db.Model):
     # TODO: Возможно, пользователю не обязательно иметь поле `all_rides`. Тем более, что поездки еще арихвируются
     passengers = db.relationship('User', secondary=association_user_ride, backref='all_rides')
     cost = db.Column(db.Float)
+    car_id = db.Column(db.Integer, db.ForeignKey('car.id'), nullable=False, server_default='2')
     description = db.Column(db.String(600))
 
 

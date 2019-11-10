@@ -56,7 +56,8 @@ def create_ride():
         start_time=data.get('start_time'),
         total_seats=data.get('total_seats'),
         description=data.get('description'),
-        host_driver_id=user_id
+        host_driver_id=user_id,
+        car_id=data['car_id']
     )
     db.session.add(ride)
     db.session.commit()

@@ -26,11 +26,18 @@ class CreateRideSchema(ma.ModelSchema):
     description = fields.String(required=False)
     total_seats = fields.Integer(required=True)
     cost = fields.Float(required=False)
+    car_id = fields.Integer(required=True)
 
     @validates('start_time')
     def is_not_empty(self, value):
         if len(value) == 0:
             raise ValidationError('Should not be empty string')
+
+    @validates('car_id')
+    def car_exists(self, car_id):
+        car = db.sesion.query(Car).filter_by(id=car_id).first()
+        if not car:
+            raise ValidationError('Invalid car')
 
 
 class JoinRideSchema(ma.ModelSchema):
