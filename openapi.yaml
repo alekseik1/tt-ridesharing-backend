@@ -47,10 +47,11 @@ paths:
                   $ref: '#/components/examples/errorMissingOneParameter'
                 missing two parameters:
                   $ref: '#/components/examples/errorMissingTwoParameters'
-                email is already registered:
-                  value:
-                    name: Email is already registered
-                    value: m.smith@mail.ru
+                # Тут теперь все равно 'Some params are invalid'
+                #email is already registered:
+                #  value:
+                #    name: Email is already registered
+                #    value: m.smith@mail.ru
   /register_driver:
     post:
       tags:
@@ -306,7 +307,7 @@ paths:
       security:
       - cookieAuth: []
 
-  /register_car_for_driver:
+  /register_own_car:
     post:
       tags:
         - user
@@ -730,11 +731,19 @@ components:
           type: integer
 
     car:
+      allOf:
+        - $ref: '#/components/schemas/carWithoutOwner'
+      required:
+        - owner_id
+      properties:
+        owner_id:
+          type: integer
+
+    carWithoutOwner:
       required:
         - model
         - color
         - registry_number
-        - owner_id
       properties:
         model:
           type: string
@@ -742,8 +751,6 @@ components:
           type: string
         registry_number:
           type: string
-        owner_id:
-          type: integer
 
     rideID:
       required:
@@ -1119,13 +1126,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/car'
-            required:
-              - owner_id
-            properties:
-              owner_id:
-                type: integer
-                description: id владельца
+              - $ref: '#/components/schemas/carWithoutOwner'
 
     createRide:
       content:
@@ -1137,6 +1138,7 @@ components:
             - stop_latitude
             - stop_longitude
             - total_seats
+            - car_id
             type: object
             properties:
               start_organization_id:
@@ -1160,6 +1162,9 @@ components:
               cost:
                 type: number
                 description: Сколько будет стоить
+              car_id:
+                type: number
+                description: ID машины, на которой будем ехать
     registerUser:
       content:
         application/json:
