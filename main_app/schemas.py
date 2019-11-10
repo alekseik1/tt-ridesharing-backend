@@ -85,6 +85,7 @@ class RegisterDriverSchema(ma.ModelSchema):
 class RegisterUserSchema(ma.ModelSchema):
     class Meta:
         model = User
+    email = fields.Email(required=True)
     password = fields.String(required=True)
 
     @validates('email')
