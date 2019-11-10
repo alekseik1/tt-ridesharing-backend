@@ -96,7 +96,8 @@ class CarSchema(ma.ModelSchema):
 class RegisterCarForDriverSchema(ma.ModelSchema):
     class Meta:
         model = Car
-    owner_id = fields.Integer(required=True)
+    # Leave this field only for validation
+    owner_id = fields.Integer(required=False)
 
     @validates('owner_id')
     def owner_exists(self, owner_id):

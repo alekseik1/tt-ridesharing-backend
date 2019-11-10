@@ -23,13 +23,13 @@ def register_car(car_info):
     return car
 
 
-@api.route('/register_car_for_driver', methods=['POST'])
+@api.route('/register_own_car', methods=['POST'])
 @login_required
 def register_car_for_driver():
-    # BUG: можно регистрировать машину на чужого пользователя
     data = request.get_json()
     # Также валидирует на наличие водителя. Я начал писать нормально
     error = validate_params_with_schema(RegisterCarForDriverSchema(), data)
+    data['owner_id'] = current_user.id
     if error:
         return error
     car = register_car(data)
