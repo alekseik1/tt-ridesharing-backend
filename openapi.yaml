@@ -386,6 +386,39 @@ paths:
               examples:
                 not logged in:
                   $ref: '#/components/examples/errorAuthorizationRequred'
+  /leave_ride:
+    post:
+      tags:
+        - user
+      summary: Убирает себя (текущего пользователя) из поездки.
+      description: Ты должен быть авторизован как пользователь.
+      requestBody:
+        $ref: '#/components/requestBodies/joinRide'
+      responses:
+        200:
+          description: Успех, пользователь больше не в поездке, а она снова доступна
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rideID'
+        400:
+          description: Любая ошибка во входных данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                invalid ride ID:
+                  $ref: '#/components/examples/errorInvalidRide'
+        401:
+          description: Пользователь не залогинен. БАГ - пока можно быть не залогиненым как водитель
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                not logged in:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
 
   /get_my_cars:
     get:
