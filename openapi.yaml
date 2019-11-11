@@ -358,6 +358,8 @@ paths:
       tags:
         - driver
       summary: Помечает поездку как завершенную
+      security:
+        - cookieAuth: []
       description: Должно вызываться при авторизованном водителе
       requestBody:
         $ref: '#/components/requestBodies/joinRide'
@@ -391,6 +393,8 @@ paths:
       tags:
         - user
       summary: Убирает себя (текущего пользователя) из поездки.
+      security:
+        - cookieAuth: []
       description: Ты должен быть авторизован как пользователь.
       requestBody:
         $ref: '#/components/requestBodies/joinRide'
