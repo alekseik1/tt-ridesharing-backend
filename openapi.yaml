@@ -353,6 +353,38 @@ paths:
                 not logged in:
                   $ref: '#/components/examples/errorAuthorizationRequred'
 
+  /finish_ride:
+    post:
+      tags:
+        - driver
+      summary: Помечает поездку как завершенную
+      description: Должно вызываться при авторизованном водителе
+      responses:
+        200:
+          description: Успех, отмечена как завершена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rideID'
+        400:
+          description: Любая ошибка во входных данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                invalid ride ID:
+                  $ref: '#/components/examples/errorInvalidRide'
+        401:
+          description: Пользователь не залогинен. БАГ - пока можно быть не залогиненым как водитель
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                not logged in:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+
   /get_my_cars:
     get:
       tags:
