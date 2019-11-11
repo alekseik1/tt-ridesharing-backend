@@ -89,3 +89,17 @@ def get_all_organizations():
     organization_schema = OrganizationSchema(many=True)
     result = organization_schema.dump(db.session.query(Organization).all(), many=True)
     return jsonify(result), 200
+
+
+@api.route('/create_organization', methods=['POST'])
+@login_required
+def create_organization():
+    organization_schema = OrganizationSchema()
+    data = request.get_json()
+    errors = validate_params_with_schema(organization_schema, data)
+    if errors:
+        return errors
+    organization = Organization(**data)
+    db.session.add(organization)
+    db.session.commit()
+    return jsonify(dict(organization_id=organization.id)), 200
