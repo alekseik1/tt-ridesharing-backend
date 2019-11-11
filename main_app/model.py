@@ -45,7 +45,7 @@ class Driver(db.Model):
 
 class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200))
+    name = db.Column(db.String(200), nullable=False)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
     address = db.Column(db.String(600))
