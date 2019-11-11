@@ -181,6 +181,40 @@ paths:
                   $ref: '#/components/examples/errorAuthorizationRequred'
       security:
       - cookieAuth: []
+
+  /create_organization:
+    post:
+      tags:
+        - user
+      summary: Создать организацию. Вот тут, миленькие мои, нужно передавать всю инфу об организации
+      requestBody:
+        $ref: '#/components/requestBodies/createOrganization'
+      responses:
+        200:
+          description: Успех, организация добавлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organizationID'
+        400:
+          description: Любая из проверок входных данных провалена
+          # TODO: Примеры!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+        - cookieAuth: []
+
   /join_organization:
     post:
       tags:
@@ -1191,6 +1225,13 @@ components:
                 - 37.5208155
                 items:
                   type: number
+
+    createOrganization:
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/organizationInfo'
 
     registerCarForDriver:
       content:
