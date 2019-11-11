@@ -35,7 +35,7 @@ class CreateRideSchema(ma.ModelSchema):
 
     @validates('car_id')
     def car_exists(self, car_id):
-        car = db.sesion.query(Car).filter_by(id=car_id).first()
+        car = db.session.query(Car).filter_by(id=car_id).first()
         if not car:
             raise ValidationError('Invalid car')
 
