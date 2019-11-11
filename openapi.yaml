@@ -359,6 +359,8 @@ paths:
         - driver
       summary: Помечает поездку как завершенную
       description: Должно вызываться при авторизованном водителе
+      requestBody:
+        $ref: '#/components/requestBodies/joinRide'
       responses:
         200:
           description: Успех, отмечена как завершена
