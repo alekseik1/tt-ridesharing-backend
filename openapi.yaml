@@ -708,6 +708,24 @@ paths:
                   $ref: '#/components/examples/errorAuthorizationRequred'
       security:
       - cookieAuth: []
+
+  /get_auth:
+    get:
+      tags:
+        - anonymous
+      summary: Проверить, валидна ли кука
+      responses:
+        200:
+          description: '`true` или `false`. Если `false`, то `user_id` будет -1'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  is_valid:
+                    type: boolean
+                  user_id:
+                    type: integer
   /get_multiple_users_info:
     post:
       tags:

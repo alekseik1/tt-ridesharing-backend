@@ -51,3 +51,11 @@ def register_user():
     db.session.add(user)
     db.session.commit()
     return jsonify(user_id=user.id)
+
+
+@api.route('/get_auth', methods=['GET'])
+def get_auth():
+    if not current_user.is_authenticated:
+        return jsonify(dict(is_valid=False))
+    else:
+        return jsonify(dict(is_valid=True, user_id=current_user.id))
