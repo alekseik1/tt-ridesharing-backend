@@ -64,6 +64,17 @@ class UserSchema(ma.ModelSchema):
     organizations = fields.Nested(OrganizationSchema, many=True)
 
 
+class UserSchemaNoOrganizations(ma.ModelSchema):
+    class Meta:
+        model = User
+        include_fk = True
+        exclude = ['password_hash', 'all_rides']
+
+
+class UserIDSchema(ma.ModelSchema):
+    user_id = fields.Integer(required=True)
+
+
 class DriverSchema(ma.ModelSchema):
     class Meta:
         model = Driver
