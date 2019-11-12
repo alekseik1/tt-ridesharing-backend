@@ -1,4 +1,6 @@
 import logging
+import os
+from datetime import datetime
 
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -62,6 +64,13 @@ def create_app(config_name):
     return app
 
 
+def setup_logger():
+    os.makedirs('logs', exist_ok=True)
+    date = datetime.now().strftime('%d_%m__%H_%M')
+    logging.basicConfig(filename=f'logs/error_{date}.log', level=logging.DEBUG)
+
+
 if __name__ == '__main__':
     app = create_app('dev')
+    setup_logger()
     app.run(host='0.0.0.0')
