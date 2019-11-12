@@ -1,9 +1,20 @@
 from marshmallow import fields, validates, ValidationError
 from flask import jsonify
+import phonenumbers
 
 from app import ma, db
 from main_app.model import Ride, User, Organization, Driver, Car
 from main_app.responses import SwaggerResponses
+
+
+def _check_and_format_phone_number(phone_number):
+    try:
+        number = phonenumbers.parse(phone_number)
+        if not phonenumbers.is_valid_number(number):
+            raise ValidationError('Invalid phone number')
+    except:
+        raise ValidationError('Invalid phone number')
+    return phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.E164)
 
 
 class FindBestRidesSchema(ma.ModelSchema):
@@ -99,12 +110,24 @@ class RegisterUserSchema(ma.ModelSchema):
     email = fields.Email(required=True)
     password = fields.String(required=True)
 
+    @validates('phone_number')
+    def is_phone_like(self, phone_number):
+        return _check_and_format_phone_number(phone_number)
+
     @validates('email')
     def email_is_not_in_db(self, email):
         user = db.session.query(User).filter_by(email=email).first()
         if user:
             raise ValidationError('Email is already registered')
         return email
+
+
+class ChangePhoneSchema(ma.ModelSchema):
+    phone_number = fields.String(required=True)
+
+    @validates('phone_number')
+    def is_phone_like(self, phone_number):
+        return _check_and_format_phone_number(phone_number)
 
 
 class CarSchema(ma.ModelSchema):

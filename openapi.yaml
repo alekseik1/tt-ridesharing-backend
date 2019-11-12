@@ -962,6 +962,7 @@ components:
       - email
       - first_name
       - last_name
+      - phone_number
       type: object
       properties:
         first_name:
@@ -972,6 +973,8 @@ components:
           type: string
         organizations:
           $ref: '#/components/schemas/organizationInfo'
+        phone_number:
+          type: string
 
     userExtra:
       type: object

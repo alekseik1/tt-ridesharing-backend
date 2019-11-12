@@ -1,11 +1,12 @@
 from flask import jsonify, request
 from flask_login import login_required, current_user
+import phonenumbers
 
 from app import db
 from main_app.controller import validate_all, validate_params_with_schema, validate_is_in_db, \
     validate_is_authorized_with_id
 from main_app.model import Driver, User
-from main_app.schemas import UserSchema, RegisterDriverSchema, UserSchemaNoOrganizations
+from main_app.schemas import UserSchema, RegisterDriverSchema, UserSchemaNoOrganizations, ChangePhoneSchema
 from main_app.views import api
 
 
@@ -52,6 +53,21 @@ def register_driver():
     db.session.add(driver)
     db.session.commit()
     return jsonify(user_id=driver.id), 200
+
+
+@api.route('/change_phone_number', methods=['POST'])
+def change_number():
+    data = request.get_json()
+    errors = validate_params_with_schema(ChangePhoneSchema(), data)
+    if errors:
+        return errors
+    new_number = phonenumbers.format_number(
+        phonenumbers.parse(data.get('phone_number')),
+        phonenumbers.PhoneNumberFormat.E164
+    )
+    current_user.phone_number = new_number
+    db.session.commit()
+    return jsonify(dict(new_number=new_number))
 
 
 @api.route('/get_multiple_users_info', methods=['POST'])

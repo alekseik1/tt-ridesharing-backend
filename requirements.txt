@@ -12,3 +12,4 @@ mimesis
 psycopg2
 flask_cors
 geopy
+phonenumbers
