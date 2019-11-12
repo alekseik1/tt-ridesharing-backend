@@ -708,6 +708,60 @@ paths:
                   $ref: '#/components/examples/errorAuthorizationRequred'
       security:
       - cookieAuth: []
+  /get_multiple_users_info:
+    post:
+      tags:
+        - user
+      summary: Получить инфу о нескольких юзерах
+      description: Все поля, _кроме пароля и __организации___. `organization_id` при этом возвращается.
+        Если пользователь еще и водитель, то данные будут __только__ о пользователе, но не о водителе.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: integer
+            examples:
+              three ids:
+                value:
+                  ids: [1, 3, 5]
+      responses:
+        200:
+          description: Все ок
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/userID'
+                    - $ref: '#/components/schemas/userBase'
+                    - $ref: '#/components/schemas/userExtra'
+        400:
+          description: Любая ошибка в данных
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorEmailNotFound'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+        - cookieAuth: []
   /get_user_info:
     get:
       tags:
