@@ -56,7 +56,7 @@ def join_organization():
     if not organization:
         error = build_error(SwaggerResponses.INVALID_ORGANIZATION_ID, data_organization_id)
         return jsonify(error), 400
-    if organization in current_user.organzations:
+    if organization in current_user.organizations:
         error = build_error(SwaggerResponses.INVALID_ORGANIZATION_ID, data_organization_id)
         return jsonify(error), 400
     current_user.organizations.append(organization)
