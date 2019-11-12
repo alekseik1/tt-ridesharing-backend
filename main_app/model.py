@@ -28,6 +28,7 @@ class User(UserMixin, db.Model):
     last_name = db.Column(db.String(MAX_SURNAME_LENGTH), nullable=False)
     email = db.Column(db.String(MAX_EMAIL_LENGTH), nullable=False, unique=True)
     photo = db.Column(db.String(MAX_URL_LENGTH))
+    phone_number = db.Column(db.String(20), server_default='+71111111111', nullable=False)
     password_hash = db.Column(db.String(94))
 
     def set_password(self, password):
