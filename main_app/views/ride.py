@@ -138,7 +138,7 @@ def get_ride_info():
     response = format_time([response])[0]
     # Дополнительные поля, не вошедшие в схему
     # TODO: мб как-то дополнить схему?
-    response['host_driver_info'] = _get_user_info(ride.host_driver_id)
+    response['host_driver_info'] = _get_user_info(ride.host_driver_id, include_organizations=False)
     response['seats_available'] = ride.total_seats - len(ride.passengers)
     return jsonify(response), 200
 
