@@ -780,6 +780,44 @@ paths:
                   $ref: '#/components/examples/errorAuthorizationRequred'
       security:
         - cookieAuth: []
+  /change_phone_number:
+    post:
+      tags:
+        - user
+      summary: Поменять свой номер телефона
+      description: Меняет только у текущего залогиненного пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/phoneNumber'
+      responses:
+        200:
+          description: Все ок, номер сменился
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/phoneNumber'
+        400:
+          description: Телефон не валиден
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorBase'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+        - cookieAuth: []
   /get_user_info:
     get:
       tags:
@@ -944,6 +982,13 @@ components:
       properties:
         id:
           type: integer
+
+    phoneNumber:
+      required:
+        - phone_number
+      properties:
+        phone_number:
+          type: string
 
     login:
       required:
