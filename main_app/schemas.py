@@ -72,6 +72,7 @@ class UserSchema(ma.ModelSchema):
         model = User
         include_fk = True
         exclude = ['password_hash', 'all_rides']
+    is_driver = fields.Boolean()
     organizations = fields.Nested(OrganizationSchema, many=True)
 
 

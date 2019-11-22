@@ -662,6 +662,7 @@ paths:
       - cookieAuth: []
   /am_i_driver:
     get:
+      deprecated: true
       tags:
       - user
       summary: Водитель ли я
@@ -1027,6 +1028,9 @@ components:
         photo:
           type: string
           description: URL в хранилище
+        is_driver:
+          type: boolean
+          description: Является ли пользователь водителем
 
     driverBase:
       required:

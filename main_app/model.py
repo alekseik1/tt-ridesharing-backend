@@ -1,5 +1,6 @@
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import db
 
@@ -36,6 +37,11 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    @hybrid_property
+    def is_driver(self):
+        id = db.session.query(Driver).filter_by(id=self.id).first() is not None
+        return id
 
 
 class Driver(db.Model):
