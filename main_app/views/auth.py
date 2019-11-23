@@ -4,10 +4,10 @@ from sqlalchemy.exc import IntegrityError
 
 from app import db
 from main_app.model import User
-from main_app.schemas import RegisterUserSchema, is_valid_phone_number, format_phone_number
+from main_app.schemas import RegisterUserSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
-from main_app.controller import validate_params_with_schema, validate_all
+from main_app.controller import validate_params_with_schema, validate_all, is_valid_phone_number, format_phone_number
 
 
 @api.route('/logout', methods=['POST'])

@@ -1,41 +1,10 @@
 from marshmallow import fields, validates, ValidationError
 from flask import jsonify
-import phonenumbers
 
 from app import ma, db
 from main_app.model import Ride, User, Organization, Driver, Car
-from main_app.controller import check_email
+from main_app.controller import check_email, check_phone_number
 from main_app.responses import SwaggerResponses
-
-
-def is_valid_phone_number(phone_number):
-    try:
-        validate_phone_number(phone_number)
-    except ValidationError:
-        return False
-    return True
-
-
-def validate_phone_number(phone_number):
-    """
-    Validates phone number via raising exceptions
-
-    :param phone_number: String of number
-    :return: A <Phone number> object from `phonenumbers` lib
-    :raise: ValidationError
-    """
-    try:
-        number = phonenumbers.parse(phone_number)
-        if not phonenumbers.is_valid_number(number):
-            raise ValidationError('Invalid phone number')
-    except:
-        raise ValidationError('Invalid phone number')
-    return phone_number
-
-
-def format_phone_number(phone_number_str):
-    number = phonenumbers.parse(phone_number_str)
-    return phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.E164)
 
 
 class FindBestRidesSchema(ma.ModelSchema):
@@ -134,7 +103,7 @@ class RegisterUserSchema(ma.ModelSchema):
 
     @validates('phone_number')
     def is_phone_like(self, phone_number):
-        return format_phone_number(validate_phone_number(phone_number))
+        return check_phone_number(phone_number)
 
     @validates('email')
     def is_valid_email(self, email):
@@ -146,7 +115,7 @@ class ChangePhoneSchema(ma.ModelSchema):
 
     @validates('phone_number')
     def is_phone_like(self, phone_number):
-        return format_phone_number(validate_phone_number(phone_number))
+        return check_phone_number(phone_number)
 
 
 class ChangeNameSchema(ma.ModelSchema):

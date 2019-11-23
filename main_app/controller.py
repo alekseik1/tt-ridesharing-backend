@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import jsonify
 from marshmallow import ValidationError
 from email_validator import validate_email, EmailNotValidError
+import phonenumbers
 
 from main_app.model import User
 from main_app.responses import SwaggerResponses
@@ -57,3 +58,38 @@ def check_email(email):
     if user:
         raise ValidationError('Email is already registered')
     return email
+
+
+def is_valid_phone_number(phone_number):
+    try:
+        validate_phone_number(phone_number)
+    except ValidationError:
+        return False
+    return True
+
+
+def validate_phone_number(phone_number):
+    """
+    Validates phone number via raising exceptions
+
+    :param phone_number: String of number
+    :return: A <Phone number> object from `phonenumbers` lib
+    :raise: ValidationError
+    """
+    try:
+        number = phonenumbers.parse(phone_number)
+        if not phonenumbers.is_valid_number(number):
+            raise ValidationError('Invalid phone number')
+    except:
+        raise ValidationError('Invalid phone number')
+    return phone_number
+
+
+def format_phone_number(phone_number_str):
+    number = phonenumbers.parse(phone_number_str)
+    return phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.E164)
+
+
+def check_phone_number(phone_number):
+    from app import db
+    return format_phone_number(validate_phone_number(phone_number))
