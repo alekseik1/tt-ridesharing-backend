@@ -1,10 +1,10 @@
 from marshmallow import fields, validates, ValidationError
 from flask import jsonify
 import phonenumbers
-from email_validator import validate_email, EmailNotValidError
 
 from app import ma, db
 from main_app.model import Ride, User, Organization, Driver, Car
+from main_app.controller import check_email
 from main_app.responses import SwaggerResponses
 
 
@@ -137,11 +137,8 @@ class RegisterUserSchema(ma.ModelSchema):
         return format_phone_number(validate_phone_number(phone_number))
 
     @validates('email')
-    def email_is_not_in_db(self, email):
-        user = db.session.query(User).filter_by(email=email).first()
-        if user:
-            raise ValidationError('Email is already registered')
-        return email
+    def is_valid_email(self, email):
+        return check_email(email)
 
 
 class ChangePhoneSchema(ma.ModelSchema):
@@ -177,11 +174,7 @@ class ChangeEmailSchema(ma.ModelSchema):
 
     @validates('email')
     def is_valid_email(self, email):
-        try:
-            email = validate_email(email)['email']
-        except EmailNotValidError:
-            raise ValidationError('Invalid email')
-        return email
+        return check_email(email)
 
 
 class CarSchema(ma.ModelSchema):

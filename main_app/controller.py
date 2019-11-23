@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from flask import jsonify
+from marshmallow import ValidationError
+from email_validator import validate_email, EmailNotValidError
 
 from main_app.model import User
 from main_app.responses import SwaggerResponses
@@ -43,3 +45,15 @@ def validate_all(validation_results):
         if rv:
             return rv
     return None
+
+
+def check_email(email):
+    from app import db
+    try:
+        email = validate_email(email)['email']
+    except EmailNotValidError:
+        raise ValidationError('Invalid email')
+    user = db.session.query(User).filter_by(email=email).first()
+    if user:
+        raise ValidationError('Email is already registered')
+    return email
