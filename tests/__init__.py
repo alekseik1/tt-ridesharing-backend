@@ -22,7 +22,7 @@ def add_users(number=2):
             first_name=person.name(),
             last_name=person.surname(),
             email=person.email(),
-            photo='',
+            photo_url='',
         )
         user.set_password('12345')
         db.session.add(user)

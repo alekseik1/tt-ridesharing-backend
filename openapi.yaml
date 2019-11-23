@@ -1159,7 +1159,7 @@ components:
     userExtra:
       type: object
       properties:
-        photo:
+        photo_url:
           type: string
           description: URL в хранилище
         is_driver:
