@@ -23,7 +23,7 @@ paths:
       tags:
       - anonymous
       summary: Зарегать пользователя
-      description: Регает пользователя, без авы.
+      description: Регает пользователя, без авы. **Если передать аватарку, то будет ошибка.**
       requestBody:
         $ref: '#/components/requestBodies/registerUser'
       responses:
