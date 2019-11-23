@@ -3,7 +3,7 @@ from flask import jsonify
 
 from app import ma, db
 from main_app.model import Ride, User, Organization, Driver, Car
-from main_app.controller import check_email, check_phone_number, check_photo_url
+from main_app.controller import check_email, check_phone_number, check_image_url
 from main_app.responses import SwaggerResponses
 
 
@@ -71,7 +71,7 @@ class PhotoURLSchema(ma.ModelSchema):
 
     @validates('photo_url')
     def check_photo_url(self, photo_url):
-        return check_photo_url(photo_url)
+        return check_image_url(photo_url)
 
 
 class UserSchemaNoOrganizations(ma.ModelSchema):
@@ -102,6 +102,11 @@ class RegisterDriverSchema(ma.ModelSchema):
             raise ValidationError('Driver is already registered')
         return driver
 
+    @validates('license_1')
+    @validates('license_2')
+    def is_valid_image_url(self, image_url):
+        return check_image_url(image_url)
+
 
 class RegisterUserSchema(ma.ModelSchema):
     class Meta:
@@ -116,6 +121,10 @@ class RegisterUserSchema(ma.ModelSchema):
     @validates('email')
     def is_valid_email(self, email):
         return check_email(email)
+
+    @validates('photo_url')
+    def is_valid_avatar_url(self, avatar_url):
+        return check_image_url(avatar_url)
 
 
 class ChangePhoneSchema(ma.ModelSchema):

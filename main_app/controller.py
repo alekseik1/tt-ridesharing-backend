@@ -95,6 +95,6 @@ def check_phone_number(phone_number):
     return format_phone_number(validate_phone_number(phone_number))
 
 
-def check_photo_url(photo_url):
+def check_image_url(photo_url):
     # TODO: validate if photo url is in our S3 storage
     return photo_url
