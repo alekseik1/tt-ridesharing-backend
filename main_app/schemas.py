@@ -1,6 +1,7 @@
 from marshmallow import fields, validates, ValidationError
 from flask import jsonify
 import phonenumbers
+from email_validator import validate_email, EmailNotValidError
 
 from app import ma, db
 from main_app.model import Ride, User, Organization, Driver, Car
@@ -169,6 +170,18 @@ class ChangeLastNameSchema(ma.ModelSchema):
         if not name:
             raise ValidationError('Invalid last name')
         return name
+
+
+class ChangeEmailSchema(ma.ModelSchema):
+    email = fields.String(required=True)
+
+    @validates('email')
+    def is_valid_email(self, email):
+        try:
+            email = validate_email(email)['email']
+        except EmailNotValidError:
+            raise ValidationError('Invalid email')
+        return email
 
 
 class CarSchema(ma.ModelSchema):
