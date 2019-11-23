@@ -69,7 +69,7 @@ def change_number():
     )
     current_user.phone_number = new_number
     db.session.commit()
-    return jsonify(dict(new_number=new_number))
+    return get_user_info()
 
 
 @api.route('/get_multiple_users_info', methods=['POST'])
