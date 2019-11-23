@@ -6,7 +6,7 @@ from geopy.distance import great_circle
 
 from app import db
 from main_app.model import Ride, Driver, Organization
-from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema
+from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema, UserSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, format_time, validate_all
@@ -189,6 +189,8 @@ def leave_ride():
 def get_my_rides():
     ride_schema = RideSchema(many=True)
     response = ride_schema.dump(current_user.all_rides)
+    for x in response:
+        x['host_driver_info'] = _get_user_info(x['host_driver_id'])
     return jsonify(response), 200
 
 
