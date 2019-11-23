@@ -151,6 +151,16 @@ class ChangePhoneSchema(ma.ModelSchema):
         return format_phone_number(validate_phone_number(phone_number))
 
 
+class ChangeNameSchema(ma.ModelSchema):
+    first_name = fields.String(required=True)
+
+    @validates('first_name')
+    def is_not_none(self, name):
+        if not name:
+            raise ValidationError('Invalid first name')
+        return name
+
+
 class CarSchema(ma.ModelSchema):
     class Meta:
         model = Car

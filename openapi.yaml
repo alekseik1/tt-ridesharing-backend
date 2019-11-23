@@ -781,6 +781,47 @@ paths:
                   $ref: '#/components/examples/errorAuthorizationRequred'
       security:
         - cookieAuth: []
+
+  /change_first_name:
+    post:
+      tags:
+        - user
+      summary: Поменять свое имя
+      description: Меняет только у текущего залогиненного пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/userName'
+      responses:
+        200:
+          description: Все ок, имя сменилось
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/userID'
+                  - $ref: '#/components/schemas/userBase'
+                  - $ref: '#/components/schemas/userExtra'
+        400:
+          description: Ошибка в запросе
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorBase'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+        - cookieAuth: []
   /change_phone_number:
     post:
       tags:
@@ -983,6 +1024,13 @@ components:
       properties:
         id:
           type: integer
+
+    userName:
+      required:
+        - first_name
+      properties:
+        first_name:
+          type: string
 
     phoneNumber:
       required:

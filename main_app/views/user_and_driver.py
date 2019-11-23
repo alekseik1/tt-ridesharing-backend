@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify, request, abort
 from flask_login import login_required, current_user
 import phonenumbers
 
@@ -6,8 +6,10 @@ from app import db
 from main_app.controller import validate_all, validate_params_with_schema, validate_is_in_db, \
     validate_is_authorized_with_id
 from main_app.model import Driver, User
-from main_app.schemas import UserSchema, RegisterDriverSchema, UserSchemaNoOrganizations, ChangePhoneSchema
+from main_app.schemas import UserSchema, RegisterDriverSchema, UserSchemaNoOrganizations, ChangePhoneSchema, \
+    ChangeNameSchema
 from main_app.views import api
+from main_app.responses import SwaggerResponses, build_error
 
 
 @api.route('/get_user_info', methods=['GET'])
@@ -80,3 +82,15 @@ def get_multiple_users_info():
         return jsonify([])
     return jsonify([_get_user_info(user_id, include_organizations=False) for user_id in data])
 
+
+@api.route('/change_first_name', methods=['PATCH', 'POST'])
+@login_required
+def change_first_name():
+    data = request.get_json()
+    name = data.get('first_name')
+    errors = validate_params_with_schema(ChangeNameSchema(), data)
+    if errors:
+        return errors
+    current_user.first_name = name
+    db.session.commit()
+    return get_user_info()
