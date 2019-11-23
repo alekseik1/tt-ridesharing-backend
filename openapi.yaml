@@ -932,7 +932,9 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/phoneNumber'
+                  - $ref: '#/components/schemas/userID'
+                  - $ref: '#/components/schemas/userBase'
+                  - $ref: '#/components/schemas/userExtra'
         400:
           description: Телефон не валиден
           content:
