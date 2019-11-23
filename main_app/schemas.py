@@ -3,7 +3,7 @@ from flask import jsonify
 
 from app import ma, db
 from main_app.model import Ride, User, Organization, Driver, Car
-from main_app.controller import check_email, check_phone_number
+from main_app.controller import check_email, check_phone_number, check_photo_url
 from main_app.responses import SwaggerResponses
 
 
@@ -64,6 +64,14 @@ class UserSchema(ma.ModelSchema):
         exclude = ['password_hash', 'all_rides']
     is_driver = fields.Boolean()
     organizations = fields.Nested(OrganizationSchema, many=True)
+
+
+class PhotoURLSchema(ma.ModelSchema):
+    photo_url = fields.String(required=True)
+
+    @validates('photo_url')
+    def check_photo_url(self, photo_url):
+        return check_photo_url(photo_url)
 
 
 class UserSchemaNoOrganizations(ma.ModelSchema):

@@ -7,7 +7,7 @@ from main_app.controller import validate_all, validate_params_with_schema, valid
     validate_is_authorized_with_id
 from main_app.model import Driver, User
 from main_app.schemas import UserSchema, RegisterDriverSchema, UserSchemaNoOrganizations, ChangePhoneSchema, \
-    ChangeNameSchema, ChangeLastNameSchema, ChangeEmailSchema
+    ChangeNameSchema, ChangeLastNameSchema, ChangeEmailSchema, PhotoURLSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 
@@ -118,5 +118,18 @@ def change_email():
     if errors:
         return errors
     current_user.email = email
+    db.session.commit()
+    return get_user_info()
+
+
+@api.route('/upload_avatar', methods=['POST'])
+@login_required
+def upload_avatar():
+    data = request.get_json()
+    photo_url = data.get('photo_url')
+    errors = validate_params_with_schema(PhotoURLSchema(), data)
+    if errors:
+        return errors
+    current_user.photo_url = photo_url
     db.session.commit()
     return get_user_info()

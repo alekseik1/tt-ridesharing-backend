@@ -93,3 +93,8 @@ def format_phone_number(phone_number_str):
 def check_phone_number(phone_number):
     from app import db
     return format_phone_number(validate_phone_number(phone_number))
+
+
+def check_photo_url(photo_url):
+    # TODO: validate if photo url is in our S3 storage
+    return photo_url
