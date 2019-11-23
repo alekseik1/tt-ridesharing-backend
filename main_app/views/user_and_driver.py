@@ -57,7 +57,7 @@ def register_driver():
     return jsonify(user_id=driver.id), 200
 
 
-@api.route('/change_phone_number', methods=['POST'])
+@api.route('/change_phone_number', methods=['POST', 'PATCH'])
 def change_number():
     data = request.get_json()
     errors = validate_params_with_schema(ChangePhoneSchema(), data)
