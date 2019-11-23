@@ -781,6 +781,49 @@ paths:
                   $ref: '#/components/examples/errorAuthorizationRequred'
       security:
         - cookieAuth: []
+  /change_last_name:
+    post:
+      tags:
+        - user
+      summary: Поменять свою фамилию
+      description: Меняет только у текущего залогиненного пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - last_name
+              properties:
+                last_name:
+                  type: string
+      responses:
+        200:
+          description: Все ок, фамилия сменилась
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/userID'
+                  - $ref: '#/components/schemas/userBase'
+                  - $ref: '#/components/schemas/userExtra'
+        400:
+          description: Ошибка в запросе
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorBase'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+        - cookieAuth: []
 
   /change_first_name:
     post:
@@ -792,8 +835,11 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: '#/components/schemas/userName'
+              required:
+                - first_name
+              properties:
+                first_name:
+                  type: string
       responses:
         200:
           description: Все ок, имя сменилось
@@ -1024,13 +1070,6 @@ components:
       properties:
         id:
           type: integer
-
-    userName:
-      required:
-        - first_name
-      properties:
-        first_name:
-          type: string
 
     phoneNumber:
       required:

@@ -7,7 +7,7 @@ from main_app.controller import validate_all, validate_params_with_schema, valid
     validate_is_authorized_with_id
 from main_app.model import Driver, User
 from main_app.schemas import UserSchema, RegisterDriverSchema, UserSchemaNoOrganizations, ChangePhoneSchema, \
-    ChangeNameSchema
+    ChangeNameSchema, ChangeLastNameSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 
@@ -92,5 +92,18 @@ def change_first_name():
     if errors:
         return errors
     current_user.first_name = name
+    db.session.commit()
+    return get_user_info()
+
+
+@api.route('/change_last_name', methods=['PATCH', 'POST'])
+@login_required
+def change_last_name():
+    data = request.get_json()
+    name = data.get('last_name')
+    errors = validate_params_with_schema(ChangeLastNameSchema(), data)
+    if errors:
+        return errors
+    current_user.last_name = name
     db.session.commit()
     return get_user_info()

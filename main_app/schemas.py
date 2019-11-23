@@ -161,6 +161,16 @@ class ChangeNameSchema(ma.ModelSchema):
         return name
 
 
+class ChangeLastNameSchema(ma.ModelSchema):
+    last_name = fields.String(required=True)
+
+    @validates('last_name')
+    def is_not_none(self, name):
+        if not name:
+            raise ValidationError('Invalid last name')
+        return name
+
+
 class CarSchema(ma.ModelSchema):
     class Meta:
         model = Car
