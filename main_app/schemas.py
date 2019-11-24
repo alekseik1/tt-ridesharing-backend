@@ -128,6 +128,7 @@ class RegisterUserSchema(ma.ModelSchema):
         model = User
     email = fields.Email(required=True)
     password = fields.String(required=True)
+    phone_number = fields.String(required=True)
 
     @validates('phone_number')
     def is_phone_like(self, phone_number):
