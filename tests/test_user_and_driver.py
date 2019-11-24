@@ -4,7 +4,7 @@ from main_app.model import User, Driver
 from app import db
 
 from main_app.responses import SwaggerResponses, build_error
-from main_app.schemas import UserSchema
+from main_app.schemas import UserSchemaOrganizationInfo
 from tests import BaseTest
 
 
@@ -15,7 +15,7 @@ class TestUserAndDriver(BaseTest):
         super().setUp()
         self.get_user_info_url = url_for(f'api.{get_user_info.__name__}')
         self.am_i_driver_url = url_for(f'api.{am_i_driver.__name__}')
-        self.user_schema = UserSchema()
+        self.user_schema = UserSchemaOrganizationInfo()
 
     def test_get_user_info(self):
         # Correct data for each user

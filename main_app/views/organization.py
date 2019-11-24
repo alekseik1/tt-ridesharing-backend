@@ -3,7 +3,8 @@ from flask_login import login_required, current_user
 
 from app import db
 from main_app.model import Organization
-from main_app.schemas import OrganizationIDSchema, UserSchema, OrganizationSchema
+from main_app.schemas import OrganizationIDSchema, UserSchemaOrganizationInfo, \
+    OrganizationSchemaUserIDs, OrganizationSchemaUserInfo
 from main_app.views import api, MAX_ORGANIZATIONS_PER_USER
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, validate_all
@@ -71,7 +72,7 @@ def join_organization():
 @login_required
 def get_my_organization_members():
     data = request.args
-    user_schema = UserSchema(many=True)
+    user_schema = UserSchemaOrganizationInfo(many=True)
     id = data.get('organization_id')
     try:
         id = int(id)
@@ -89,7 +90,7 @@ def get_my_organization_members():
 @api.route('/get_all_organizations', methods=['GET'])
 @login_required
 def get_all_organizations():
-    organization_schema = OrganizationSchema(many=True)
+    organization_schema = OrganizationSchemaUserInfo(many=True)
     result = organization_schema.dump(db.session.query(Organization).all(), many=True)
     return jsonify(result), 200
 
@@ -97,7 +98,7 @@ def get_all_organizations():
 @api.route('/create_organization', methods=['POST'])
 @login_required
 def create_organization():
-    organization_schema = OrganizationSchema()
+    organization_schema = OrganizationSchemaUserIDs()
     data = request.get_json()
     errors = validate_params_with_schema(organization_schema, data)
     if errors:

@@ -6,7 +6,7 @@ from app import db
 from main_app.controller import validate_all, validate_params_with_schema, validate_is_in_db, \
     validate_is_authorized_with_id
 from main_app.model import Driver, User
-from main_app.schemas import UserSchema, RegisterDriverSchema, UserSchemaNoOrganizations, ChangePhoneSchema, \
+from main_app.schemas import UserSchemaOrganizationInfo, RegisterDriverSchema, UserSchemaNoOrganizations, ChangePhoneSchema, \
     ChangeNameSchema, ChangeLastNameSchema, ChangeEmailSchema, PhotoURLSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
@@ -15,7 +15,7 @@ from main_app.responses import SwaggerResponses, build_error
 @api.route('/get_user_info', methods=['GET'])
 @login_required
 def get_user_info():
-    user_schema = UserSchema()
+    user_schema = UserSchemaOrganizationInfo()
     response = user_schema.dump(current_user)
     return jsonify(response), 200
 
@@ -31,7 +31,7 @@ def am_i_driver():
 
 def _get_user_info(user_id, include_organizations=True):
     if include_organizations:
-        user_schema = UserSchema()
+        user_schema = UserSchemaOrganizationInfo()
     else:
         user_schema = UserSchemaNoOrganizations()
     user = db.session.query(User).filter_by(id=user_id).first()

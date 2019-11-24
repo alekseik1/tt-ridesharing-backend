@@ -51,19 +51,34 @@ class RideSchema(ma.ModelSchema):
         include_fk = True
 
 
-class OrganizationSchema(ma.ModelSchema):
+class OrganizationSchemaUserIDs(ma.ModelSchema):
     class Meta:
         model = Organization
         exclude = ['is_start_for']
 
 
-class UserSchema(ma.ModelSchema):
+class UserSchemaOrganizationInfo(ma.ModelSchema):
     class Meta:
         model = User
         include_fk = True
         exclude = ['password_hash', 'all_rides']
     is_driver = fields.Boolean()
-    organizations = fields.Nested(OrganizationSchema, many=True)
+    organizations = fields.Nested(OrganizationSchemaUserIDs, many=True)
+
+
+class UserSchemaOrganizationIDs(ma.ModelSchema):
+    class Meta:
+        model = User
+        include_fk = True
+        exclude = ['password_hash', 'all_rides']
+    is_driver = fields.Boolean()
+
+
+class OrganizationSchemaUserInfo(ma.ModelSchema):
+    class Meta:
+        model = Organization
+        exclude = ['is_start_for']
+    users = fields.Nested(UserSchemaOrganizationIDs, many=True)
 
 
 class PhotoURLSchema(ma.ModelSchema):

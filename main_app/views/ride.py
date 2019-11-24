@@ -6,7 +6,8 @@ from geopy.distance import great_circle
 
 from app import db
 from main_app.model import Ride, Driver, Organization
-from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, FindBestRidesSchema, UserSchema
+from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, \
+    FindBestRidesSchema, UserSchemaOrganizationInfo, UserSchemaOrganizationIDs
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, format_time, validate_all

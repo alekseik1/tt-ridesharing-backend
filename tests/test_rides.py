@@ -3,7 +3,7 @@ from datetime import datetime
 
 from app import db
 from main_app.model import Driver, Organization, Ride
-from main_app.schemas import OrganizationSchema
+from main_app.schemas import OrganizationSchemaUserIDs
 from tests import BaseTest
 from main_app.responses import SwaggerResponses
 
@@ -43,7 +43,7 @@ class GetAllRidesTests(RidesBaseTest):
 
     def test_correct_response(self):
         response = self.client.get(self.get_all_rides_url)
-        organization_schema = OrganizationSchema()
+        organization_schema = OrganizationSchemaUserIDs()
         correct_response = SwaggerResponses.RIDE_INFO
         correct_response['host_driver_id'] = self.driver1.id
         correct_response['start_time'] = str(self.start_time)
