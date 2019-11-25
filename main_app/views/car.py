@@ -29,8 +29,8 @@ def register_car_for_driver():
     data = request.get_json()
     # Также валидирует на наличие водителя. Я начал писать нормально
     error = validate_params_with_schema(RegisterCarForDriverSchema(), data)
-    data['owner_id'] = current_user.id
     if error:
         return error
+    data['owner_id'] = current_user.id
     car = register_car(data)
     return jsonify(car_id=car.id), 200
