@@ -438,13 +438,9 @@ paths:
           content:
             application/json:
               schema:
-                required:
-                  - is_user_removed
-                properties:
-                  is_user_removed:
-                    type: boolean
+                $ref: '#/components/schemas/rideID'
         400:
-          description: Любая ошибка во входных данных
+          description: Любая ошибка во входных данных, либо текущий пользователь не состоит в поездке
           content:
             application/json:
               schema:
@@ -452,6 +448,8 @@ paths:
               examples:
                 invalid ride ID:
                   $ref: '#/components/examples/errorInvalidRide'
+                user not in ride:
+                  $ref: '#/components/examples/errorUserNotInRide'
         401:
           description: Пользователь не залогинен. БАГ - пока можно быть не залогиненым как водитель
           content:
@@ -1402,6 +1400,10 @@ components:
       value:
         name: Invalid ride with id
         value: 37
+    errorUserNotInRide:
+      value:
+        name: User is not in ride with ride_id
+        value: 2
     errorOrganizationInvalid:
       value:
         name: Invalid organization with id

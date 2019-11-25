@@ -181,14 +181,14 @@ def leave_ride():
         error = build_error(SwaggerResponses.INVALID_RIDE_WITH_ID, ride_id)
         return jsonify(error), 400
     # Иначе, убираем пользователя из поездки
-    is_removed = False
-    if current_user in ride.passengers:
-        ride.passengers.remove(current_user)
-        is_removed = True
-        # Обновим поездку
-        ride.is_available = True
-        db.session.commit()
-    response = dict(is_user_removed=is_removed)
+    if current_user not in ride.passengers:
+        error = build_error(SwaggerResponses.ERROR_USER_NOT_IN_RIDE, ride_id)
+        return jsonify(error), 400
+    ride.passengers.remove(current_user)
+    # Обновим поездку
+    ride.is_available = True
+    db.session.commit()
+    response = {'ride_id': ride_id}
     return jsonify(response), 200
 
 

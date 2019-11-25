@@ -31,6 +31,8 @@ class SwaggerResponses:
     INVALID_DRIVER_WITH_ID = {'name': 'Invalid driver with id', 'value': 36}
     ERROR_INVALID_NAME = {'name': 'Invalid name', 'value': ''}
 
+    ERROR_USER_NOT_IN_RIDE = {'name': 'User is not in ride with ride_id', 'value': ''}
+
     MATCHING_RESULTS = {'top': []}
 
     @staticmethod
