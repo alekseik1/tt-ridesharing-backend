@@ -438,7 +438,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/rideID'
+                required:
+                  - is_user_removed
+                properties:
+                  is_user_removed:
+                    type: boolean
         400:
           description: Любая ошибка во входных данных
           content:
