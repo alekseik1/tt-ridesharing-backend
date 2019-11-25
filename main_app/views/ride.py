@@ -118,7 +118,8 @@ def find_best_rides():
         return errors
     start_organization_id = data['start_organization_id']
     destination_gps = (data['destination_latitude'], data['destination_longitude'])
-    matching_results = _find_best_rides(start_organization_id, destination_gps)
+    m_distance = data.get('max_destination_distance_km', 2)
+    matching_results = _find_best_rides(start_organization_id, destination_gps, max_destination_distance_km=m_distance)
     response = matching_results
     return jsonify(response), 200
 
@@ -197,7 +198,7 @@ def get_my_rides():
 
 # TODO: for now, `organizations` is ignored
 # TODO: Optimization! Don't take all rides, use more filters
-def _find_best_rides(start_organization_id, destination_gps):
+def _find_best_rides(start_organization_id, destination_gps, max_destination_distance_km=2):
     # Get all rides starting from exact organization and are available
     ride_schema = RideSchema()
     all_rides = db.session.query(Ride)\
@@ -211,6 +212,8 @@ def _find_best_rides(start_organization_id, destination_gps):
             (ride.stop_latitude, ride.stop_longitude),
             destination_gps
         ).kilometers
+        if distance >= max_destination_distance_km:
+            continue
         ride_info = ride_schema.dump(ride)
         ride_info['host_driver_info'] = _get_user_info(ride.host_driver_id)
         ride_info = format_time([ride_info])[0]

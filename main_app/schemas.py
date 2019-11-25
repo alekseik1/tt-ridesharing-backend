@@ -12,6 +12,7 @@ class FindBestRidesSchema(ma.ModelSchema):
     start_organization_id = fields.Integer(required=True)
     destination_latitude = fields.Integer(required=True)
     destination_longitude = fields.Integer(required=True)
+    max_destination_distance_km = fields.Integer(required=False)
 
 
 class OrganizationIDSchema(ma.ModelSchema):

@@ -1456,6 +1456,7 @@ components:
             - destination_longitude
             - start_date
             - start_organization_id
+            - max_destination_distance_km
             type: object
             properties:
               start_date:
@@ -1468,6 +1469,9 @@ components:
                 type: number
               destination_longitude:
                 type: number
+              max_destination_distance_km:
+                type: number
+                description: Расстояние до пункта назначения, по которому отсекать
     gpsJSON:
       content:
         application/json:
