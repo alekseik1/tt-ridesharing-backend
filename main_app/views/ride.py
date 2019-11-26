@@ -199,6 +199,7 @@ def get_my_rides():
     response = ride_schema.dump(current_user.all_rides)
     for x in response:
         x['host_driver_info'] = _get_user_info(x['host_driver_id'])
+        x['is_mine'] = x['host_driver_id'] == current_user.id
     return jsonify(response), 200
 
 

@@ -699,7 +699,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/rideInfo'
+                  allOf:
+                    - $ref: '#/components/schemas/rideInfo'
+                  properties:
+                    is_mine:
+                      type: boolean
+                      description: Являюсь ли я хостом этой поездки
         401:
           description: Нужна авторизация
           content:
