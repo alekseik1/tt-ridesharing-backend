@@ -50,6 +50,7 @@ class RideSchema(ma.ModelSchema):
     class Meta:
         model = Ride
         include_fk = True
+    is_mine = fields.Boolean(required=True)
 
 
 class OrganizationSchemaUserIDs(ma.ModelSchema):
