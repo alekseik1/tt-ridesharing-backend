@@ -210,7 +210,7 @@ def _find_best_rides(start_organization_id, destination_gps, max_destination_dis
     ride_schema = RideSchema()
     all_rides = db.session.query(Ride)\
         .filter_by(start_organization_id=start_organization_id)\
-        .filter_by(is_available=True).all()
+        .filter_by(is_available=True).filter_by(is_mine=False).all()
     # For each ride, find distance to `gps`
     # We make top based on  destination point
     result_top = []
