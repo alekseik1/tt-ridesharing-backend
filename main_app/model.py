@@ -57,7 +57,8 @@ class Organization(db.Model):
     longitude = db.Column(db.Float)
     address = db.Column(db.String(600))
     description = db.Column(db.String(600))
-    users = db.relationship('User', secondary=association_user_organization, backref='organizations')
+    users = db.relationship('User', secondary=association_user_organization, backref='organizations',
+                            passive_deletes=True)
 
 
 class Ride(db.Model):
