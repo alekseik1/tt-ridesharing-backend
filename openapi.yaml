@@ -1202,7 +1202,6 @@ components:
 
     organizationInfo:
       required:
-      - id
       - latitude
       - longitude
       - name
