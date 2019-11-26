@@ -5,9 +5,9 @@ import phonenumbers
 from app import db
 from main_app.controller import validate_all, validate_params_with_schema, validate_is_in_db, \
     validate_is_authorized_with_id
-from main_app.model import Driver, User
+from main_app.model import Driver, User, Car
 from main_app.schemas import UserSchemaOrganizationInfo, RegisterDriverSchema, UserSchemaNoOrganizations, ChangePhoneSchema, \
-    ChangeNameSchema, ChangeLastNameSchema, ChangeEmailSchema, PhotoURLSchema
+    ChangeNameSchema, ChangeLastNameSchema, ChangeEmailSchema, PhotoURLSchema, CarSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 
@@ -15,8 +15,10 @@ from main_app.responses import SwaggerResponses, build_error
 @api.route('/get_user_info', methods=['GET'])
 @login_required
 def get_user_info():
-    user_schema = UserSchemaOrganizationInfo()
+    user_schema, car_schema = UserSchemaOrganizationInfo(), CarSchema(many=True)
     response = user_schema.dump(current_user)
+    his_cars = db.session.query(Car).filter_by(owner_id=current_user.id).all()
+    response['cars'] = car_schema.dump(his_cars)
     return jsonify(response), 200
 
 

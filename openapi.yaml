@@ -977,6 +977,14 @@ paths:
                 - $ref: '#/components/schemas/userID'
                 - $ref: '#/components/schemas/userBase'
                 - $ref: '#/components/schemas/userExtra'
+                required:
+                  - cars
+                properties:
+                  cars:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/car'
         400:
           description: Емэйл не найден
           content:
