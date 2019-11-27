@@ -162,6 +162,9 @@ def finish_ride():
         error = build_error(SwaggerResponses.INVALID_RIDE_WITH_ID, ride_id)
         return jsonify(error), 400
     ride = db.session.query(Ride).filter_by(id=ride_id).first()
+    if ride is None:
+        error = build_error(SwaggerResponses.INVALID_RIDE_WITH_ID, ride_id)
+        return jsonify(error), 400
     if ride.host_driver_id != current_user.id:
         error = build_error(SwaggerResponses.NO_PERMISSION_FOR_USER, current_user.id)
         return jsonify(error), 400
