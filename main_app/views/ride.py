@@ -29,7 +29,7 @@ def dump_rides(rides):
 @login_required
 def get_all_rides():
     rides = db.session.query(Ride).filter_by(is_available=True).all()
-    return jsonify(dump_rides(rides))
+    return jsonify(dump_rides(rides)[::-1])
 
 
 @api.route('/get_finished_rides', methods=['GET'])
