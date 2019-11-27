@@ -130,6 +130,7 @@ def get_ride_info():
     data = request.args
     ride_schema = RideSchema()
     id = data.get('ride_id')
+    # TODO: validation should be in schemas
     try:
         id = int(id)
     except:
@@ -153,6 +154,7 @@ def finish_ride():
     if not ride_id:
         error = build_error(SwaggerResponses.INVALID_RIDE_WITH_ID, ride_id)
         return jsonify(error), 400
+    # TODO: validation should be in schemas
     try:
         ride_id = int(ride_id)
     except TypeError:
