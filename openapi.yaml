@@ -188,8 +188,9 @@ paths:
     post:
       tags:
         - user
-      summary: 'Создать организацию. Вот тут, миленькие мои, нужно передавать всю инфу об организации.
-      После создания пользователь добавляется в организацю.'
+      summary: Создать организацию
+      description: 'Вот тут, миленькие мои, нужно передавать всю инфу об организации.
+        После создания пользователь добавляется в организацю.'
       requestBody:
         $ref: '#/components/requestBodies/createOrganization'
       responses:
@@ -249,7 +250,7 @@ paths:
     post:
       tags:
       - user
-      summary: Присоединиться к организации
+      summary: Покинуть организацию
       requestBody:
         $ref: '#/components/requestBodies/organizationID'
       responses:
