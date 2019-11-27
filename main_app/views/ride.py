@@ -32,9 +32,9 @@ def get_all_rides():
     return jsonify(dump_rides(rides)[::-1])
 
 
-@api.route('/get_finished_rides', methods=['GET'])
+@api.route('/get_my_finished_rides', methods=['GET'])
 @login_required
-def get_finished_rides():
+def get_my_finished_rides():
     # Все законченнные, которые ты хостил
     rides = db.session.query(Ride).filter(Ride.is_finished).\
         filter(Ride.host_driver_id == current_user.id).all()

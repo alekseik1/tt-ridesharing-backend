@@ -297,7 +297,7 @@ paths:
                   $ref: '#/components/examples/errorAuthorizationRequred'
       security:
         - cookieAuth: []
-  /get_finished_rides:
+  /get_my_finished_rides:
     get:
       tags:
       - user
