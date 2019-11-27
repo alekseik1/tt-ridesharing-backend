@@ -15,17 +15,32 @@ from main_app.controller import validate_params_with_schema, format_time, valida
 from main_app.views.user_and_driver import _get_user_info
 
 
-@api.route('/get_all_rides', methods=['GET'])
-@login_required
-def get_all_rides():
-    rides = db.session.query(Ride).filter_by(is_available=True).all()
+def dump_rides(rides):
     ride_schema = RideSchema(many=True)
     response = ride_schema.dump(rides)
     for x in response:
         x['host_driver_info'] = _get_user_info(x['host_driver_id'])
     # Форматируем время
     response = format_time(response)
-    return jsonify(response), 200
+    return response
+
+
+@api.route('/get_all_rides', methods=['GET'])
+@login_required
+def get_all_rides():
+    rides = db.session.query(Ride).filter_by(is_available=True).all()
+    return jsonify(dump_rides(rides))
+
+
+@api.route('/get_finished_rides', methods=['GET'])
+@login_required
+def get_finished_rides():
+    # Все законченнные, которые ты хостил
+    rides = db.session.query(Ride).filter(Ride.is_finished).\
+        filter(Ride.host_driver_id == current_user.id).all()
+    # Все законченные, в которых ты был пассажиром
+    rides.extend([x for x in current_user.all_rides if x.is_finished])
+    return jsonify(dump_rides(rides))
 
 
 # TODO: tests

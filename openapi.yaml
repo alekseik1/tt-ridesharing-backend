@@ -272,9 +272,35 @@ paths:
   /get_all_rides:
     get:
       tags:
-      - user
+        - user
       summary: Список ВСЕХ доступных поездок
       description: Получить список всех доступных поездок.
+      responses:
+        200:
+          description: Проблем нет, возвращаем список поездок.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/rideInfo'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+        - cookieAuth: []
+  /get_finished_rides:
+    get:
+      tags:
+      - user
+      summary: Личный список законченных поездок
+      description: Все законченные поездки, которые либо ты захостил, либо ты в них участвовал
       responses:
         200:
           description: Проблем нет, возвращаем список поездок.
