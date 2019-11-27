@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from app import db
 from main_app.model import Organization
 from main_app.schemas import OrganizationIDSchema, UserSchemaOrganizationInfo, \
-    OrganizationSchemaUserIDs, OrganizationSchemaUserInfo
+    OrganizationSchemaUserIDs, OrganizationSchemaUserInfo, OrganizationPhotoURLSchema
 from main_app.views import api, MAX_ORGANIZATIONS_PER_USER
 from main_app.model import User
 from main_app.responses import SwaggerResponses, build_error
@@ -112,3 +112,23 @@ def create_organization():
     db.session.add(organization)
     db.session.commit()
     return jsonify(dict(organization_id=organization.id)), 200
+
+
+# TODO: пока любой пользователь может загружать аватар организации
+@api.route('/upload_organization_avatar', methods=['POST'])
+@login_required
+def upload_organization_avatar():
+    data = request.get_json()
+    photo_url, organization_id = data.get('photo_url'), data.get('organization_id')
+    errors = validate_params_with_schema(OrganizationPhotoURLSchema(), data)
+    if errors:
+        return errors
+    organization = db.session.query(Organization).filter_by(id=organization_id).first()
+    # Если мы не состоим в этой организации, выкинуть ошибку
+    if organization not in current_user.organizations:
+        error = build_error(SwaggerResponses.ERROR_NOT_IN_ORGANIZATION, organization_id)
+        return jsonify(error), 400
+    # Назначаем photo_url организации
+    organization.photo_url = photo_url
+    db.session.commit()
+    return jsonify(dict(organization_id=organization_id))

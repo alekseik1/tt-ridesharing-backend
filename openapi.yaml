@@ -822,6 +822,94 @@ paths:
       security:
         - cookieAuth: []
 
+  /upload_avatar:
+    post:
+      tags:
+        - user
+      summary: Поменять свой аватар
+      description: Меняет только у текущего залогиненного пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - photo_url
+              properties:
+                photo_url:
+                  type: string
+      responses:
+        200:
+          description: Все ок, аватар сменился
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/userID'
+                  - $ref: '#/components/schemas/userBase'
+                  - $ref: '#/components/schemas/userExtra'
+        400:
+          description: Ошибка в запросе
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorBase'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+        - cookieAuth: []
+  /upload_organization_avatar:
+    post:
+      tags:
+        - user
+      summary: Поменять аватар организации
+      description: 'Пока что любой пользователь из организации может менять аватар организации.
+       Потом надо будет продумать безопасность.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - photo_url
+                - organization_id
+              properties:
+                photo_url:
+                  type: string
+                organization_id:
+                  type: string
+      responses:
+        200:
+          description: Все ок, аватар сменился
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/organizationID'
+        400:
+          description: Ошибка в запросе
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorBase'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+      security:
+        - cookieAuth: []
   /change_email:
     post:
       tags:

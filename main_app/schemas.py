@@ -91,6 +91,17 @@ class PhotoURLSchema(ma.ModelSchema):
         return check_image_url(photo_url)
 
 
+class OrganizationPhotoURLSchema(PhotoURLSchema):
+    organization_id = fields.Integer(required=True)
+
+    @validates('organization_id')
+    def is_valid_organization(self, organization_id):
+        organization = db.session.query(Organization).filter_by(id=organization_id).first()
+        if not organization:
+            raise ValidationError(f'Invalid organization with id: {organization_id}')
+        return organization_id
+
+
 class UserSchemaNoOrganizations(ma.ModelSchema):
     class Meta:
         model = User
