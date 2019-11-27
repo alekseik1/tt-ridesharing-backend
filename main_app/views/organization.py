@@ -6,6 +6,7 @@ from main_app.model import Organization
 from main_app.schemas import OrganizationIDSchema, UserSchemaOrganizationInfo, \
     OrganizationSchemaUserIDs, OrganizationSchemaUserInfo
 from main_app.views import api, MAX_ORGANIZATIONS_PER_USER
+from main_app.model import User
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, validate_all
 
@@ -103,6 +104,9 @@ def create_organization():
     errors = validate_params_with_schema(organization_schema, data)
     if errors:
         return errors
+    user_ids = data['users']
+    users = db.session.query(User).filter(User.id.in_(user_ids)).all()
+    data['users'] = users
     organization = Organization(**data)
     db.session.add(organization)
     db.session.commit()
