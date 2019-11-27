@@ -1,4 +1,5 @@
 import operator
+from datetime import datetime
 
 from flask import jsonify, request
 from flask_login import login_required, current_user
@@ -163,6 +164,10 @@ def finish_ride():
     ride = db.session.query(Ride).filter_by(id=ride_id).first()
     if ride.host_driver_id != current_user.id:
         error = build_error(SwaggerResponses.NO_PERMISSION_FOR_USER, current_user.id)
+        return jsonify(error), 400
+    # Нельзя завершать поездки из будущего
+    if ride.start_time > datetime.now():
+        error = build_error(SwaggerResponses.RIDE_NOT_STARTED, ride_id)
         return jsonify(error), 400
     # is_finished -- только для того, чтобы отделить историю
     ride.is_finished = True

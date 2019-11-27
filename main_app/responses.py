@@ -32,6 +32,7 @@ class SwaggerResponses:
     ERROR_INVALID_NAME = {'name': 'Invalid name', 'value': ''}
 
     ERROR_USER_NOT_IN_RIDE = {'name': 'User is not in ride with ride_id', 'value': ''}
+    RIDE_NOT_STARTED = {'name': 'Ride has not started yet', 'value': ''}
 
     MATCHING_RESULTS = {'top': []}
 
