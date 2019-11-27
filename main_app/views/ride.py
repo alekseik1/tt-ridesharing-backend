@@ -14,6 +14,8 @@ from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, format_time, validate_all
 from main_app.views.user_and_driver import _get_user_info
 
+MAX_RIDES_IN_HISTORY = 10
+
 
 def dump_rides(rides):
     ride_schema = RideSchema(many=True)
@@ -37,7 +39,7 @@ def get_all_rides():
 def get_my_finished_rides():
     # Все законченнные, которые ты хостил
     rides = db.session.query(Ride).filter(Ride.is_finished).\
-        filter(Ride.host_driver_id == current_user.id).all()
+        filter(Ride.host_driver_id == current_user.id).limit(MAX_RIDES_IN_HISTORY).all()
     # Все законченные, в которых ты был пассажиром
     rides.extend([x for x in current_user.all_rides if x.is_finished])
     return jsonify(dump_rides(rides))
