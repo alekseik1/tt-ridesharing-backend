@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_login import LoginManager
 from flask_marshmallow import Marshmallow
@@ -68,6 +68,10 @@ def setup_logger():
     os.makedirs('logs', exist_ok=True)
     date = datetime.now().strftime('%d_%m__%H_%M')
     logging.basicConfig(filename=f'logs/error_{date}.log', level=logging.DEBUG)
+
+    @app.before_request
+    def log_request_info():
+        app.logger.debug('Body: %s', request.get_data())
 
 
 if __name__ == '__main__':
