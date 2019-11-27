@@ -1261,6 +1261,9 @@ components:
         description:
           type: string
           description: Описание организации
+        photo_url:
+          type: string
+          description: Фотка организации
     rideInfo:
       required:
       - host_driver_id

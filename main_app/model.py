@@ -59,6 +59,7 @@ class Organization(db.Model):
     description = db.Column(db.String(600))
     users = db.relationship('User', secondary=association_user_organization, backref='organizations',
                             passive_deletes=True)
+    photo_url = db.Column(db.String(MAX_URL_LENGTH))
 
 
 class Ride(db.Model):
