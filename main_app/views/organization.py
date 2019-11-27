@@ -108,6 +108,7 @@ def create_organization():
     users = db.session.query(User).filter(User.id.in_(user_ids)).all()
     data['users'] = users
     organization = Organization(**data)
+    organization.users.append(current_user)
     db.session.add(organization)
     db.session.commit()
     return jsonify(dict(organization_id=organization.id)), 200
