@@ -225,11 +225,11 @@ def leave_ride():
 @api.route('/get_my_rides', methods=['GET'])
 @login_required
 def get_my_rides():
-    ride_schema = RideSchema(many=True)
-    response = ride_schema.dump(current_user.all_rides)
-    for x in response:
-        x['host_driver_info'] = _get_user_info(x['host_driver_id'])
-    return jsonify(response), 200
+    # Все, которые ты хостил
+    rides = db.session.query(Ride).filter(Ride.host_driver_id == current_user.id).all()
+    # Все, в которых ты был пассажиром
+    rides.extend(current_user.all_rides)
+    return jsonify(dump_rides(rides))
 
 
 # TODO: for now, `organizations` is ignored
