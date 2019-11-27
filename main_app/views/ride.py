@@ -230,9 +230,9 @@ def leave_ride():
 @login_required
 def get_my_rides():
     # Все, которые ты хостил
-    rides = db.session.query(Ride).filter(Ride.host_driver_id == current_user.id).all()
+    rides = db.session.query(Ride).filter((Ride.host_driver_id == current_user.id) & (not Ride.is_finished)).all()
     # Все, в которых ты был пассажиром
-    rides.extend(current_user.all_rides)
+    rides.extend([x for x in current_user.all_rides if not x.is_finished])
     return jsonify(dump_rides(rides))
 
 
