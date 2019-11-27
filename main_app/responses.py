@@ -33,6 +33,7 @@ class SwaggerResponses:
 
     ERROR_USER_NOT_IN_RIDE = {'name': 'User is not in ride with ride_id', 'value': ''}
     RIDE_NOT_STARTED = {'name': 'Ride has not started yet', 'value': ''}
+    RIDE_IS_FINISHED = {'name': 'Ride is finished', 'value': ''}
 
     MATCHING_RESULTS = {'top': []}
 

@@ -126,7 +126,7 @@ paths:
         400:
           description: Если каких-то данных не хватает, либо поездки с таким ID не
             существует, либо пользователь уже в поездке, либо пользователь является
-            водителем этой поездки
+            водителем этой поездки, либо поездка протухла
           content:
             application/json:
               schema:
@@ -142,6 +142,8 @@ paths:
                   $ref: '#/components/examples/errorAlreadyInRide'
                 is ride host:
                   $ref: '#/components/examples/errorIsRideHost'
+                ride is finished:
+                  $ref: '#/components/examples/errorRideIsFinished'
         401:
           description: Нужна авторизация
           content:
@@ -1442,6 +1444,10 @@ components:
       value:
         name: Invalid ride with id
         value: 37
+    errorRideIsFinished:
+      value:
+        name: Ride is finished
+        value: 19
     errorUserNotInRide:
       value:
         name: User is not in ride with ride_id

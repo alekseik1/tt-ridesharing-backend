@@ -101,6 +101,10 @@ def join_ride():
     if not ride.is_available:
         error = build_error(SwaggerResponses.ERROR_RIDE_UNAVAILABLE, ride_id)
         return jsonify(error), 400
+    # Нельзя вступать в протухшие поездки
+    if ride.start_time < datetime.now():
+        error = build_error(SwaggerResponses.RIDE_IS_FINISHED, ride_id)
+        return jsonify(error), 400
     # Пользователь не должен быть уже в поездке
     if current_user in ride.passengers:
         error = build_error(SwaggerResponses.ERROR_ALREADY_IN_RIDE, current_user.id)
