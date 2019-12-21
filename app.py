@@ -19,7 +19,7 @@ ma = Marshmallow()
 login = LoginManager()
 
 
-def create_app(config_name):
+def create_app(config_name: str = os.environ['FLASK_ENV']):
     app = Flask(__name__)
 
     # Take config from `config.py`
@@ -67,7 +67,13 @@ def create_app(config_name):
 def setup_logger(app):
     os.makedirs('logs', exist_ok=True)
     date = datetime.now().strftime('%d_%m__%H_%M')
-    logging.basicConfig(filename=f'logs/{app.name}_error_{date}.log', level=logging.DEBUG)
+    log_level = logging.ERROR
+    if app.debug:
+        log_level = logging.DEBUG
+    if app.testing:
+        log_level = logging.INFO
+    logging.basicConfig(filename=f'logs/{app.config.get("LOGGER_NAME", app.name)}_error_{date}.log',
+                        level=log_level)
 
     @app.before_request
     def log_request_info():
