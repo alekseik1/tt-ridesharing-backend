@@ -60,14 +60,14 @@ def create_app(config_name):
 
     app.register_error_handler(Exception, handle_uncaught_error)
     app.register_error_handler(Unauthorized, handle_unauthorized)
-
+    setup_logger(app)
     return app
 
 
-def setup_logger():
+def setup_logger(app):
     os.makedirs('logs', exist_ok=True)
     date = datetime.now().strftime('%d_%m__%H_%M')
-    logging.basicConfig(filename=f'logs/error_{date}.log', level=logging.DEBUG)
+    logging.basicConfig(filename=f'logs/{app.name}_error_{date}.log', level=logging.DEBUG)
 
     @app.before_request
     def log_request_info():
@@ -76,5 +76,4 @@ def setup_logger():
 
 if __name__ == '__main__':
     app = create_app('dev')
-    setup_logger()
     app.run(host='0.0.0.0')
