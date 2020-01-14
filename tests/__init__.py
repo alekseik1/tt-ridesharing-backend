@@ -118,7 +118,7 @@ def register_drivers(users_to_register: list):
 class BaseTest(TestCase):
 
     def create_app(self):
-        return create_app('test')
+        return create_app()
 
     def setUp(self) -> None:
         self.app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = False
