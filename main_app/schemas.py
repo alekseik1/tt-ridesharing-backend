@@ -211,5 +211,14 @@ class RegisterCarForDriverSchema(ma.ModelSchema):
             return jsonify(error), 400
 
 
+class ReverseGeocodingSchema(ma.ModelSchema):
+    latitude = fields.Float(required=True)
+    longitude = fields.Float(required=True)
+
+
+class ForwardGeocodingSchema(ma.ModelSchema):
+    address = fields.String(required=True)
+
+
 class CarIdSchema(ma.ModelSchema):
     car_id = fields.Integer(required=True)
