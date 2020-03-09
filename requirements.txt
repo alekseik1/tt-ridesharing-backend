@@ -9,8 +9,9 @@ marshmallow
 flask_login
 cryptography
 mimesis
-psycopg2
+psycopg2-binary
 flask_cors
 geopy
 phonenumbers
 email-validator
+gunicorn
