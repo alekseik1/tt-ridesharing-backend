@@ -31,7 +31,7 @@ def create_app():
     CORS(app, supports_credentials=True)
     login.init_app(app)
     # register all Blueprints
-    from main_app.views import auth, user_and_driver, organization, ride, car
+    from main_app.views import auth, user_and_driver, organization, ride, car, misc
     from main_app.views import api
     app.register_blueprint(api)
 
