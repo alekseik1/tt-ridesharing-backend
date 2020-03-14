@@ -4,6 +4,8 @@ services:
   web:
     build: .
     environment:
+      - SECRET_KEY=$SECRET_KEY
+      - GEOCODING_KEY=$GEOCODING_KEY
       - DATABASE_URL=postgresql://app:app@db:5432/ridesharing_test
     command: python -m unittest discover
     depends_on:
