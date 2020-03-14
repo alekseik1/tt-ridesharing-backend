@@ -4,10 +4,10 @@ services:
   web:
     build: .
     env_file:
-      - .env
+      - .env.dev
     ports:
       - 5000:5000
-    command: gunicorn --bind 0.0.0.0:5000 'app:create_app()'
+    command: flask run --host 0.0.0.0
     depends_on:
       - db
     volumes:
@@ -22,7 +22,7 @@ services:
     environment:
       - POSTGRES_USER=app
       - POSTGRES_PASSWORD=app
-      - POSTGRES_DB=ridesharing
+      - POSTGRES_DB=ridesharing_dev
 
 volumes:
   postgres_data:
