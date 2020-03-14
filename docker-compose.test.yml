@@ -3,13 +3,11 @@ version: '3.7'
 services:
   web:
     build: .
-    env_file:
-      - .env.dev
+    environment:
+      - DATABASE_URL=postgresql://app:app@db:5432/ridesharing_test
     command: python -m unittest discover
     depends_on:
       - db
-    volumes:
-    - ./:/app/
 
   db:
     image: postgres:12.0-alpine
@@ -18,4 +16,4 @@ services:
     environment:
       - POSTGRES_USER=app
       - POSTGRES_PASSWORD=app
-      - POSTGRES_DB=ridesharing_dev
+      - POSTGRES_DB=ridesharing_test

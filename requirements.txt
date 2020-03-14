@@ -16,3 +16,4 @@ phonenumbers
 email-validator
 gunicorn
 requests
+python-dotenv

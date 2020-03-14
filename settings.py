@@ -1,17 +1,18 @@
 import os
+from dotenv import load_dotenv
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 
 class Config:
-    FLASK_ENV = os.environ['FLASK_ENV']
-    DEBUG = os.environ['DEBUG']
-    TESTING = os.environ['TESTING']
-    PRESERVE_CONTEXT_ON_EXCEPTION = os.environ['PRESERVE_CONTEXT_ON_EXCEPTION']
-    SQLALCHEMY_TRACK_MODIFICATIONS = os.environ['SQLALCHEMY_TRACK_MODIFICATIONS']
-    #SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
-    if 'DATABASE_URL' in os.environ:
-        # Heroku
-        SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
-    else:
-        # docker-compose
-        SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
+    """
+    All variables are for production by default
+    """
     SECRET_KEY = os.environ['SECRET_KEY']
+    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+
+    PRESERVE_CONTEXT_ON_EXCEPTION = os.environ.get('PRESERVE_CONTEXT_ON_EXCEPTION', False)
+    SQLALCHEMY_TRACK_MODIFICATIONS = os.environ.get('SQLALCHEMY_TRACK_MODIFICATIONS', False)
+    FLASK_ENV = os.environ.get('FLASK_ENV', 'production')
+    DEBUG = os.environ.get('DEBUG', False)
+    TESTING = os.environ.get('TESTING', False)
