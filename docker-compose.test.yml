@@ -8,6 +8,8 @@ services:
     command: python -m unittest discover
     depends_on:
       - db
+    volumes:
+    - ./:/app/
 
   db:
     image: postgres:12.0-alpine
