@@ -10,8 +10,6 @@ services:
     command: flask run --host 0.0.0.0
     depends_on:
       - db
-    volumes:
-    - ./:/app/
 
   db:
     image: postgres:12.0-alpine

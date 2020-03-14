@@ -10,8 +10,6 @@ services:
     command: gunicorn --bind 0.0.0.0:80 'app:create_app()'
     depends_on:
       - db
-    volumes:
-    - ./:/app/
 
   db:
     image: postgres:12.0-alpine
