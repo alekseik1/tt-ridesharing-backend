@@ -4,7 +4,6 @@ FROM python:3.7-slim-buster
 ADD requirements.txt /app/requirements.txt
 WORKDIR /app
 RUN pip install -r requirements.txt
-# Upload whole application
-ADD . /app
+# NOTE: we expect /app to be mounted by volumes
 
 ENTRYPOINT ["/app/entrypoint.sh"]
