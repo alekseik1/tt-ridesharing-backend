@@ -1,7 +1,8 @@
 from main_app.views import api
 from main_app.controller import validate_params_with_schema
-from main_app.schemas import ReverseGeocodingSchema, ForwardGeocodingSchema
+from main_app.schemas import ReverseGeocodingSchema, ForwardGeocodingSchema, OrganizationSchemaUserIDs
 from flask import request
+from flask_login import login_required, current_user
 import os
 import requests
 
@@ -31,6 +32,10 @@ def forward_geocoding_blocking(address):
     ).json()
 
 
+def get_distance(coords1, coords2):
+    return ((coords1[0] - coords2[0]) ** 2 + (coords1[1] - coords2[1]) ** 2) ** 0.5
+
+
 @api.route('/decode_gps', methods=['POST'])
 def decode_gps():
     data = request.get_json()
@@ -47,3 +52,18 @@ def encode_address():
     if error:
         return error
     return forward_geocoding_blocking(**data)
+
+
+@api.route('/nearest_organizations', methods=['GET'])
+@login_required
+def get_nearest_organizations():
+    data = request.args
+    error = validate_params_with_schema(ReverseGeocodingSchema(), data)
+    if error:
+        return error
+    # TODO: what if organization does not have coordinates??
+    distance = lambda x: get_distance((x.latitude, x.longitude),
+                                      (float(data['latitude']), float(data['longitude'])))
+    result = sorted(current_user.organizations, key=distance)
+    dump_schema = OrganizationSchemaUserIDs(many=True)
+    return dump_schema.dumps(result)
