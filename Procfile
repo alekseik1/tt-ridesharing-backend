@@ -1,1 +1,1 @@
-web: gunicorn --bind 0.0.0.0:80 'app:create_app()'
+web: flask run --host 0.0.0.0
