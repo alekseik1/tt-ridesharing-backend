@@ -8,5 +8,10 @@ class Config:
     PRESERVE_CONTEXT_ON_EXCEPTION = os.environ['PRESERVE_CONTEXT_ON_EXCEPTION']
     SQLALCHEMY_TRACK_MODIFICATIONS = os.environ['SQLALCHEMY_TRACK_MODIFICATIONS']
     #SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
-    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    if 'DATABASE_URL' in os.environ:
+        # Heroku
+        SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    else:
+        # docker-compose
+        SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
     SECRET_KEY = os.environ['SECRET_KEY']
