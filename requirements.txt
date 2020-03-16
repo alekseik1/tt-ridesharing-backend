@@ -17,3 +17,4 @@ email-validator
 gunicorn
 requests
 python-dotenv
+flake8
