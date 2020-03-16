@@ -2,7 +2,7 @@ from main_app.views import api
 from main_app.controller import validate_params_with_schema
 from main_app.schemas import ReverseGeocodingSchema, \
     ForwardGeocodingSchema, OrganizationSchemaUserIDs
-from flask import request
+from flask import request, jsonify
 from flask_login import login_required, current_user
 import os
 import requests
@@ -27,9 +27,19 @@ def reverse_geocoding_blocking(latitude, longitude):
 
 
 def forward_geocoding_blocking(address):
-    return requests.get(
+    yandex_response = requests.get(
         FORWARD_GEOCODING_URL.format(key=GEO_TOKEN, address=address)
     ).json()
+    results = [
+        dict(
+            address=x['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['formatted'],
+            # NOTE: (latitude, longitude) are in reverse order
+            gps=dict(zip(
+                ('latitude', 'longitude'),
+                x['GeoObject']['Point']['pos'].split(' ')[::-1]))
+        )
+        for x in yandex_response['response']['GeoObjectCollection']['featureMember']]
+    return jsonify(results)
 
 
 def get_distance(coords1, coords2):
