@@ -8,7 +8,7 @@ from geopy.distance import great_circle
 from app import db
 from main_app.model import Ride, Driver, Organization
 from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, \
-    FindBestRidesSchema, UserSchemaOrganizationInfo, UserSchemaOrganizationIDs
+    FindBestRidesSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, format_time, validate_all
@@ -61,7 +61,8 @@ def create_ride():
         error = build_error(SwaggerResponses.IS_NOT_DRIVER, user_id)
         return jsonify(error), 401
     # 3. Организация должна существовать
-    organization = db.session.query(Organization).filter_by(id=data['start_organization_id']).first()
+    organization = db.session.query(Organization).\
+        filter_by(id=data['start_organization_id']).first()
     if not organization:
         error = build_error(SwaggerResponses.INVALID_ORGANIZATION_ID, data['start_organization_id'])
         return jsonify(error), 400
@@ -141,7 +142,8 @@ def find_best_rides():
     start_organization_id = data['start_organization_id']
     destination_gps = (data['destination_latitude'], data['destination_longitude'])
     m_distance = data.get('max_destination_distance_km', 2)
-    matching_results = _find_best_rides(start_organization_id, destination_gps, max_destination_distance_km=m_distance)
+    matching_results = _find_best_rides(start_organization_id, destination_gps,
+                                        max_destination_distance_km=m_distance)
     response = matching_results
     return jsonify(response), 200
 
@@ -155,7 +157,7 @@ def get_ride_info():
     # TODO: validation should be in schemas
     try:
         id = int(id)
-    except:
+    except ValueError:
         error = build_error(SwaggerResponses.INVALID_RIDE_WITH_ID, id)
         return jsonify(error), 400
     ride = db.session.query(Ride).filter_by(id=id).first()
@@ -232,7 +234,9 @@ def leave_ride():
 @login_required
 def get_my_rides():
     # Все, которые ты хостил
-    rides = db.session.query(Ride).filter((Ride.host_driver_id == current_user.id) & (not Ride.is_finished)).all()
+    rides = db.session.query(Ride).filter(
+        (Ride.host_driver_id == current_user.id) & (not Ride.is_finished))\
+        .all()
     # Все, в которых ты был пассажиром
     rides.extend([x for x in current_user.all_rides if not x.is_finished])
     return jsonify(dump_rides(rides))

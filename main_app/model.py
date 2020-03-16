@@ -57,15 +57,16 @@ class Organization(db.Model):
     longitude = db.Column(db.Float)
     address = db.Column(db.String(600))
     description = db.Column(db.String(600))
-    users = db.relationship('User', secondary=association_user_organization, backref='organizations',
-                            passive_deletes=True)
+    users = db.relationship('User', secondary=association_user_organization,
+                            backref='organizations', passive_deletes=True)
     photo_url = db.Column(db.String(MAX_URL_LENGTH))
 
 
 class Ride(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     start_organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
-    start_organization = db.relationship('Organization', backref='is_start_for', foreign_keys=[start_organization_id])
+    start_organization = db.relationship(
+        'Organization', backref='is_start_for', foreign_keys=[start_organization_id])
     stop_latitude = db.Column(db.Float, nullable=False)
     stop_longitude = db.Column(db.Float, nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
@@ -76,7 +77,8 @@ class Ride(db.Model):
     estimated_time = db.Column(db.Time)
     is_available = db.Column(db.Boolean, nullable=False, default=True)
     is_finished = db.Column(db.Boolean, server_default='false', nullable=False, default=False)
-    # TODO: Возможно, пользователю не обязательно иметь поле `all_rides`. Тем более, что поездки еще арихвируются
+    # TODO: Возможно, пользователю не обязательно иметь поле `all_rides`.
+    #  Тем более, что поездки еще арихвируются
     passengers = db.relationship('User', secondary=association_user_ride, backref='all_rides')
     cost = db.Column(db.Float)
     car_id = db.Column(db.Integer, db.ForeignKey('car.id'), nullable=False, server_default='2')

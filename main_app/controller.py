@@ -80,7 +80,7 @@ def validate_phone_number(phone_number):
         number = phonenumbers.parse(phone_number)
         if not phonenumbers.is_valid_number(number):
             raise ValidationError('Invalid phone number')
-    except:
+    except phonenumbers.NumberParseException:
         raise ValidationError('Invalid phone number')
     return phone_number
 
@@ -91,7 +91,6 @@ def format_phone_number(phone_number_str):
 
 
 def check_phone_number(phone_number):
-    from app import db
     return format_phone_number(validate_phone_number(phone_number))
 
 

@@ -77,7 +77,7 @@ def get_my_organization_members():
     id = data.get('organization_id')
     try:
         id = int(id)
-    except:
+    except ValueError:
         error = build_error(SwaggerResponses.INVALID_ORGANIZATION_ID, id)
         return jsonify(error), 400
     organization = db.session.query(Organization).filter_by(id=id).first()

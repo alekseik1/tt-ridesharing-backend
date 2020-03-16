@@ -1,11 +1,11 @@
 from main_app.views import api
 from main_app.controller import validate_params_with_schema
-from main_app.schemas import ReverseGeocodingSchema, ForwardGeocodingSchema, OrganizationSchemaUserIDs
+from main_app.schemas import ReverseGeocodingSchema, \
+    ForwardGeocodingSchema, OrganizationSchemaUserIDs
 from flask import request
 from flask_login import login_required, current_user
 import os
 import requests
-
 
 """
 Yandex geocoder.
@@ -62,8 +62,12 @@ def get_nearest_organizations():
     if error:
         return error
     # TODO: what if organization does not have coordinates??
-    distance = lambda x: get_distance((x.latitude, x.longitude),
-                                      (float(data['latitude']), float(data['longitude'])))
-    result = sorted(current_user.organizations, key=distance)
+    result = sorted(
+        current_user.organizations,
+        key=lambda x: get_distance(
+            (x.latitude, x.longitude),
+            (float(data['latitude']), float(data['longitude']))
+        )
+    )
     dump_schema = OrganizationSchemaUserIDs(many=True)
     return dump_schema.dumps(result)

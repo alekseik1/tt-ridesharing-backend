@@ -1,4 +1,4 @@
-from flask import jsonify, request, abort
+from flask import jsonify, request
 from flask_login import login_required, current_user
 import phonenumbers
 
@@ -6,10 +6,10 @@ from app import db
 from main_app.controller import validate_all, validate_params_with_schema, validate_is_in_db, \
     validate_is_authorized_with_id
 from main_app.model import Driver, User, Car
-from main_app.schemas import UserSchemaOrganizationInfo, RegisterDriverSchema, UserSchemaNoOrganizations, ChangePhoneSchema, \
+from main_app.schemas import UserSchemaOrganizationInfo, RegisterDriverSchema,\
+    UserSchemaNoOrganizations, ChangePhoneSchema, \
     ChangeNameSchema, ChangeLastNameSchema, ChangeEmailSchema, PhotoURLSchema, CarSchema
 from main_app.views import api
-from main_app.responses import SwaggerResponses, build_error
 
 
 @api.route('/get_user_info', methods=['GET'])
