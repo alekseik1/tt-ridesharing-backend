@@ -184,6 +184,56 @@ paths:
       security:
       - cookieAuth: []
 
+
+  /nearest_organizations:
+    get:
+      tags:
+      - user
+      - driver
+      summary: Найти ближайшую организацию
+      parameters:
+        - in: path
+          name: latitude
+          schema:
+            type: number
+          required: true
+        - in: path
+          name: longitude
+          schema:
+            type: number
+          required: true
+      description: Возвращает список всех своих организаций, отсортированный по расстоянию
+      responses:
+        200:
+          description: Проблем нет, возвращаем список организаций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/organizationInfo'
+              examples:
+                main:
+                  $ref: '#/components/examples/organizationInfo'
+        401:
+          description: Нужна авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+              examples:
+                main:
+                  $ref: '#/components/examples/errorAuthorizationRequred'
+        400:
+          description: Неправильный формат GPS-координат
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorBase'
+
+      security:
+      - cookieAuth: []
+
   /create_organization:
     post:
       tags:
