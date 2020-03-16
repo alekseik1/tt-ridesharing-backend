@@ -155,6 +155,35 @@ paths:
                   $ref: '#/components/examples/errorAuthorizationRequred'
       security:
       - cookieAuth: []
+
+  /decode_gps:
+    post:
+      summary: GPS в адрес
+      description: (lat, long) -> Адрес. **Только один** адрес, остальные кандидаты отметаются
+      requestBody:
+        $ref: '#/components/requestBodies/forwardGeocoding'
+      responses:
+        200:
+          description: Все ок, возвращаем адреса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forwardGeocoding'
+
+  /encode_address:
+    post:
+      summary: Поиск адреса по адрессной строке (типа матчинг)
+      description: Вбиваешь "первомайск" - получаешь предложения типа "Первомайская ул."
+      requestBody:
+        $ref: '#/components/requestBodies/reverseGeocoding'
+      responses:
+        200:
+          description: Все ок, возвращаем адреса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reverseGeocoding'
+
   /find_best_rides:
     post:
       tags:
@@ -1355,6 +1384,39 @@ components:
           type: boolean
           description: Является ли пользователь водителем
 
+    gpsSchema:
+      required:
+        - latitude
+        - lognitude
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+
+    reverseGeocoding:
+      required:
+        - address
+        - gps
+      type: object
+      properties:
+        address:
+          type: string
+          description: Заматченный адрес
+        gps:
+          $ref: '#/components/schemas/gpsSchema'
+
+    forwardGeocoding:
+      type: object
+      required:
+        - address
+        - gps
+      properties:
+        address:
+          type: string
+        gps:
+          $ref: '#/components/schemas/gpsSchema'
+
     driverBase:
       required:
       - license_1
@@ -1675,6 +1737,30 @@ components:
               max_destination_distance_km:
                 type: number
                 description: Расстояние до пункта назначения, по которому отсекать
+    reverseGeocoding:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - address
+            properties:
+              address:
+                type: string
+                description: Адрес, который угадываем
+    forwardGeocoding:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - latitude
+              - longitude
+            properties:
+              latitude:
+                type: number
+              longitude:
+                type: number
     gpsJSON:
       content:
         application/json:
