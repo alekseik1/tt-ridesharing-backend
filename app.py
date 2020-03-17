@@ -19,6 +19,14 @@ login = LoginManager()
 
 
 def create_app():
+    # Configure Sentry if possible
+    if 'SENTRY_DSN' in os.environ:
+        import sentry_sdk
+        from sentry_sdk.integrations.flask import FlaskIntegration
+        sentry_sdk.init(
+            dsn=os.environ['SENTRY_DSN'],
+            integrations=[FlaskIntegration()]
+        )
     app = Flask(__name__)
 
     app.config.from_object('settings.Config')
