@@ -9,8 +9,10 @@ from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import Unauthorized
+from marshmallow import ValidationError
 
 from main_app.responses import SwaggerResponses
+from main_app.exceptions.handlers import handle_validation_error
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -62,6 +64,7 @@ def create_app():
     def handle_unauthorized(error):
         return jsonify(SwaggerResponses.AUTHORIZATION_REQUIRED), 401
 
+    app.register_error_handler(ValidationError, handle_validation_error)
     app.register_error_handler(Exception, handle_uncaught_error)
     app.register_error_handler(Unauthorized, handle_unauthorized)
     setup_logger(app)
