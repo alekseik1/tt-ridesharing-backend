@@ -85,4 +85,4 @@ def get_nearest_organizations():
         )
     )
     dump_schema = OrganizationSchemaUserIDs(many=True)
-    return dump_schema.dumps(result)
+    return jsonify(dump_schema.dump(result))
