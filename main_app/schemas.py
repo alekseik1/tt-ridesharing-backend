@@ -1,4 +1,4 @@
-from marshmallow import fields, validates, ValidationError
+from marshmallow import fields, validates, ValidationError, Schema
 from flask import jsonify
 
 from app import ma, db
@@ -211,12 +211,12 @@ class RegisterCarForDriverSchema(ma.ModelSchema):
             return jsonify(error), 400
 
 
-class ReverseGeocodingSchema(ma.ModelSchema):
+class ReverseGeocodingSchema(Schema):
     latitude = fields.Float(required=True)
     longitude = fields.Float(required=True)
 
 
-class ForwardGeocodingSchema(ma.ModelSchema):
+class ForwardGeocodingSchema(Schema):
     address = fields.String(required=True)
 
 
