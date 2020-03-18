@@ -3,6 +3,11 @@ from dotenv import load_dotenv
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
+MAX_EMAIL_LENGTH = 256
+MAX_NAME_LENGTH = 40
+MAX_SURNAME_LENGTH = 40
+MAX_URL_LENGTH = 2000
+
 
 class Config:
     """

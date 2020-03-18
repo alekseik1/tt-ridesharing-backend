@@ -1,10 +1,20 @@
-from marshmallow import fields, validates, ValidationError, Schema
+from marshmallow import fields, validates, ValidationError, Schema, post_load
+from marshmallow.validate import Length
 from flask import jsonify
 
 from app import ma, db
 from main_app.model import Ride, User, Organization, Driver, Car
-from main_app.controller import check_email, check_phone_number, check_image_url
+from settings import MAX_EMAIL_LENGTH
+from main_app.controller import check_email, parse_phone_number, check_image_url
 from main_app.responses import SwaggerResponses
+
+
+class LoginSchema(Schema):
+    login = fields.Email(required=True, validate=Length(max=MAX_EMAIL_LENGTH))
+    password = fields.String(required=True)
+
+
+# OLD CODE #
 
 
 class FindBestRidesSchema(ma.ModelSchema):
@@ -139,21 +149,24 @@ class RegisterDriverSchema(ma.ModelSchema):
 class RegisterUserSchema(ma.ModelSchema):
     class Meta:
         model = User
+        exclude = ['password_hash', ]
     email = fields.Email(required=True)
     password = fields.String(required=True)
     phone_number = fields.String(required=True)
 
     @validates('phone_number')
     def is_phone_like(self, phone_number):
-        return check_phone_number(phone_number)
-
-    @validates('email')
-    def is_valid_email(self, email):
-        return check_email(email)
+        return parse_phone_number(phone_number)
 
     @validates('photo_url')
     def is_valid_avatar_url(self, avatar_url):
-        return check_image_url(avatar_url)
+        pass
+
+    @post_load(pass_original=True)
+    def make_user(self, user_obj: User, data, **kwargs):
+        user_obj.set_password(data['password'])
+        user_obj.phone_number = parse_phone_number(data['phone_number'])
+        return user_obj
 
 
 class ChangePhoneSchema(ma.ModelSchema):
@@ -161,7 +174,7 @@ class ChangePhoneSchema(ma.ModelSchema):
 
     @validates('phone_number')
     def is_phone_like(self, phone_number):
-        return check_phone_number(phone_number)
+        return parse_phone_number(phone_number)
 
 
 class ChangeNameSchema(ma.ModelSchema):

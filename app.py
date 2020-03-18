@@ -2,17 +2,14 @@ import logging
 import os
 from datetime import datetime
 
-from flask import Flask, jsonify, request
+from flask import Flask, request
 from flask_cors import CORS
 from flask_login import LoginManager
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.exceptions import Unauthorized
-from marshmallow import ValidationError
 
-from main_app.responses import SwaggerResponses
-from main_app.exceptions.handlers import handle_validation_error
+from main_app.exceptions import setup_handlers
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -54,19 +51,7 @@ def create_app():
             return None
         return user
 
-    # register handler for uncaught errors
-    # TODO: maybe move error handler to different module?
-    def handle_uncaught_error(error):
-        app.logger.error(error)
-        return jsonify({'name': 'uncaught error', 'value': 'see flask errors for more info'})
-
-    # TODO: make all views in `views.py` raise `Unauthorized` instead of handling it on their own
-    def handle_unauthorized(error):
-        return jsonify(SwaggerResponses.AUTHORIZATION_REQUIRED), 401
-
-    app.register_error_handler(ValidationError, handle_validation_error)
-    app.register_error_handler(Exception, handle_uncaught_error)
-    app.register_error_handler(Unauthorized, handle_unauthorized)
+    setup_handlers(app)
     setup_logger(app)
     return app
 

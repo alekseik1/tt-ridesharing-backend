@@ -3,11 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import db
-
-MAX_NAME_LENGTH = 40
-MAX_SURNAME_LENGTH = 40
-MAX_EMAIL_LENGTH = 256
-MAX_URL_LENGTH = 2000
+from settings import MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, MAX_SURNAME_LENGTH, MAX_URL_LENGTH
 
 association_user_ride = db.Table(
     'association_user_ride', db.metadata,
@@ -30,7 +26,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(MAX_EMAIL_LENGTH), nullable=False, unique=True)
     photo_url = db.Column(db.String(MAX_URL_LENGTH))
     phone_number = db.Column(db.String(20), server_default='+71111111111', nullable=False)
-    password_hash = db.Column(db.String(94))
+    password_hash = db.Column(db.String(94), nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

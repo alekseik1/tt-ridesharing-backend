@@ -60,38 +60,12 @@ def check_email(email):
     return email
 
 
-def is_valid_phone_number(phone_number):
+def parse_phone_number(phone_number):
     try:
-        validate_phone_number(phone_number)
-    except ValidationError:
-        return False
-    return True
-
-
-def validate_phone_number(phone_number):
-    """
-    Validates phone number via raising exceptions
-
-    :param phone_number: String of number
-    :return: A <Phone number> object from `phonenumbers` lib
-    :raise: ValidationError
-    """
-    try:
-        number = phonenumbers.parse(phone_number)
-        if not phonenumbers.is_valid_number(number):
-            raise ValidationError('Invalid phone number')
+        return phonenumbers.format_number(phonenumbers.parse(phone_number),
+                                          phonenumbers.PhoneNumberFormat.E164)
     except phonenumbers.NumberParseException:
         raise ValidationError('Invalid phone number')
-    return phone_number
-
-
-def format_phone_number(phone_number_str):
-    number = phonenumbers.parse(phone_number_str)
-    return phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.E164)
-
-
-def check_phone_number(phone_number):
-    return format_phone_number(validate_phone_number(phone_number))
 
 
 def check_image_url(photo_url):
