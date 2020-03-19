@@ -1,6 +1,8 @@
 from flask import Blueprint, redirect, url_for
 
-api = Blueprint('api', __name__)
+from settings import BLUEPRINT_API_NAME
+
+api = Blueprint(BLUEPRINT_API_NAME, __name__)
 # TODO: перенести это в конфиг
 MAX_ORGANIZATIONS_PER_USER = 5
 
