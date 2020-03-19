@@ -40,7 +40,7 @@ def login():
 
 @api.route('/register_user', methods=['POST'])
 def register_user():
-    user = RegisterUserSchema().load(request.json)
+    user = RegisterUserSchema().load(request.json, session=db.session)
     db.session.add(user)
     try:
         db.session.commit()
