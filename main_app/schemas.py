@@ -119,8 +119,8 @@ class UserSchemaNoOrganizations(ma.ModelSchema):
         exclude = ['_password_hash', 'all_rides']
 
 
-class UserIDSchema(ma.ModelSchema):
-    user_id = fields.Integer(required=True)
+class UserIDSchema(Schema):
+    id = fields.Integer(data_key='user_id', required=True)
 
 
 class DriverSchema(ma.ModelSchema):

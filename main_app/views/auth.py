@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app import db
 from main_app.model import User
-from main_app.schemas import RegisterUserSchema, LoginSchema
+from main_app.schemas import RegisterUserSchema, LoginSchema, UserIDSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import parse_phone_number
@@ -19,7 +19,7 @@ def logout():
         error = build_error(SwaggerResponses.AUTHORIZATION_REQUIRED)
         return jsonify(error), 400
     logout_user()
-    return '', 200
+    return ''
 
 
 @api.route('/login', methods=['POST'])
@@ -35,7 +35,7 @@ def login():
     if user is None or not user.check_password(password):
         raise InvalidCredentials()
     login_user(user, remember=True)
-    return jsonify({'user_id': user.id}), 200
+    return UserIDSchema().dump(user)
 
 
 @api.route('/register_user', methods=['POST'])
@@ -47,12 +47,12 @@ def register_user():
     except IntegrityError:
         db.session.rollback()
         raise EmailBusy()
-    return jsonify(user_id=user.id)
+    return UserIDSchema().dump(user)
 
 
 @api.route('/get_auth', methods=['GET'])
 def get_auth():
     if not current_user.is_authenticated:
-        return jsonify(dict(is_valid=False))
+        return jsonify({'is_valid': False})
     else:
-        return jsonify(dict(is_valid=True, user_id=current_user.id))
+        return jsonify({'is_valid': True, 'user_id': current_user.id})
