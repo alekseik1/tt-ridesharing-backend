@@ -26,13 +26,18 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(MAX_EMAIL_LENGTH), nullable=False, unique=True)
     photo_url = db.Column(db.String(MAX_URL_LENGTH))
     phone_number = db.Column(db.String(20), server_default='+71111111111', nullable=False)
-    password_hash = db.Column(db.String(94), nullable=False)
+    _password_hash = db.Column(db.String(94), nullable=False)
 
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+    @hybrid_property
+    def password(self):
+        return self._password_hash
+
+    @password.setter
+    def password(self, value):
+        self._password_hash = generate_password_hash(value)
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.password, password)
 
     @hybrid_property
     def is_driver(self):

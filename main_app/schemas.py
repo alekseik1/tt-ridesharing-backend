@@ -73,7 +73,7 @@ class UserSchemaOrganizationInfo(ma.ModelSchema):
     class Meta:
         model = User
         include_fk = True
-        exclude = ['password_hash', 'all_rides']
+        exclude = ['_password_hash', 'all_rides']
     is_driver = fields.Boolean()
     organizations = fields.Nested(OrganizationSchemaUserIDs, many=True)
 
@@ -82,7 +82,7 @@ class UserSchemaOrganizationIDs(ma.ModelSchema):
     class Meta:
         model = User
         include_fk = True
-        exclude = ['password_hash', 'all_rides']
+        exclude = ['_password_hash', 'all_rides']
     is_driver = fields.Boolean()
 
 
@@ -116,7 +116,7 @@ class UserSchemaNoOrganizations(ma.ModelSchema):
     class Meta:
         model = User
         include_fk = True
-        exclude = ['password_hash', 'all_rides']
+        exclude = ['_password_hash', 'all_rides']
 
 
 class UserIDSchema(ma.ModelSchema):
@@ -149,7 +149,7 @@ class RegisterDriverSchema(ma.ModelSchema):
 class RegisterUserSchema(ma.ModelSchema):
     class Meta:
         model = User
-        exclude = ['password_hash', ]
+        exclude = ['_password_hash', 'id', ]
     email = fields.Email(required=True)
     password = fields.String(required=True)
     phone_number = fields.String(required=True)
@@ -164,7 +164,7 @@ class RegisterUserSchema(ma.ModelSchema):
 
     @post_load(pass_original=True)
     def make_user(self, user_obj: User, data, **kwargs):
-        user_obj.set_password(data['password'])
+        user_obj.password = data['password']
         user_obj.phone_number = parse_phone_number(data['phone_number'])
         return user_obj
 
