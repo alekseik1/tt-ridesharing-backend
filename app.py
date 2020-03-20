@@ -32,7 +32,9 @@ def create_app():
     app.config.from_object('settings.Config')
     app.secret_key = app.config['SECRET_KEY']
     app.config.update(
-        SESSSION_COOKIE_SAMESITE='Lax',
+        SESSION_COOKIE_SECURE=True,
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE=None,
     )
 
     db.init_app(app)
