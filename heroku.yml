@@ -1,5 +1,9 @@
 build:
   docker:
     web: Dockerfile
+release:
+  image: web
+  command:
+    - ./entrypoint.sh
 run:
   web: gunicorn 'app:create_app()'
