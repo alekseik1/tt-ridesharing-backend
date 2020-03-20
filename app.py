@@ -31,6 +31,9 @@ def create_app():
 
     app.config.from_object('settings.Config')
     app.secret_key = app.config['SECRET_KEY']
+    app.config.update(
+        SESSSION_COOKIE_SAMESITE='Lax',
+    )
 
     db.init_app(app)
     migrate.init_app(app, db)
