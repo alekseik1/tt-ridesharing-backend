@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from geopy.distance import great_circle
 
 from app import db
-from main_app.model import Ride, Driver, Organization
+from main_app.model import Ride, Organization
 from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, \
     FindBestRidesSchema
 from main_app.views import api

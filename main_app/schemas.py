@@ -3,7 +3,7 @@ from marshmallow.validate import Length
 from flask import jsonify
 
 from app import ma, db
-from main_app.model import Ride, User, Organization, Driver, Car
+from main_app.model import Ride, User, Organization, Car
 from settings import MAX_EMAIL_LENGTH
 from main_app.controller import check_email, parse_phone_number, check_image_url
 from main_app.responses import SwaggerResponses
@@ -123,29 +123,6 @@ class UserIDSchema(Schema):
     id = fields.Integer(data_key='user_id', required=True)
 
 
-class DriverSchema(ma.ModelSchema):
-    class Meta:
-        model = Driver
-
-
-class RegisterDriverSchema(ma.ModelSchema):
-    id = fields.Integer(required=True)
-    license_1 = fields.String(required=True)
-    license_2 = fields.String(required=True)
-
-    @validates('id')
-    def id_is_not_in_db(self, id):
-        driver = db.session.query(Driver).filter_by(id=id).first()
-        if driver:
-            raise ValidationError('Driver is already registered')
-        return driver
-
-    @validates('license_1')
-    @validates('license_2')
-    def is_valid_image_url(self, image_url):
-        return check_image_url(image_url)
-
-
 class RegisterUserSchema(ma.ModelSchema):
     class Meta:
         model = User
@@ -218,7 +195,7 @@ class RegisterCarForDriverSchema(ma.ModelSchema):
 
     @validates('owner_id')
     def owner_exists(self, owner_id):
-        if db.session.query(Driver).filter_by(id=owner_id).first() is None:
+        if db.session.query(User).filter_by(id=owner_id).first() is None:
             error = SwaggerResponses.INVALID_DRIVER_WITH_ID
             error['value'] = owner_id
             return jsonify(error), 400

@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 
 from main_app.schemas import CarSchema, RegisterCarForDriverSchema
 from app import db
-from main_app.model import Car, Driver
+from main_app.model import Car, User
 from main_app.controller import validate_params_with_schema
 from main_app.views import api
 
@@ -12,7 +12,7 @@ from main_app.views import api
 @login_required
 def get_my_cars():
     car_schema = CarSchema(many=True)
-    corresponding_driver = db.session.query(Driver).filter_by(id=current_user.id).first()
+    corresponding_driver = db.session.query(User).filter_by(id=current_user.id).first()
     return jsonify(car_schema.dump(corresponding_driver.cars))
 
 

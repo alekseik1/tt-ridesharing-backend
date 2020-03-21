@@ -1,25 +1,25 @@
 from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
+from main_app.misc import reverse_geocoding_blocking
 
 from app import db
 from settings import MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, MAX_SURNAME_LENGTH, MAX_URL_LENGTH
 
 association_user_ride = db.Table(
     'association_user_ride', db.metadata,
-    db.Column('left_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('left_id', db.Integer, db.ForeignKey(f'user.id')),
     db.Column('right_id', db.Integer, db.ForeignKey('ride.id'))
 )
 
 association_user_organization = db.Table(
     'association_user_organization', db.metadata,
-    db.Column('left_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('left_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('right_id', db.Integer, db.ForeignKey('organization.id'))
 )
 
 
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(MAX_NAME_LENGTH), nullable=False)
     last_name = db.Column(db.String(MAX_SURNAME_LENGTH), nullable=False)
@@ -39,17 +39,6 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
-    @hybrid_property
-    def is_driver(self):
-        id = db.session.query(Driver).filter_by(id=self.id).first() is not None
-        return id
-
-
-class Driver(db.Model):
-    id = db.Column(db.Integer, db.ForeignKey(User.__tablename__ + '.id'), primary_key=True)
-    license_1 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
-    license_2 = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
-
 
 class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -65,25 +54,27 @@ class Organization(db.Model):
 
 class Ride(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+
     start_organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
     start_organization = db.relationship(
         'Organization', backref='is_start_for', foreign_keys=[start_organization_id])
+
     stop_latitude = db.Column(db.Float, nullable=False)
     stop_longitude = db.Column(db.Float, nullable=False)
-    start_time = db.Column(db.DateTime, nullable=False)
-    # TODO: Очень плохо брать со стороны фронта адрес, а не определять самим
-    stop_address = db.Column(db.String(600))
+
     total_seats = db.Column(db.Integer, server_default='4', nullable=False)
-    host_driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
-    estimated_time = db.Column(db.Time)
-    is_available = db.Column(db.Boolean, nullable=False, default=True)
-    is_finished = db.Column(db.Boolean, server_default='false', nullable=False, default=False)
-    # TODO: Возможно, пользователю не обязательно иметь поле `all_rides`.
-    #  Тем более, что поездки еще арихвируются
+    host_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     passengers = db.relationship('User', secondary=association_user_ride, backref='all_rides')
-    cost = db.Column(db.Float)
+
+    price = db.Column(db.Float)
     car_id = db.Column(db.Integer, db.ForeignKey('car.id'), nullable=False, server_default='2')
     description = db.Column(db.String(600))
+
+    @hybrid_property
+    def stop_address(self):
+        return reverse_geocoding_blocking(
+            latitude=self.stop_latitude, longitude=self.stop_longitude
+        )['address']
 
     @hybrid_property
     def is_mine(self):
@@ -95,5 +86,5 @@ class Car(db.Model):
     model = db.Column(db.String(100), nullable=False)
     color = db.Column(db.String(100), nullable=False)
     registry_number = db.Column(db.String(20), nullable=False)
-    owner_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
-    owner = db.relationship('Driver', backref='cars')
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    owner = db.relationship('User', backref='cars')

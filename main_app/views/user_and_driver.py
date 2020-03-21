@@ -5,8 +5,8 @@ import phonenumbers
 from app import db
 from main_app.controller import validate_all, validate_params_with_schema, validate_is_in_db, \
     validate_is_authorized_with_id
-from main_app.model import Driver, User, Car
-from main_app.schemas import UserSchemaOrganizationInfo, RegisterDriverSchema,\
+from main_app.model import User, Car
+from main_app.schemas import UserSchemaOrganizationInfo,\
     UserSchemaNoOrganizations, ChangePhoneSchema, \
     ChangeNameSchema, ChangeLastNameSchema, ChangeEmailSchema, PhotoURLSchema, CarSchema
 from main_app.views import api

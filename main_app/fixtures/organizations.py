@@ -2,7 +2,7 @@ import factory.fuzzy, factory.random
 from main_app.model import Organization
 from app import db
 import mimesis
-from main_app.views.misc import reverse_geocoding_blocking
+from main_app.misc import reverse_geocoding_blocking
 
 
 class OrganizationFactory(factory.alchemy.SQLAlchemyModelFactory):
