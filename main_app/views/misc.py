@@ -35,7 +35,7 @@ def reverse_geocoding_blocking(latitude, longitude):
     ).json()
     results = _parse_geocoding_results(yandex_response)
     # NOTE: we assume that first list element is nearest element
-    return jsonify(results[0])
+    return results[0]
 
 
 def forward_geocoding_blocking(address):
@@ -43,7 +43,7 @@ def forward_geocoding_blocking(address):
         FORWARD_GEOCODING_URL.format(key=GEO_TOKEN, address=address)
     ).json()
     results = _parse_geocoding_results(yandex_response)
-    return jsonify(results)
+    return results
 
 
 def get_distance(coords1, coords2):
@@ -53,13 +53,13 @@ def get_distance(coords1, coords2):
 @api.route('/decode_gps', methods=['POST'])
 def decode_gps():
     data = ReverseGeocodingSchema().load(request.json)
-    return reverse_geocoding_blocking(**data)
+    return jsonify(reverse_geocoding_blocking(**data))
 
 
 @api.route('/encode_address', methods=['POST'])
 def encode_address():
     data = ForwardGeocodingSchema().load(request.json)
-    return forward_geocoding_blocking(**data)
+    return jsonify(forward_geocoding_blocking(**data))
 
 
 @api.route('/nearest_organizations', methods=['GET'])
