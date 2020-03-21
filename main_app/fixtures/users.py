@@ -6,7 +6,7 @@ from main_app.controller import parse_phone_number
 from main_app.model import User
 
 
-class UserFactoryNoID(factory.alchemy.SQLAlchemyModelFactory):
+class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     class Meta:
         model = User
@@ -20,7 +20,3 @@ class UserFactoryNoID(factory.alchemy.SQLAlchemyModelFactory):
         lambda n: parse_phone_number('+7 (950) 000-00-00')
     )
     password = '12345'
-
-
-class UserFactory(UserFactoryNoID):
-    id = factory.Sequence(lambda n: n + 1)

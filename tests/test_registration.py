@@ -9,7 +9,7 @@ from main_app.model import User
 from main_app.views import auth
 import app
 from app import db
-from main_app.fixtures.users import UserFactoryNoID
+from main_app.fixtures.users import UserFactory
 
 
 class BasicRegistrationTests(TestCase):
@@ -23,7 +23,7 @@ class BasicRegistrationTests(TestCase):
         self.url = url_for(f'{BLUEPRINT_API_NAME}.{auth.register_user.__name__}')
 
     def _register_random_user(self):
-        user_json = factory.build(dict, FACTORY_CLASS=UserFactoryNoID)
+        user_json = factory.build(dict, FACTORY_CLASS=UserFactory)
         response = self.client.post(self.url, json=user_json)
         return response
 
@@ -40,7 +40,7 @@ class BasicRegistrationTests(TestCase):
         UserIDSchema().validate(data)
 
     def test_register_same_emails(self):
-        new_user = factory.build(dict, FACTORY_CLASS=UserFactoryNoID)
+        new_user = factory.build(dict, FACTORY_CLASS=UserFactory)
         self.client.post(self.url, json=new_user)
         # Register same user again
         response = self.client.post(self.url, json=new_user)
