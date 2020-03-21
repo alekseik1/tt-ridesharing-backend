@@ -3,7 +3,7 @@
 python manage.py db upgrade
 
 # For staging, fill database
-if [ $STAGING -eq 1 ]
+if [ "$STAGING" = 1 ]
 then
   python fill_db.py
 fi
