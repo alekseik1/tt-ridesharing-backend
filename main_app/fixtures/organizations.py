@@ -18,3 +18,11 @@ class OrganizationFactory(factory.alchemy.SQLAlchemyModelFactory):
             latitude=o.latitude, longitude=o.longitude)['address']
     )
     description = factory.Sequence(lambda n: f'Not fastfood')
+
+    @factory.post_generation
+    def users(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for user in extracted:
+                self.users.append(user)

@@ -7,9 +7,11 @@ from main_app.model import User
 
 
 class UserFactoryNoID(factory.alchemy.SQLAlchemyModelFactory):
+
     class Meta:
         model = User
         sqlalchemy_session = db.session
+        exclude = ['id', ]
     first_name = factory.Sequence(lambda n: Person().name())
     last_name = factory.Sequence(lambda n: Person().surname())
     email = factory.Sequence(lambda n: Person().email())
