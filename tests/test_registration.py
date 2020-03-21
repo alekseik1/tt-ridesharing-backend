@@ -9,7 +9,7 @@ from main_app.model import User
 from main_app.views import auth
 import app
 from app import db
-from . import UserFactoryNoID
+from main_app.fixtures.users import UserFactoryNoID
 
 
 class BasicRegistrationTests(TestCase):
