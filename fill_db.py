@@ -9,6 +9,8 @@ from main_app.fixtures.cars import CarFactory
 
 def fill_database(app):
     with app.app_context():
+        db.drop_all()
+        db.create_all()
         # Users without cars
         users = factory.build_batch(UserFactory, 20)
         db.session.add_all(users)
