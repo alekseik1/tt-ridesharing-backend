@@ -52,58 +52,6 @@ paths:
                 #  value:
                 #    name: Email is already registered
                 #    value: m.smith@mail.ru
-  /register_driver:
-    post:
-      tags:
-      - user
-      summary: Зарегать драйвера на основе пользователя
-      description: Нужна авторизация. Создает аккаунт водителя на основе пользовательского
-        акка.
-      requestBody:
-        $ref: '#/components/requestBodies/registerDriver'
-      responses:
-        200:
-          description: Успех
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/userID'
-              examples:
-                main:
-                  $ref: '#/components/examples/userID'
-        400:
-          description: Если каких-то данных не хватает, либо User с таким ID не существует.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorBase'
-              examples:
-                missing one parameter:
-                  $ref: '#/components/examples/errorMissingOneParameter'
-                missing two parameters:
-                  $ref: '#/components/examples/errorMissingTwoParameters'
-                no such user:
-                  $ref: '#/components/examples/errorInvalidUser'
-        401:
-          description: Нужна авторизация
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorBase'
-              examples:
-                main:
-                  $ref: '#/components/examples/errorAuthorizationRequred'
-        403:
-          description: Если пытаемся зарегать не свой userID
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorBase'
-              examples:
-                not your ID:
-                  $ref: '#/components/examples/errorNoPermissionForUser'
-      security:
-      - cookieAuth: []
   /join_ride:
     post:
       tags:
@@ -762,30 +710,6 @@ paths:
               examples:
                 invalid ride ID:
                   $ref: '#/components/examples/errorInvalidRide'
-        401:
-          description: Нужна авторизация
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorBase'
-              examples:
-                main:
-                  $ref: '#/components/examples/errorAuthorizationRequred'
-      security:
-      - cookieAuth: []
-  /am_i_driver:
-    get:
-      deprecated: true
-      tags:
-      - user
-      summary: Водитель ли я
-      responses:
-        200:
-          description: Все ок, инфа прогружена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_200_1'
         401:
           description: Нужна авторизация
           content:

@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from geopy.distance import great_circle
 
 from app import db
-from main_app.model import Ride, Organization
+from main_app.model import Ride, Organization, User
 from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, \
     FindBestRidesSchema
 from main_app.views import api
@@ -57,7 +57,7 @@ def create_ride():
         return errors
     user_id = current_user.id
     # 2. Пользователь должен быть водителем
-    if not db.session.query(Driver).filter_by(id=user_id).first():
+    if not db.session.query(User).filter_by(id=user_id).first():
         error = build_error(SwaggerResponses.IS_NOT_DRIVER, user_id)
         return jsonify(error), 401
     # 3. Организация должна существовать

@@ -1,4 +1,5 @@
-import factory.fuzzy, factory.random
+import factory.fuzzy
+import factory.random
 from main_app.model import Organization
 from app import db
 import mimesis
