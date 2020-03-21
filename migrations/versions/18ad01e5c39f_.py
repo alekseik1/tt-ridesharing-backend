@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 6c9de84aa35f
+Revision ID: 18ad01e5c39f
 Revises: 
-Create Date: 2020-01-14 19:16:14.656518
+Create Date: 2020-03-21 21:55:39.597591
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6c9de84aa35f'
+revision = '18ad01e5c39f'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,29 +28,22 @@ def upgrade():
     sa.Column('photo_url', sa.String(length=2000), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('users',
+    op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('first_name', sa.String(length=40), nullable=False),
     sa.Column('last_name', sa.String(length=40), nullable=False),
     sa.Column('email', sa.String(length=256), nullable=False),
     sa.Column('photo_url', sa.String(length=2000), nullable=True),
     sa.Column('phone_number', sa.String(length=20), server_default='+71111111111', nullable=False),
-    sa.Column('_password_hash', sa.String(length=94), nullable=True),
+    sa.Column('_password_hash', sa.String(length=94), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
     op.create_table('association_user_organization',
     sa.Column('left_id', sa.Integer(), nullable=True),
     sa.Column('right_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['left_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['left_id'], ['user.id'], ),
     sa.ForeignKeyConstraint(['right_id'], ['organization.id'], )
-    )
-    op.create_table('driver',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('license_1', sa.String(length=2000), nullable=False),
-    sa.Column('license_2', sa.String(length=2000), nullable=False),
-    sa.ForeignKeyConstraint(['id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('car',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -58,7 +51,7 @@ def upgrade():
     sa.Column('color', sa.String(length=100), nullable=False),
     sa.Column('registry_number', sa.String(length=20), nullable=False),
     sa.Column('owner_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['owner_id'], ['driver.id'], ),
+    sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('ride',
@@ -66,25 +59,20 @@ def upgrade():
     sa.Column('start_organization_id', sa.Integer(), nullable=False),
     sa.Column('stop_latitude', sa.Float(), nullable=False),
     sa.Column('stop_longitude', sa.Float(), nullable=False),
-    sa.Column('start_time', sa.DateTime(), nullable=False),
-    sa.Column('stop_address', sa.String(length=600), nullable=True),
     sa.Column('total_seats', sa.Integer(), server_default='4', nullable=False),
-    sa.Column('host_driver_id', sa.Integer(), nullable=False),
-    sa.Column('estimated_time', sa.Time(), nullable=True),
-    sa.Column('is_available', sa.Boolean(), nullable=False),
-    sa.Column('is_finished', sa.Boolean(), server_default='false', nullable=False),
-    sa.Column('cost', sa.Float(), nullable=True),
+    sa.Column('host_id', sa.Integer(), nullable=False),
+    sa.Column('price', sa.Float(), nullable=True),
     sa.Column('car_id', sa.Integer(), server_default='2', nullable=False),
     sa.Column('description', sa.String(length=600), nullable=True),
     sa.ForeignKeyConstraint(['car_id'], ['car.id'], ),
-    sa.ForeignKeyConstraint(['host_driver_id'], ['driver.id'], ),
+    sa.ForeignKeyConstraint(['host_id'], ['user.id'], ),
     sa.ForeignKeyConstraint(['start_organization_id'], ['organization.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('association_user_ride',
     sa.Column('left_id', sa.Integer(), nullable=True),
     sa.Column('right_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['left_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['left_id'], ['user.id'], ),
     sa.ForeignKeyConstraint(['right_id'], ['ride.id'], )
     )
     # ### end Alembic commands ###
@@ -95,8 +83,7 @@ def downgrade():
     op.drop_table('association_user_ride')
     op.drop_table('ride')
     op.drop_table('car')
-    op.drop_table('driver')
     op.drop_table('association_user_organization')
-    op.drop_table('users')
+    op.drop_table('user')
     op.drop_table('organization')
     # ### end Alembic commands ###
