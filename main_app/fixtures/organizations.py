@@ -13,7 +13,8 @@ class OrganizationFactory(factory.alchemy.SQLAlchemyModelFactory):
     name = factory.Sequence(lambda n: f'{mimesis.Food().dish()} restaurant')
     latitude = factory.fuzzy.FuzzyFloat(-20.0, +20.0)
     longitude = factory.fuzzy.FuzzyFloat(-20.0, +20.0)
-    address = factory.lazy_attribute(lambda o:
-        reverse_geocoding_blocking(latitude=o.latitude, longitude=o.longitude)['address']
+    address = factory.lazy_attribute(
+        lambda o: reverse_geocoding_blocking(
+            latitude=o.latitude, longitude=o.longitude)['address']
     )
     description = factory.Sequence(lambda n: f'Not fastfood')
