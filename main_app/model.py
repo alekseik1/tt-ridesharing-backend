@@ -15,8 +15,8 @@ association_user_ride = db.Table(
 
 association_user_organization = db.Table(
     'association_user_organization', db.metadata,
-    db.Column('left_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('right_id', db.Integer, db.ForeignKey('organization.id'))
+    db.Column('left_id', db.Integer, db.ForeignKey('user.id', ondelete='cascade')),
+    db.Column('right_id', db.Integer, db.ForeignKey('organization.id', ondelete='cascade'))
 )
 
 
@@ -53,7 +53,10 @@ class Organization(db.Model):
     control_question = db.Column(db.String(400), nullable=False, server_default='undefined')
     control_answer = db.Column(db.String(200), nullable=False, server_default='undefined')
     users = db.relationship('User', secondary=association_user_organization,
-                            backref='organizations', lazy='dynamic')
+                            backref='organizations',
+                            cascade='all, delete',
+                            passive_deletes=True
+                            )
     photo_url = db.Column(db.String(MAX_URL_LENGTH))
 
     @hybrid_property
