@@ -108,7 +108,7 @@ class OrganizationJsonSchema(ma.ModelSchema, CamelCaseSchema):
         model = Organization
     last_ride_datetime = fields.String(dump_only=True)
     users = fields.Nested(UserJsonSchema, only=(
-        'first_name', 'last_name', 'photo_url', 'rating'
+        'id', 'first_name', 'last_name', 'photo_url', 'rating'
     ), many=True, data_key='members')
     total_members = fields.String(dump_only=True)
     total_drivers = fields.String(dump_only=True)
