@@ -64,3 +64,19 @@ class BasicTest(TestCase):
             with login_as(self.client, not_owner):
                 response = self.client.post(self.url, json=json)
             self.assert403(response)
+
+    def test_delete_organization(self):
+        ID = 1
+        json = {
+            'id': ID
+        }
+        org_owner = db.session.query(Organization).filter_by(id=ID).first().creator
+        not_owner = db.session.query(User).filter(User.id != org_owner.id).first()
+        with self.subTest('Correct response from owner'):
+            with login_as(self.client, org_owner):
+                response = self.client.delete(self.url, json=json)
+            self.assert200(response)
+        with self.subTest('Forbidden for non-owner'):
+            with login_as(self.client, not_owner):
+                response = self.client.delete(self.url, json=json)
+            self.assert403(response)

@@ -53,7 +53,7 @@ class Organization(db.Model):
     control_question = db.Column(db.String(400), nullable=False, server_default='undefined')
     control_answer = db.Column(db.String(200), nullable=False, server_default='undefined')
     users = db.relationship('User', secondary=association_user_organization,
-                            backref='organizations', passive_deletes=True)
+                            backref='organizations', lazy='dynamic')
     photo_url = db.Column(db.String(MAX_URL_LENGTH))
 
     @hybrid_property

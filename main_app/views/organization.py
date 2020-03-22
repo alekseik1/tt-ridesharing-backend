@@ -39,6 +39,13 @@ def organization():
         db.session.add(org)
         db.session.commit()
         return IdSchema().dump(org)
+    if request.method == 'DELETE':
+        org = OrganizationJsonSchema(only=('id', ), session=db.session).load(request.json)
+        if current_user != org.creator:
+            raise Forbidden('Only creator can delete an organization')
+        db.session.delete(org)
+        db.session.commit()
+        return ''
 
 
 @api.route('/leave_organization', methods=['POST'])
