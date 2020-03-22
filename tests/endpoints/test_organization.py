@@ -23,7 +23,9 @@ class BasicTest(TestCase):
 
     def test_get_organization(self):
         ID = 1
-        response = self.client.get(self.url, query_string={'id': ID})
+        response = self.client.get(self.url, query_string={
+            'id': ID
+        })
         organization = db.session.query(Organization).filter_by(id=ID).first()
         schema = OrganizationJsonSchema()
 
