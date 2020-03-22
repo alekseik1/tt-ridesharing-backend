@@ -4,7 +4,7 @@ from flask import url_for
 from app import create_app, db
 from settings import BLUEPRINT_API_NAME
 from main_app.views.organization import organization as endpoint
-from main_app.schemas import OrganizationJsonSchema, IdSchema
+from main_app.schemas import OrganizationJsonSchema, IdSchema, UserJsonSchema
 from tests import login_as
 from main_app.model import Organization, User
 from fill_db import fill_database
@@ -87,3 +87,21 @@ class BasicTest(TestCase):
             with login_as(self.client, not_owner):
                 response = self.client.delete(self.url, json=json)
             self.assert403(response)
+
+    def test_organization_members(self):
+        ID = 1
+        query_params = {
+            'id': ID
+        }
+        with login_as(self.client, db.session.query(User).first()):
+            response = self.client.get(f'{self.url}/members', query_string=query_params)
+            self.assert200(response)
+            # Response content check
+            self.assertEqual({'id', 'members'}, response.json.keys())
+            UserJsonSchema(
+                session=db.session,
+                only=('id', 'first_name', 'last_name', 'photo_url'),
+                # `rating` is dump_only, so we need to handle it separately
+                unknown=('rating',),
+                many=True
+            ).load(response.json['members'])
