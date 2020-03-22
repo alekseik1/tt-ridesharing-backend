@@ -23,7 +23,7 @@ def handle_uncaught_error(error):
     return jsonify({
         'code': 500,
         'description': 'Uncaught error',
-    })
+    }), 500
 
 
 GENERIC_EXCEPTIONS = {Unauthorized, InvalidCredentials, AlreadyLoggedIn, HTTPException, EmailBusy}
