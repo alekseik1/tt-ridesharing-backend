@@ -27,7 +27,14 @@ class BasicTest(TestCase):
             'id': ID
         })
         organization = db.session.query(Organization).filter_by(id=ID).first()
-        schema = OrganizationJsonSchema()
+        schema = OrganizationJsonSchema(only=(
+            'name', 'address',
+            'creator', 'last_ride_datetime',
+            'id', 'photo_url',
+            'total_members', 'total_drivers',
+            'min_ride_cost', 'max_ride_cost',
+            'description',
+        ))
 
         self.assert200(response)
         self.assertEqual(schema.dump(organization), response.json)
