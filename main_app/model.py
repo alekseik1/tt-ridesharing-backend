@@ -37,6 +37,11 @@ class User(UserMixin, db.Model):
     def password(self, value):
         self._password_hash = generate_password_hash(value)
 
+    @hybrid_property
+    def rating(self):
+        # TODO: implementation
+        return 5.0
+
     def check_password(self, password):
         return check_password_hash(self.password, password)
 

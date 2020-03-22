@@ -99,13 +99,17 @@ class IdSchema(CamelCaseSchema):
 class UserJsonSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = User
+    organizations = fields.Nested('OrganizationJsonSchema', many=True)
+    rating = fields.Float()
 
 
 class OrganizationJsonSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = Organization
-        exclude = ['users', 'is_start_for', ]
     last_ride_datetime = fields.String(dump_only=True)
+    users = fields.Nested(UserJsonSchema, only=(
+        'first_name', 'last_name', 'photo_url', 'rating'
+    ), many=True, data_key='members')
     total_members = fields.String(dump_only=True)
     total_drivers = fields.String(dump_only=True)
     min_ride_cost = fields.String(dump_only=True)
