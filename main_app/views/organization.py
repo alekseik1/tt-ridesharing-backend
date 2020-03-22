@@ -26,7 +26,9 @@ def organization():
     if request.method == 'PUT':
         org = OrganizationJsonSchema().load(request.json)
         org.creator = current_user
-        org.address = reverse_geocoding_blocking(latitude=org.latitude, longitude=org.longitude)['address']
+        org.address = reverse_geocoding_blocking(
+            latitude=org.latitude, longitude=org.longitude
+        )['address']
         db.session.add(org)
         db.session.commit()
         return IdSchema().dump(org)

@@ -26,7 +26,9 @@ def handle_uncaught_error(error):
     }), 500
 
 
-GENERIC_EXCEPTIONS = {Unauthorized, InvalidCredentials, AlreadyLoggedIn, HTTPException, EmailBusy, Forbidden}
+GENERIC_EXCEPTIONS = {
+    Unauthorized, InvalidCredentials, AlreadyLoggedIn, HTTPException, EmailBusy, Forbidden
+}
 SPECIAL_EXCEPTIONS = {
     ValidationError: handle_validation_error,
     Exception: handle_uncaught_error
