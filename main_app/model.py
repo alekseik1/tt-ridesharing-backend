@@ -44,12 +44,14 @@ class User(UserMixin, db.Model):
 class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
     address = db.Column(db.String(600), nullable=False, server_default='undefined')
     description = db.Column(db.String(600))
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, server_default='1')
     creator = db.relationship('User')
+    control_question = db.Column(db.String(400), nullable=False, server_default='undefined')
+    control_answer = db.Column(db.String(200), nullable=False, server_default='undefined')
     users = db.relationship('User', secondary=association_user_organization,
                             backref='organizations', passive_deletes=True)
     photo_url = db.Column(db.String(MAX_URL_LENGTH))

@@ -3,6 +3,7 @@ import factory.random
 from main_app.model import Organization
 from app import db
 import mimesis
+from .users import UserFactory
 from main_app.misc import reverse_geocoding_blocking
 
 
@@ -19,6 +20,10 @@ class OrganizationFactory(factory.alchemy.SQLAlchemyModelFactory):
             latitude=o.latitude, longitude=o.longitude)['address']
     )
     description = factory.Sequence(lambda n: f'Not fastfood')
+    creator = factory.SubFactory(UserFactory)
+    creator_id = factory.SelfAttribute('creator.id')
+    control_question = 'What can change the nature of the man?'
+    control_answer = factory.fuzzy.FuzzyChoice(['faith', 'suffering', 'love', 'nothing'])
 
     @factory.post_generation
     def users(self, create, extracted, **kwargs):

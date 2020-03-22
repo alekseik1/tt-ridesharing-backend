@@ -8,6 +8,7 @@ from main_app.schemas import OrganizationIDSchema, UserSchemaOrganizationInfo, \
     IdSchema, OrganizationJsonSchema
 from main_app.views import api, MAX_ORGANIZATIONS_PER_USER
 from main_app.model import User
+from main_app.misc import reverse_geocoding_blocking
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, validate_all
 
@@ -21,6 +22,13 @@ def organization():
                 **IdSchema().load(request.args)
             ).first()
         )
+    if request.method == 'PUT':
+        org = OrganizationJsonSchema().load(request.json)
+        org.creator = current_user
+        org.address = reverse_geocoding_blocking(latitude=org.latitude, longitude=org.longitude)['address']
+        db.session.add(org)
+        db.session.commit()
+        return IdSchema().dump(org)
 
 
 @api.route('/leave_organization', methods=['POST'])

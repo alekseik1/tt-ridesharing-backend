@@ -104,12 +104,17 @@ class UserJsonSchema(ma.ModelSchema, CamelCaseSchema):
 class OrganizationJsonSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = Organization
-        exclude = ['users', 'is_start_for', 'latitude', 'longitude', ]
+        exclude = ['users', 'is_start_for', ]
     last_ride_datetime = fields.String(dump_only=True)
     total_members = fields.String(dump_only=True)
     total_drivers = fields.String(dump_only=True)
     min_ride_cost = fields.String(dump_only=True)
     max_ride_cost = fields.String(dump_only=True)
+    # Not for dumping
+    control_question = fields.String(load_only=True)
+    control_answer = fields.String(load_only=True)
+    latitude = fields.Float(load_only=True)
+    longitude = fields.Float(load_only=True)
 
     creator = fields.Nested(UserJsonSchema, data_key='creator', dump_only=True, only=[
         'id', 'photo_url'
