@@ -4,11 +4,23 @@ from flask_login import login_required, current_user
 from app import db
 from main_app.model import Organization
 from main_app.schemas import OrganizationIDSchema, UserSchemaOrganizationInfo, \
-    OrganizationSchemaUserIDs, OrganizationSchemaUserInfo, OrganizationPhotoURLSchema
+    OrganizationSchemaUserIDs, OrganizationSchemaUserInfo, OrganizationPhotoURLSchema, \
+    IdSchema, OrganizationJsonSchema
 from main_app.views import api, MAX_ORGANIZATIONS_PER_USER
 from main_app.model import User
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, validate_all
+
+
+@api.route('/organization', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@login_required
+def organization():
+    if request.method == 'GET':
+        return OrganizationJsonSchema().dump(
+            db.session.query(Organization).filter_by(
+                **IdSchema().load(request.args)
+            ).first()
+        )
 
 
 @api.route('/leave_organization', methods=['POST'])

@@ -9,6 +9,20 @@ from main_app.controller import check_email, parse_phone_number, check_image_url
 from main_app.responses import SwaggerResponses
 
 
+def camelcase(s):
+    parts = iter(s.split("_"))
+    return next(parts) + "".join(i.title() for i in parts)
+
+
+class CamelCaseSchema(Schema):
+    """Schema that uses camel-case for its external representation
+    and snake-case for its internal representation.
+    """
+
+    def on_bind_field(self, field_name, field_obj):
+        field_obj.data_key = camelcase(field_obj.data_key or field_name)
+
+
 class LoginSchema(Schema):
     login = fields.Email(required=True, validate=Length(max=MAX_EMAIL_LENGTH))
     password = fields.String(required=True)
@@ -76,6 +90,30 @@ class UserSchemaOrganizationInfo(ma.ModelSchema):
         exclude = ['_password_hash', 'all_rides']
     is_driver = fields.Boolean()
     organizations = fields.Nested(OrganizationSchemaUserIDs, many=True)
+
+
+class IdSchema(CamelCaseSchema):
+    id = fields.Integer(required=True)
+
+
+class UserJsonSchema(ma.ModelSchema, CamelCaseSchema):
+    class Meta:
+        model = User
+
+
+class OrganizationJsonSchema(ma.ModelSchema, CamelCaseSchema):
+    class Meta:
+        model = Organization
+        exclude = ['users', 'is_start_for', 'latitude', 'longitude', ]
+    last_ride_datetime = fields.String(dump_only=True)
+    total_members = fields.String(dump_only=True)
+    total_drivers = fields.String(dump_only=True)
+    min_ride_cost = fields.String(dump_only=True)
+    max_ride_cost = fields.String(dump_only=True)
+
+    creator = fields.Nested(UserJsonSchema, data_key='creator', dump_only=True, only=[
+        'id', 'photo_url'
+    ])
 
 
 class UserSchemaOrganizationIDs(ma.ModelSchema):
