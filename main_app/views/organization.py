@@ -1,14 +1,53 @@
 from flask import request, jsonify
 from flask_login import login_required, current_user
+from werkzeug.exceptions import Forbidden
 
 from app import db
 from main_app.model import Organization
 from main_app.schemas import OrganizationIDSchema, UserSchemaOrganizationInfo, \
-    OrganizationSchemaUserIDs, OrganizationSchemaUserInfo, OrganizationPhotoURLSchema
+    OrganizationSchemaUserIDs, OrganizationSchemaUserInfo, OrganizationPhotoURLSchema, \
+    IdSchema, OrganizationJsonSchema
 from main_app.views import api, MAX_ORGANIZATIONS_PER_USER
 from main_app.model import User
+from main_app.misc import reverse_geocoding_blocking
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, validate_all
+
+
+@api.route('/organization', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@login_required
+def organization():
+    if request.method == 'GET':
+        return OrganizationJsonSchema().dump(
+            db.session.query(Organization).filter_by(
+                **IdSchema().load(request.args)
+            ).first()
+        )
+    if request.method == 'PUT':
+        org = OrganizationJsonSchema().load(request.json)
+        org.creator = current_user
+        org.address = reverse_geocoding_blocking(
+            latitude=org.latitude, longitude=org.longitude
+        )['address']
+        db.session.add(org)
+        db.session.commit()
+        return IdSchema().dump(org)
+    if request.method == 'POST':
+        # BUG: может быть больше параметров, и он съет
+        # Надо написать отдельную схему на PUT и POST
+        org = OrganizationJsonSchema(session=db.session).load(request.json)
+        if current_user != org.creator:
+            raise Forbidden('Only creator can edit organization info')
+        db.session.add(org)
+        db.session.commit()
+        return IdSchema().dump(org)
+    if request.method == 'DELETE':
+        org = OrganizationJsonSchema(only=('id', ), session=db.session).load(request.json)
+        if current_user != org.creator:
+            raise Forbidden('Only creator can delete an organization')
+        db.session.delete(org)
+        db.session.commit()
+        return ''
 
 
 @api.route('/leave_organization', methods=['POST'])

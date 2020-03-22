@@ -2,6 +2,7 @@ from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
 from main_app.misc import reverse_geocoding_blocking
+from datetime import datetime
 
 from app import db
 from settings import MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, MAX_SURNAME_LENGTH, MAX_URL_LENGTH
@@ -14,8 +15,8 @@ association_user_ride = db.Table(
 
 association_user_organization = db.Table(
     'association_user_organization', db.metadata,
-    db.Column('left_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('right_id', db.Integer, db.ForeignKey('organization.id'))
+    db.Column('left_id', db.Integer, db.ForeignKey('user.id', ondelete='cascade')),
+    db.Column('right_id', db.Integer, db.ForeignKey('organization.id', ondelete='cascade'))
 )
 
 
@@ -43,15 +44,40 @@ class User(UserMixin, db.Model):
 class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
-    address = db.Column(db.String(600))
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    address = db.Column(db.String(600), nullable=False, server_default='undefined')
     description = db.Column(db.String(600))
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, server_default='1')
     creator = db.relationship('User')
+    control_question = db.Column(db.String(400), nullable=False, server_default='undefined')
+    control_answer = db.Column(db.String(200), nullable=False, server_default='undefined')
     users = db.relationship('User', secondary=association_user_organization,
-                            backref='organizations', passive_deletes=True)
+                            backref='organizations',
+                            cascade='all, delete',
+                            passive_deletes=True
+                            )
     photo_url = db.Column(db.String(MAX_URL_LENGTH))
+
+    @hybrid_property
+    def last_ride_datetime(self):
+        return max([x.submit_datetime for x in self.is_start_for]) if self.is_start_for else '-'
+
+    @hybrid_property
+    def total_members(self):
+        return len(self.users)
+
+    @hybrid_property
+    def total_drivers(self):
+        return sum([len(user.cars) > 0 for user in self.users])
+
+    @hybrid_property
+    def min_ride_cost(self):
+        return min([x.price for x in self.is_start_for]) if self.is_start_for else '-'
+
+    @hybrid_property
+    def max_ride_cost(self):
+        return max([x.price for x in self.is_start_for]) if self.is_start_for else '-'
 
 
 class Ride(db.Model):
@@ -63,6 +89,7 @@ class Ride(db.Model):
 
     stop_latitude = db.Column(db.Float, nullable=False)
     stop_longitude = db.Column(db.Float, nullable=False)
+    submit_datetime = db.Column(db.DateTime, server_default=datetime.now().isoformat())
 
     total_seats = db.Column(db.Integer, server_default='4', nullable=False)
     host_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
