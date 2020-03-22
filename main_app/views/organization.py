@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from flask_login import login_required, current_user
+from werkzeug.exceptions import Forbidden
 
 from app import db
 from main_app.model import Organization
@@ -33,6 +34,8 @@ def organization():
         # BUG: может быть больше параметров, и он съет
         # Надо написать отдельную схему на PUT и POST
         org = OrganizationJsonSchema(session=db.session).load(request.json)
+        if current_user != org.creator:
+            raise Forbidden('Only creator can edit organization info')
         db.session.add(org)
         db.session.commit()
         return IdSchema().dump(org)

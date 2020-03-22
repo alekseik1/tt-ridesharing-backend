@@ -53,8 +53,14 @@ class BasicTest(TestCase):
             'description': 'I\'m new description!',
             'photoUrl': 'https://photos.com/1.jpg',
         }
-        with self.subTest('correct request'):
-            with login_as(self.client, db.session.query(User).first()):
+        org_owner = db.session.query(Organization).filter_by(id=ID).first().creator
+        not_owner = db.session.query(User).filter(User.id != org_owner.id).first()
+        with self.subTest('Correct response from owner'):
+            with login_as(self.client, org_owner):
                 response = self.client.post(self.url, json=json)
             self.assert200(response)
             IdSchema().load(response.json)
+        with self.subTest('Forbidden for non-owner'):
+            with login_as(self.client, not_owner):
+                response = self.client.post(self.url, json=json)
+            self.assert403(response)

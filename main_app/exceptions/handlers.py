@@ -1,6 +1,6 @@
 from marshmallow import ValidationError
 from .custom import InvalidCredentials, AlreadyLoggedIn, EmailBusy
-from werkzeug.exceptions import HTTPException, Unauthorized
+from werkzeug.exceptions import HTTPException, Unauthorized, Forbidden
 from flask import jsonify, current_app
 
 
@@ -26,7 +26,7 @@ def handle_uncaught_error(error):
     }), 500
 
 
-GENERIC_EXCEPTIONS = {Unauthorized, InvalidCredentials, AlreadyLoggedIn, HTTPException, EmailBusy}
+GENERIC_EXCEPTIONS = {Unauthorized, InvalidCredentials, AlreadyLoggedIn, HTTPException, EmailBusy, Forbidden}
 SPECIAL_EXCEPTIONS = {
     ValidationError: handle_validation_error,
     Exception: handle_uncaught_error
