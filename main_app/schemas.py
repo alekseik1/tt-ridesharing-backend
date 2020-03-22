@@ -100,7 +100,7 @@ class UserJsonSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = User
     organizations = fields.Nested('OrganizationJsonSchema', many=True)
-    rating = fields.Float()
+    rating = fields.Float(dump_only=True)
 
 
 class OrganizationJsonSchema(ma.ModelSchema, CamelCaseSchema):
