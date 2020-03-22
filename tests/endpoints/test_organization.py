@@ -44,3 +44,17 @@ class BasicTest(TestCase):
             response = self.client.put(self.url, json=json)
         self.assert200(response)
         IdSchema().load(response.json)
+
+    def test_post_organization(self):
+        ID = 1
+        json = {
+            'id': ID,
+            'name': 'Brave new name',
+            'description': 'I\'m new description!',
+            'photoUrl': 'https://photos.com/1.jpg',
+        }
+        with self.subTest('correct request'):
+            with login_as(self.client, db.session.query(User).first()):
+                response = self.client.post(self.url, json=json)
+            self.assert200(response)
+            IdSchema().load(response.json)

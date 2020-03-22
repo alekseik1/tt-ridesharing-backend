@@ -29,6 +29,13 @@ def organization():
         db.session.add(org)
         db.session.commit()
         return IdSchema().dump(org)
+    if request.method == 'POST':
+        # BUG: может быть больше параметров, и он съет
+        # Надо написать отдельную схему на PUT и POST
+        org = OrganizationJsonSchema(session=db.session).load(request.json)
+        db.session.add(org)
+        db.session.commit()
+        return IdSchema().dump(org)
 
 
 @api.route('/leave_organization', methods=['POST'])
