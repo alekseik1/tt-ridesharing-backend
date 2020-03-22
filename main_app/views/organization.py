@@ -53,14 +53,6 @@ def organization():
 @api.route('/organization/members', methods=['GET'])
 @login_required
 def organization_members():
-    '''
-    return jsonify({'members': UserJsonSchema(many=True).dump(
-        db.session.query(Organization).filter_by(
-            **IdSchema().load(request.args)
-        ).first().users
-    )})
-    '''
-
     return OrganizationJsonSchema(only=('id', 'users')).dump(
         db.session.query(Organization).filter_by(**IdSchema().load(request.args)).first()
     )
