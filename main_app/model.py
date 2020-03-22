@@ -47,6 +47,8 @@ class Organization(db.Model):
     longitude = db.Column(db.Float)
     address = db.Column(db.String(600))
     description = db.Column(db.String(600))
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, server_default='1')
+    creator = db.relationship('User')
     users = db.relationship('User', secondary=association_user_organization,
                             backref='organizations', passive_deletes=True)
     photo_url = db.Column(db.String(MAX_URL_LENGTH))
