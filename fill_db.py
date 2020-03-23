@@ -1,5 +1,4 @@
 import factory
-from factory.random import randgen
 
 from app import create_app, db
 from main_app.fixtures.organizations import OrganizationFactory

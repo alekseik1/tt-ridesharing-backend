@@ -4,7 +4,7 @@ import factory
 import unittest
 
 from settings import BLUEPRINT_API_NAME
-from main_app.schemas import UserIDSchema, UserJsonSchema
+from main_app.schemas import UserIDSchema
 from main_app.model import User
 from main_app.views import auth
 import app

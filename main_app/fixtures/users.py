@@ -1,6 +1,5 @@
 import factory
 from mimesis import Person
-import time
 
 from app import db
 from main_app.controller import parse_phone_number
