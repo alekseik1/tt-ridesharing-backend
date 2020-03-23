@@ -4,7 +4,7 @@ import factory
 import unittest
 
 from settings import BLUEPRINT_API_NAME
-from main_app.schemas import UserIDSchema
+from main_app.schemas import UserIDSchema, UserJsonSchema
 from main_app.model import User
 from main_app.views import auth
 import app
@@ -23,7 +23,7 @@ class BasicRegistrationTests(TestCase):
         self.url = url_for(f'{BLUEPRINT_API_NAME}.{auth.register_user.__name__}')
 
     def _register_random_user(self):
-        user_json = factory.build(dict, FACTORY_CLASS=UserFactory)
+        user_json = UserFactory.stub().__dict__
         response = self.client.post(self.url, json=user_json)
         return response
 
