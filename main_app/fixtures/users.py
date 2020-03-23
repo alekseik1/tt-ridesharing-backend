@@ -15,7 +15,7 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
         exclude = ['id', ]
     first_name = factory.Sequence(lambda n: Person().name())
     last_name = factory.Sequence(lambda n: Person().surname())
-    email = factory.Sequence(lambda n: f'user_{time.time_ns()}@gmail.com')
+    email = factory.Sequence(lambda n: f'user_{n+1}@gmail.com')
     photo_url = 'https://ridesharing-photos.com/photo1.jpg'
     phone_number = factory.Sequence(
         lambda n: parse_phone_number('+7 (950) 000-00-00')

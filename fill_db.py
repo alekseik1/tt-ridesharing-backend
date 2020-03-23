@@ -20,10 +20,11 @@ def fill_database(app):
         db.session.add_all(cars)
         # We will explicitly iterate since we need full randomness
         organizations = []
+        all_users = users + car_users
         for i in range(3):
             # Take some users with cars, some without
             organizations.append(OrganizationFactory(
-                users=randgen.choices(users + car_users, k=len(users + car_users)//2)
+                users=[all_users[j] for j in range(i, len(all_users), 3)]
             ))
         db.session.add_all(organizations)
         db.session.commit()
