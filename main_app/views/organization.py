@@ -18,7 +18,7 @@ from main_app.controller import validate_params_with_schema, validate_all
 @login_required
 def organization():
     if request.method == 'GET':
-        return OrganizationJsonSchema(exclude=('users', 'is_start_for', 'control_question' )).dump(
+        return OrganizationJsonSchema(exclude=('users', 'is_start_for', 'control_question')).dump(
             db.session.query(Organization).filter_by(
                 **IdSchema().load(request.args)
             ).first()
@@ -35,14 +35,14 @@ def organization():
     if request.method == 'POST':
         # BUG: может быть больше параметров, и он съет
         # Надо написать отдельную схему на PUT и POST
-        org = OrganizationJsonSchema(session=db.session).load(request.json)
+        org = OrganizationJsonSchema().load(request.json)
         if current_user != org.creator:
             raise Forbidden('Only creator can edit organization info')
         db.session.add(org)
         db.session.commit()
         return IdSchema().dump(org)
     if request.method == 'DELETE':
-        org = OrganizationJsonSchema(only=('id', ), session=db.session).load(request.json)
+        org = OrganizationJsonSchema(only=('id', )).load(request.json)
         if current_user != org.creator:
             raise Forbidden('Only creator can delete an organization')
         db.session.delete(org)

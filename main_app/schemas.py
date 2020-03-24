@@ -106,6 +106,7 @@ class UserJsonSchema(ma.ModelSchema, CamelCaseSchema):
 class OrganizationJsonSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = Organization
+        sqla_session = db.session
     last_ride_datetime = fields.String(dump_only=True)
     users = fields.Nested(UserJsonSchema, only=(
         'id', 'first_name', 'last_name', 'photo_url', 'rating'
