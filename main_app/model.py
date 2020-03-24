@@ -1,6 +1,7 @@
 from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import validates
 from main_app.misc import reverse_geocoding_blocking
 from datetime import datetime
 
@@ -63,6 +64,12 @@ class Organization(db.Model):
                             passive_deletes=True
                             )
     photo_url = db.Column(db.String(MAX_URL_LENGTH))
+
+    @validates('creator')
+    def ensure_is_member(self, key, value):
+        if value not in self.users:
+            self.users.append(value)
+        return value
 
     @hybrid_property
     def last_ride_datetime(self):
