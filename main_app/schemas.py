@@ -115,7 +115,7 @@ class OrganizationJsonSchema(ma.ModelSchema, CamelCaseSchema):
     min_ride_cost = fields.String(dump_only=True)
     max_ride_cost = fields.String(dump_only=True)
     # Not for dumping
-    control_question = fields.String(load_only=True)
+    control_question = fields.String()
     control_answer = fields.String(load_only=True)
     latitude = fields.Float(load_only=True)
     longitude = fields.Float(load_only=True)

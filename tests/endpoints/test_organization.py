@@ -105,3 +105,13 @@ class BasicTest(TestCase):
                 unknown=('rating',),
                 many=True
             ).load(response.json['members'])
+
+    def test_organization_question_get(self):
+        ID = 1
+        query_params = {
+            'id': ID
+        }
+        with login_as(self.client, db.session.query(User).first()):
+            response = self.client.get(f'{self.url}/question', query_string=query_params)
+            self.assert200(response)
+            OrganizationJsonSchema(session=db.session, only=('id', 'control_question')).load(response.json)

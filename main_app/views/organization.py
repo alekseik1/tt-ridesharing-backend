@@ -18,7 +18,7 @@ from main_app.controller import validate_params_with_schema, validate_all
 @login_required
 def organization():
     if request.method == 'GET':
-        return OrganizationJsonSchema(exclude=('users', 'is_start_for', )).dump(
+        return OrganizationJsonSchema(exclude=('users', 'is_start_for', 'control_question' )).dump(
             db.session.query(Organization).filter_by(
                 **IdSchema().load(request.args)
             ).first()
@@ -54,6 +54,13 @@ def organization():
 @login_required
 def organization_members():
     return OrganizationJsonSchema(only=('id', 'users')).dump(
+        db.session.query(Organization).filter_by(**IdSchema().load(request.args)).first()
+    )
+
+
+@api.route('/organization/question', methods=['GET'])
+def question():
+    return OrganizationJsonSchema(only=('id', 'control_question')).dump(
         db.session.query(Organization).filter_by(**IdSchema().load(request.args)).first()
     )
 
