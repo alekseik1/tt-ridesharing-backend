@@ -235,9 +235,10 @@ class ChangeEmailSchema(ma.ModelSchema):
         return check_email(email)
 
 
-class CarSchema(ma.ModelSchema):
+class CarSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = Car
+        sqla_session = db.session
 
 
 class RegisterCarForDriverSchema(ma.ModelSchema):

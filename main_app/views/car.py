@@ -8,6 +8,20 @@ from main_app.controller import validate_params_with_schema
 from main_app.views import api
 
 
+@api.route('/car', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@login_required
+def car():
+    if request.method == 'GET':
+        # Only own cars
+        return jsonify(CarSchema(many=True).dump(current_user.cars))
+    if request.method == 'POST':
+        return {}
+    if request.methods == 'PUT':
+        return {}
+    if request.method == 'DELETE':
+        return {}
+
+
 @api.route('/get_my_cars', methods=['GET'])
 @login_required
 def get_my_cars():
