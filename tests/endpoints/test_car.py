@@ -52,13 +52,13 @@ class BasicTest(TestCase):
                 response = self.client.delete(self.url, json={
                     'id': car.id
                 })
-                self.assert400(response)
+                self.assert403(response)
         with self.subTest('Car does not exist'):
             with login_as(self.client, car.owner):
                 response = self.client.delete(self.url, json={
                     'id': -2
                 })
-                self.assert400(response)
+                self.assert403(response)
 
     def _post_routine(self, user, json):
         with login_as(self.client, user):
