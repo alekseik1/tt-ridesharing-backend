@@ -14,3 +14,8 @@ class AlreadyLoggedIn(HTTPException):
 class EmailBusy(HTTPException):
     code = 400
     description = 'Email is already registered'
+
+
+class IncorrectControlAnswer(HTTPException):
+    code = 400
+    description = 'Incorrect answer for control question'

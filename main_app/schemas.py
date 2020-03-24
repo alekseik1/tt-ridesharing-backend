@@ -103,6 +103,11 @@ class UserJsonSchema(ma.ModelSchema, CamelCaseSchema):
     rating = fields.Float(dump_only=True)
 
 
+class JoinOrganizationSchema(CamelCaseSchema):
+    id = fields.Integer(required=True)
+    control_answer = fields.String(required=True)
+
+
 class OrganizationJsonSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = Organization

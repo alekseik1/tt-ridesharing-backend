@@ -6,7 +6,8 @@ from app import db
 from main_app.model import Organization
 from main_app.schemas import OrganizationIDSchema, UserSchemaOrganizationInfo, \
     OrganizationSchemaUserIDs, OrganizationSchemaUserInfo, OrganizationPhotoURLSchema, \
-    IdSchema, OrganizationJsonSchema
+    IdSchema, OrganizationJsonSchema, JoinOrganizationSchema
+from main_app.exceptions.custom import IncorrectControlAnswer
 from main_app.views import api, MAX_ORGANIZATIONS_PER_USER
 from main_app.model import User
 from main_app.misc import reverse_geocoding_blocking
@@ -63,6 +64,18 @@ def question():
     return OrganizationJsonSchema(only=('id', 'control_question')).dump(
         db.session.query(Organization).filter_by(**IdSchema().load(request.args)).first()
     )
+
+
+@api.route('/organization/join', methods=['POST'])
+def join():
+    data = JoinOrganizationSchema().load(request.json)
+    org = db.session.query(Organization).filter_by(id=data['id']).first()
+    if org.control_answer != data['control_answer']:
+        raise IncorrectControlAnswer()
+    if current_user not in org.users:
+        org.users.append(current_user)
+        db.session.commit()
+    return IdSchema().dump(org)
 
 
 @api.route('/leave_organization', methods=['POST'])
