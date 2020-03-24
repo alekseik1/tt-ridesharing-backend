@@ -18,7 +18,7 @@ def car():
     if request.method == 'POST':
         return {}
     if request.method == 'PUT':
-        car = CarSchema().load(request.json)
+        car = CarSchema(exclude=('id', )).load(request.json)
         car.owner = current_user
         db.session.add(car)
         db.session.commit()

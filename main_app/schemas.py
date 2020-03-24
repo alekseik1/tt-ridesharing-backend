@@ -239,6 +239,7 @@ class CarSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = Car
         sqla_session = db.session
+    id = fields.Integer(required=True)
 
 
 class RegisterCarForDriverSchema(ma.ModelSchema):
