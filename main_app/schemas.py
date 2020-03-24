@@ -242,6 +242,16 @@ class CarSchema(ma.ModelSchema, CamelCaseSchema):
     id = fields.Integer(required=True)
 
 
+class CarPermissiveSchema(CarSchema):
+    __required__ = ('id', )
+
+    def on_bind_field(self, field_name, field_obj):
+        super().on_bind_field(field_name, field_obj)
+        # Mark all fields as `required=False`
+        if field_name not in self.__required__:
+            field_obj.required = False
+
+
 class RegisterCarForDriverSchema(ma.ModelSchema):
     class Meta:
         model = Car

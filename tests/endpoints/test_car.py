@@ -59,3 +59,22 @@ class BasicTest(TestCase):
                     'id': -2
                 })
                 self.assert400(response)
+
+    def _post_routine(self, user, json):
+        with login_as(self.client, user):
+            return self.client.post(self.url, json=json)
+
+    def test_post_car_non_owner(self):
+        car = db.session.query(Car).first()
+        non_owner = db.session.query(Car).filter(
+            Car.owner_id != car.owner_id
+        ).first().owner
+        json = {'id': car.id, 'registryNumber': 'new_number'}
+        response = self._post_routine(non_owner, json)
+        self.assert403(response, response.json)
+
+    def test_post_car_owner(self):
+        car = db.session.query(Car).first()
+        json = {'id': car.id, 'registryNumber': 'new_number'}
+        response = self._post_routine(car.owner, json)
+        self.assert200(response, response.json)
