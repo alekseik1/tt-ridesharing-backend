@@ -15,7 +15,6 @@ class BasicTest(TestCase):
 
     def create_app(self):
         app = create_app()
-        app.config['LOGIN_DISABLED'] = True
         return app
 
     def setUp(self):
@@ -24,9 +23,10 @@ class BasicTest(TestCase):
 
     def test_get_organization(self):
         ID = 1
-        response = self.client.get(self.url, query_string={
-            'id': ID
-        })
+        with login_as(self.client, db.session.query(User).first()):
+            response = self.client.get(self.url, query_string={
+                'id': ID
+            })
         organization = db.session.query(Organization).filter_by(id=ID).first()
         schema = OrganizationJsonSchema(only=(
             'name', 'address',
