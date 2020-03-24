@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from app import db
 from main_app.model import Organization
 from main_app.schemas import OrganizationSchemaUserInfo,\
-    IdSchema, OrganizationJsonSchema, JoinOrganizationSchema
+    IdSchema, OrganizationJsonSchema, JoinOrganizationSchema, OrganizationPermissiveSchema
 from main_app.exceptions.custom import IncorrectControlAnswer, \
     NotInOrganization, CreatorCannotLeave, InsufficientPermissions
 from main_app.views import api
@@ -30,12 +30,14 @@ def organization():
         db.session.commit()
         return IdSchema().dump(org)
     if request.method == 'POST':
-        # BUG: может быть больше параметров, и он съет
-        # Надо написать отдельную схему на PUT и POST
-        org = OrganizationJsonSchema().load(request.json)
-        # Don't create new organizations in POST!
-        if org.id is None or current_user != org.creator:
+        org = OrganizationPermissiveSchema().load(request.json)
+        if current_user != org.creator:
             raise InsufficientPermissions()
+        # Update address
+        # NOTE: maybe move it to DB hooks?
+        org.address = reverse_geocoding_blocking(
+            latitude=org.latitude, longitude=org.longitude
+        )['address']
         db.session.add(org)
         db.session.commit()
         return IdSchema().dump(org)
