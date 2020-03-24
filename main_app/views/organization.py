@@ -1,13 +1,12 @@
 from flask import request, jsonify
 from flask_login import login_required, current_user
-from werkzeug.exceptions import Forbidden
 
 from app import db
 from main_app.model import Organization
 from main_app.schemas import OrganizationSchemaUserInfo,\
     IdSchema, OrganizationJsonSchema, JoinOrganizationSchema
 from main_app.exceptions.custom import IncorrectControlAnswer, \
-    NotInOrganization, CreatorCannotLeave
+    NotInOrganization, CreatorCannotLeave, InsufficientPermissions
 from main_app.views import api
 from main_app.misc import reverse_geocoding_blocking
 
@@ -34,15 +33,16 @@ def organization():
         # BUG: может быть больше параметров, и он съет
         # Надо написать отдельную схему на PUT и POST
         org = OrganizationJsonSchema().load(request.json)
-        if current_user != org.creator:
-            raise Forbidden('Only creator can edit organization info')
+        # Don't create new organizations in POST!
+        if org.id is None or current_user != org.creator:
+            raise InsufficientPermissions()
         db.session.add(org)
         db.session.commit()
         return IdSchema().dump(org)
     if request.method == 'DELETE':
         org = OrganizationJsonSchema(only=('id', )).load(request.json)
         if current_user != org.creator:
-            raise Forbidden('Only creator can delete an organization')
+            raise InsufficientPermissions()
         db.session.delete(org)
         db.session.commit()
         return ''

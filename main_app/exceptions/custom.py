@@ -31,6 +31,6 @@ class CreatorCannotLeave(HTTPException):
     description = 'The creator cannot leave his organization'
 
 
-class NotCarOwner(HTTPException):
-    code = 400
-    description = 'You do not own this car or the car does not exist'
+class InsufficientPermissions(HTTPException):
+    code = 403
+    description = 'You do not own this item or the item does not exist'
