@@ -19,3 +19,13 @@ class EmailBusy(HTTPException):
 class IncorrectControlAnswer(HTTPException):
     code = 400
     description = 'Incorrect answer for control question'
+
+
+class NotInOrganization(HTTPException):
+    code = 400
+    description = 'User is not in that organization'
+
+
+class CreatorCannotLeave(HTTPException):
+    code = 400
+    description = 'The creator cannot leave his organization'

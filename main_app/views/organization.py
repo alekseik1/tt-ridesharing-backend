@@ -7,7 +7,8 @@ from main_app.model import Organization
 from main_app.schemas import OrganizationIDSchema, UserSchemaOrganizationInfo, \
     OrganizationSchemaUserIDs, OrganizationSchemaUserInfo, OrganizationPhotoURLSchema, \
     IdSchema, OrganizationJsonSchema, JoinOrganizationSchema
-from main_app.exceptions.custom import IncorrectControlAnswer
+from main_app.exceptions.custom import IncorrectControlAnswer, \
+    NotInOrganization, CreatorCannotLeave
 from main_app.views import api, MAX_ORGANIZATIONS_PER_USER
 from main_app.model import User
 from main_app.misc import reverse_geocoding_blocking
@@ -76,6 +77,18 @@ def join():
         org.users.append(current_user)
         db.session.commit()
     return IdSchema().dump(org)
+
+
+@api.route('/organization/leave', methods=['POST'])
+def leave():
+    org = db.session.query(Organization).filter_by(**IdSchema().load(request.json)).first()
+    if org not in current_user.organizations:
+        raise NotInOrganization()
+    if current_user == org.creator:
+        raise CreatorCannotLeave()
+    org.users.remove(current_user)
+    db.session.commit()
+    return {}
 
 
 @api.route('/leave_organization', methods=['POST'])

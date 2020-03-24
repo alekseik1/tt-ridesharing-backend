@@ -5,6 +5,7 @@ from app import create_app, db
 from settings import BLUEPRINT_API_NAME
 from main_app.views.organization import organization as endpoint
 from main_app.schemas import OrganizationJsonSchema, IdSchema, UserJsonSchema
+from main_app.exceptions.custom import NotInOrganization, CreatorCannotLeave
 from tests import login_as
 from main_app.model import Organization, User
 from fill_db import fill_database
@@ -143,3 +144,32 @@ class BasicTest(TestCase):
                     'id': ID, 'controlAnswer': f'INCORRECT {org.control_answer}'
                 })
                 self.assert400(response)
+
+    def test_leave_organization(self):
+        ID = 1
+        org = db.session.query(Organization).filter_by(id=ID).first()
+        creator = org.creator
+        non_creator = (set(org.users) - {creator}).pop()
+        non_member = (set(db.session.query(User).all()) - set(org.users)).pop()
+
+        def make_request():
+            return self.client.post(f'{self.url}/leave', json={
+                'id': ID
+            })
+
+        with self.subTest('Simple member'):
+            with login_as(self.client, non_creator):
+                response = make_request()
+                self.assert200(response)
+        with self.subTest('Creator cannot leave'):
+            with login_as(self.client, creator):
+                response = make_request()
+                self.assert400(response)
+                # Error message
+                self.assertEqual(CreatorCannotLeave.description, response.json.get('description'))
+        with self.subTest('Not member raises error'):
+            with login_as(self.client, non_member):
+                response = make_request()
+                self.assert400(response)
+                # Error message
+                self.assertEqual(NotInOrganization.description, response.json.get('description'))
