@@ -29,3 +29,8 @@ class NotInOrganization(HTTPException):
 class CreatorCannotLeave(HTTPException):
     code = 400
     description = 'The creator cannot leave his organization'
+
+
+class NotCarOwner(HTTPException):
+    code = 400
+    description = 'You do not own this car or the car does not exist'

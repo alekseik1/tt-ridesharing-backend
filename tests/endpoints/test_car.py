@@ -37,3 +37,25 @@ class BasicTest(TestCase):
             })
             self.assert200(response)
             IdSchema().load(response.json)
+
+    def test_delete_car(self):
+        car = db.session.query(Car).first()
+        with self.subTest('Car owner'):
+            with login_as(self.client, car.owner):
+                response = self.client.delete(self.url, json={
+                    'id': car.id
+                })
+                self.assert200(response)
+        with self.subTest('Not owner'):
+            user = db.session.query(User).filter(car.owner_id != User.id).first()
+            with login_as(self.client, user):
+                response = self.client.delete(self.url, json={
+                    'id': car.id
+                })
+                self.assert400(response)
+        with self.subTest('Car does not exist'):
+            with login_as(self.client, car.owner):
+                response = self.client.delete(self.url, json={
+                    'id': -2
+                })
+                self.assert400(response)

@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from main_app.schemas import CarSchema, RegisterCarForDriverSchema, IdSchema
 from app import db
 from main_app.model import Car, User
+from main_app.exceptions.custom import NotCarOwner
 from main_app.controller import validate_params_with_schema
 from main_app.views import api
 
@@ -23,7 +24,12 @@ def car():
         db.session.commit()
         return IdSchema().dump(car)
     if request.method == 'DELETE':
-        return {}
+        car = CarSchema(only=('id',)).load(request.json)
+        if current_user != getattr(car, 'owner', -1):
+            raise NotCarOwner()
+        db.session.delete(car)
+        db.session.commit()
+        return ''
 
 
 @api.route('/get_my_cars', methods=['GET'])
