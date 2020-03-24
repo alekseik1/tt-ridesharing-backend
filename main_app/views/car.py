@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from flask_login import login_required, current_user
 
-from main_app.schemas import CarSchema, RegisterCarForDriverSchema
+from main_app.schemas import CarSchema, RegisterCarForDriverSchema, IdSchema
 from app import db
 from main_app.model import Car, User
 from main_app.controller import validate_params_with_schema
@@ -16,8 +16,12 @@ def car():
         return jsonify(CarSchema(many=True).dump(current_user.cars))
     if request.method == 'POST':
         return {}
-    if request.methods == 'PUT':
-        return {}
+    if request.method == 'PUT':
+        car = CarSchema().load(request.json)
+        car.owner = current_user
+        db.session.add(car)
+        db.session.commit()
+        return IdSchema().dump(car)
     if request.method == 'DELETE':
         return {}
 

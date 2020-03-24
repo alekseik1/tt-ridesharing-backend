@@ -5,8 +5,8 @@ from tests import login_as
 from app import create_app, db
 from fill_db import fill_database
 from settings import BLUEPRINT_API_NAME
-from main_app.schemas import CarSchema
-from main_app.model import Car
+from main_app.schemas import CarSchema, IdSchema
+from main_app.model import Car, User
 from main_app.views.car import car as endpoint
 
 
@@ -27,3 +27,13 @@ class BasicTest(TestCase):
             self.assert200(response)
             # `Car` schema is simple, so we can directly try loading it
             CarSchema(many=True).load(response.json)
+
+    def test_put_car(self):
+        with login_as(self.client, db.session.query(User).first()):
+            response = self.client.put(self.url, json={
+                'color': 'red',
+                'model': 'model_model',
+                'registryNumber': 'К222ЧЧ777'
+            })
+            self.assert200(response)
+            IdSchema().load(response.json)
