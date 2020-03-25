@@ -113,10 +113,12 @@ class Ride(db.Model):
 
     total_seats = db.Column(db.Integer, server_default='4', nullable=False)
     host_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    host = db.relationship('User', backref='hosted_rides')
     passengers = db.relationship('User', secondary=association_user_ride, backref='all_rides')
 
     price = db.Column(db.Float)
     car_id = db.Column(db.Integer, db.ForeignKey('car.id'), nullable=False, server_default='2')
+    car = db.relationship('Car')
     description = db.Column(db.String(600))
 
     @hybrid_property

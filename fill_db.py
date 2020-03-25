@@ -1,9 +1,10 @@
-import factory
+import factory.random
 
 from app import create_app, db
 from main_app.fixtures.organizations import OrganizationFactory
 from main_app.fixtures.users import UserFactory
 from main_app.fixtures.cars import CarFactory
+from main_app.fixtures.rides import RideFactory
 
 
 def fill_database(app):
@@ -25,7 +26,16 @@ def fill_database(app):
             organizations.append(OrganizationFactory(
                 users=[all_users[j] for j in range(i, len(all_users), 3)]
             ))
+        rides = []
+        for i in range(5):
+            rides.append(RideFactory(
+                start_organization=organizations[i % len(organizations)],
+                host=car_users[i % len(car_users)],
+                # passengers=factory.random.randgen.choices(users, k=3),
+                car=car_users[i % len(car_users)].cars[0]
+            ))
         db.session.add_all(organizations)
+        db.session.add_all(rides)
         db.session.commit()
 
 
