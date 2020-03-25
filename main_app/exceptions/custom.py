@@ -34,3 +34,8 @@ class CreatorCannotLeave(HTTPException):
 class InsufficientPermissions(HTTPException):
     code = 403
     description = 'You do not own this item or the item does not exist'
+
+
+class NotCarOwner(HTTPException):
+    code = 403
+    description = 'You do not own this car or the car does not exist'

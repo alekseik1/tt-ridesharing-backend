@@ -14,6 +14,7 @@ from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, format_time, validate_all
 from main_app.views.user_and_driver import _get_user_info
+from main_app.exceptions.custom import NotInOrganization, NotCarOwner
 
 MAX_RIDES_IN_HISTORY = 10
 
@@ -36,6 +37,25 @@ def active_rides():
         'price', 'car', 'stop_address'
         # TODO: `DriverAnswer`, `DeclineReason`
     ), many=True).dump(filter(attrgetter('is_active'), current_user.all_rides)))
+
+
+@api.route('/ride', methods=['PUT'])
+def ride():
+    if request.method == 'PUT':
+        ride = RideJsonSchema(only=(
+            'car_id', 'start_organization_id',
+            'stop_latitude', 'stop_longitude',
+            'total_seats', 'price', 'description'
+        )).load(request.json)
+        ride.host = current_user
+        if ride.start_organization_id not in [x.id for x in current_user.organizations]:
+            raise NotInOrganization()
+        if ride.car_id not in [car.id for car in current_user.cars]:
+            raise NotCarOwner()
+        ride.submit_datetime = datetime.now().isoformat()
+        db.session.add(ride)
+        db.session.commit()
+        return IdSchema().dump(ride)
 
 
 @api.route('/ride/passengers', methods=['GET'])
