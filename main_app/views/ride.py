@@ -9,7 +9,7 @@ from geopy.distance import great_circle
 from app import db
 from main_app.model import Ride, Organization, User
 from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, \
-    FindBestRidesSchema, RideJsonSchema
+    FindBestRidesSchema, RideJsonSchema, IdSchema, UserJsonSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, format_time, validate_all
@@ -36,6 +36,19 @@ def active_rides():
         'price', 'car', 'stop_address'
         # TODO: `DriverAnswer`, `DeclineReason`
     ), many=True).dump(filter(attrgetter('is_active'), current_user.all_rides)))
+
+
+@api.route('/ride/passengers', methods=['GET'])
+def passengers():
+    return jsonify(
+        UserJsonSchema(only=(
+            'first_name', 'last_name', 'photo_url', 'rating', 'id'
+        ), many=True).dump(
+            getattr(
+                db.session.query(Ride).filter_by(**IdSchema().load(request.args)).first(),
+                'passengers', [])
+        )
+    )
 
 
 @api.route('/get_all_rides', methods=['GET'])
