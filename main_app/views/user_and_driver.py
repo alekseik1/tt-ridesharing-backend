@@ -7,8 +7,16 @@ from main_app.controller import validate_params_with_schema
 from main_app.model import User, Car
 from main_app.schemas import UserSchemaOrganizationInfo,\
     UserSchemaNoOrganizations, ChangePhoneSchema, \
-    ChangeNameSchema, ChangeLastNameSchema, ChangeEmailSchema, PhotoURLSchema, CarSchema
+    ChangeNameSchema, ChangeLastNameSchema, ChangeEmailSchema,\
+    PhotoURLSchema, CarSchema, OrganizationJsonSchema
 from main_app.views import api
+
+
+@api.route('/user/organizations', methods=['GET'])
+def organizations():
+    return jsonify(OrganizationJsonSchema(only=('id', 'name', 'address'), many=True).dump(
+        current_user.organizations
+    ))
 
 
 @api.route('/get_user_info', methods=['GET'])
