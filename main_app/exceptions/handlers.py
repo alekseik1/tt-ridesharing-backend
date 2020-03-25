@@ -33,7 +33,7 @@ GENERIC_EXCEPTIONS = {
 }
 SPECIAL_EXCEPTIONS = {
     ValidationError: handle_validation_error,
-    Exception: handle_uncaught_error
+    # Exception: handle_uncaught_error
 }
 
 
