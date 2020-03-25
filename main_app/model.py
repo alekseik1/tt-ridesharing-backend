@@ -47,6 +47,14 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password, password)
 
 
+class JoinRideRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    ride_id = db.Column(db.Integer, db.ForeignKey('ride.id'), nullable=False)
+    # 0 - no answer, 1 - accepted, -1 - declined
+    status = db.Column(db.Integer, nullable=False, server_default='0')
+
+
 class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
