@@ -1,5 +1,6 @@
 import operator
 from datetime import datetime
+from operator import attrgetter
 
 from flask import jsonify, request
 from flask_login import login_required, current_user
@@ -8,7 +9,7 @@ from geopy.distance import great_circle
 from app import db
 from main_app.model import Ride, Organization, User
 from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, \
-    FindBestRidesSchema
+    FindBestRidesSchema, RideJsonSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, format_time, validate_all
@@ -25,6 +26,16 @@ def dump_rides(rides):
     # Форматируем время
     response = format_time(response)
     return response
+
+
+@api.route('/ride/active')
+def active_rides():
+    return jsonify(RideJsonSchema(only=(
+        'id', 'free_seats',
+        'submit_datetime', 'host',
+        'price', 'car', 'stop_address'
+        # TODO: `DriverAnswer`, `DeclineReason`
+    ), many=True).dump(filter(attrgetter('is_active'), current_user.all_rides)))
 
 
 @api.route('/get_all_rides', methods=['GET'])

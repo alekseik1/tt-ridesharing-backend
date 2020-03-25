@@ -77,6 +77,18 @@ class RideSchema(ma.ModelSchema):
     is_mine = fields.Boolean(required=True)
 
 
+class RideJsonSchema(ma.ModelSchema, CamelCaseSchema):
+    class Meta:
+        model = Ride
+        sqla_session = db.session
+    stop_address = fields.String(dump_only=True)
+    free_seats = fields.Integer(dump_only=True)
+    car = fields.Nested('CarSchema')
+    host = fields.Nested('UserJsonSchema', only=(
+        'id', 'first_name', 'last_name', 'photo_url', 'rating', 'phone_number'
+    ))
+
+
 class OrganizationSchemaUserIDs(ma.ModelSchema):
     class Meta:
         model = Organization

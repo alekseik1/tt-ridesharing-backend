@@ -124,6 +124,10 @@ class Ride(db.Model):
     description = db.Column(db.String(600))
 
     @hybrid_property
+    def free_seats(self):
+        return self.total_seats - len(self.passengers)
+
+    @hybrid_property
     def stop_address(self):
         return reverse_geocoding_blocking(
             latitude=self.stop_latitude, longitude=self.stop_longitude
