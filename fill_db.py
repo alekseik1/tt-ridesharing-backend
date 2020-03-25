@@ -31,7 +31,7 @@ def fill_database(app):
             rides.append(RideFactory(
                 start_organization=organizations[i % len(organizations)],
                 host=car_users[i % len(car_users)],
-                # passengers=factory.random.randgen.choices(users, k=3),
+                passengers=users[3*i:3*(i+1)],
                 car=car_users[i % len(car_users)].cars[0]
             ))
         db.session.add_all(organizations)
