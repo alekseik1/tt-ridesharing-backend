@@ -118,7 +118,7 @@ class Ride(db.Model):
 
     is_active = db.Column(db.Boolean, nullable=False, server_default='true')
 
-    price = db.Column(db.Float)
+    price = db.Column(db.Float, nullable=False, server_default='0')
     car_id = db.Column(db.Integer, db.ForeignKey('car.id'), nullable=False, server_default='2')
     car = db.relationship('Car')
     description = db.Column(db.String(600))
