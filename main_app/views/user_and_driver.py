@@ -8,7 +8,8 @@ from main_app.model import User, Car
 from main_app.schemas import UserSchemaOrganizationInfo,\
     UserSchemaNoOrganizations, ChangePhoneSchema, \
     ChangeNameSchema, ChangeLastNameSchema, ChangeEmailSchema,\
-    PhotoURLSchema, CarSchema, OrganizationJsonSchema
+    PhotoURLSchema, CarSchema, OrganizationJsonSchema, UserJsonSchema
+from main_app.exceptions.custom import InsufficientPermissions
 from main_app.views import api
 
 
@@ -17,6 +18,16 @@ def organizations():
     return jsonify(OrganizationJsonSchema(only=('id', 'name', 'address'), many=True).dump(
         current_user.organizations
     ))
+
+
+@api.route('/user', methods=['GET'])
+def user():
+    user = UserJsonSchema(only=('id', )).load(request.args)
+    if user.email is None:
+        raise InsufficientPermissions()
+    return UserJsonSchema(
+        only=('first_name', 'last_name', 'rating', 'photo_url')
+    ).dump(user)
 
 
 @api.route('/get_user_info', methods=['GET'])
