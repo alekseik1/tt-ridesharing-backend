@@ -116,6 +116,8 @@ class Ride(db.Model):
     host = db.relationship('User', backref='hosted_rides')
     passengers = db.relationship('User', secondary=association_user_ride, backref='all_rides')
 
+    is_active = db.Column(db.Boolean, nullable=False, server_default='true')
+
     price = db.Column(db.Float)
     car_id = db.Column(db.Integer, db.ForeignKey('car.id'), nullable=False, server_default='2')
     car = db.relationship('Car')

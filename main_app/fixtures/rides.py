@@ -20,6 +20,7 @@ class RideFactory(factory.alchemy.SQLAlchemyModelFactory):
     car = factory.SubFactory(CarFactory)
     car_id = factory.SelfAttribute('car.id')
     description = factory.fuzzy.FuzzyChoice(['no smoke', 'have children chair', 'talk a lot'])
+    is_active = True
 
     @factory.post_generation
     def start_organization(self, create, extracted, **kwargs):
