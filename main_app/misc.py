@@ -1,5 +1,6 @@
 import os
 import requests
+from werkzeug.exceptions import BadRequest
 
 
 def get_distance(coords1, coords2):
@@ -27,6 +28,8 @@ def reverse_geocoding_blocking(latitude, longitude):
     yandex_response = requests.get(
         REVERSE_GEOCODING_URL.format(key=GEO_TOKEN, latitude=latitude, longitude=longitude)
     ).json()
+    if 'error' in yandex_response:
+        raise BadRequest(f"Yandex error: {yandex_response.get('message')}")
     results = _parse_geocoding_results(yandex_response)
     # NOTE: we assume that first list element is nearest element
     return results[0]
@@ -36,5 +39,7 @@ def forward_geocoding_blocking(address):
     yandex_response = requests.get(
         FORWARD_GEOCODING_URL.format(key=GEO_TOKEN, address=address)
     ).json()
+    if 'error' in yandex_response:
+        raise BadRequest(f"Yandex error: {yandex_response.get('message')}")
     results = _parse_geocoding_results(yandex_response)
     return results
