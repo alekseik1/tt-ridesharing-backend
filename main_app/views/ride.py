@@ -28,7 +28,7 @@ def dump_rides(rides):
     return response
 
 
-@api.route('/ride/active')
+@api.route('/ride/active', methods=['GET'])
 def active_rides():
     return jsonify(RideJsonSchema(only=(
         'id', 'free_seats',
