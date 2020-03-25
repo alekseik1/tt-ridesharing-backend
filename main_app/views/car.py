@@ -9,7 +9,7 @@ from main_app.controller import validate_params_with_schema
 from main_app.views import api
 
 
-@api.route('/car', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@api.route('/car', methods=['GET', 'POST', 'PUT'])
 @login_required
 def car():
     if request.method == 'GET':
@@ -30,13 +30,6 @@ def car():
         db.session.add(car)
         db.session.commit()
         return IdSchema().dump(car)
-    if request.method == 'DELETE':
-        car = CarSchema(only=('id',)).load(request.json)
-        if current_user != getattr(car, 'owner', -1):
-            raise InsufficientPermissions()
-        db.session.delete(car)
-        db.session.commit()
-        return ''
 
 
 @api.route('/get_my_cars', methods=['GET'])

@@ -11,7 +11,7 @@ from main_app.views import api
 from main_app.misc import reverse_geocoding_blocking
 
 
-@api.route('/organization', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@api.route('/organization', methods=['GET', 'POST', 'PUT'])
 @login_required
 def organization():
     if request.method == 'GET':
@@ -41,13 +41,6 @@ def organization():
         db.session.add(org)
         db.session.commit()
         return IdSchema().dump(org)
-    if request.method == 'DELETE':
-        org = OrganizationJsonSchema(only=('id', )).load(request.json)
-        if current_user != org.creator:
-            raise InsufficientPermissions()
-        db.session.delete(org)
-        db.session.commit()
-        return ''
 
 
 @api.route('/organization/members', methods=['GET'])
