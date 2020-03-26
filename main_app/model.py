@@ -135,7 +135,7 @@ class Ride(db.Model):
 
     @hybrid_property
     def is_mine(self):
-        return self.host_driver_id == current_user.id
+        return self.host == current_user
 
 
 class Car(db.Model):
