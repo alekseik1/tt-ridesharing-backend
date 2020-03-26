@@ -3,7 +3,7 @@ from marshmallow.validate import Length
 from flask import jsonify
 
 from app import ma, db
-from main_app.model import Ride, User, Organization, Car
+from main_app.model import Ride, User, Organization, Car, JoinRideRequest
 from settings import MAX_EMAIL_LENGTH
 from main_app.controller import check_email, parse_phone_number, check_image_url
 from main_app.responses import SwaggerResponses
@@ -66,8 +66,11 @@ class CreateRideSchema(ma.ModelSchema):
             raise ValidationError('Invalid car')
 
 
-class JoinRideSchema(ma.ModelSchema):
-    ride_id = fields.Integer(required=True)
+class JoinRideJsonSchema(ma.ModelSchema, CamelCaseSchema):
+    class Meta:
+        model = JoinRideRequest
+        sqla_session = db.session
+        include_fk = True
 
 
 class RideSchema(ma.ModelSchema):

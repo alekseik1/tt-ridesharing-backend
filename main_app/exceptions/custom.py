@@ -22,7 +22,7 @@ class IncorrectControlAnswer(HTTPException):
 
 
 class NotInOrganization(HTTPException):
-    code = 400
+    code = 403
     description = 'User is not in that organization'
 
 
@@ -39,3 +39,23 @@ class InsufficientPermissions(HTTPException):
 class NotCarOwner(HTTPException):
     code = 403
     description = 'You do not own this car or the car does not exist'
+
+
+class RideNotActive(HTTPException):
+    code = 403
+    description = 'Ride is not active or not found'
+
+
+class NoFreeSeats(HTTPException):
+    code = 403
+    description = 'No free seats available'
+
+
+class CreatorCannotJoin(HTTPException):
+    code = 403
+    description = 'You cannot join if you are the creator'
+
+
+class RequestAlreadySent(HTTPException):
+    code = 400
+    description = 'Request already sent'

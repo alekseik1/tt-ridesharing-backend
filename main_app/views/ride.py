@@ -5,16 +5,18 @@ from operator import attrgetter
 from flask import jsonify, request
 from flask_login import login_required, current_user
 from geopy.distance import great_circle
+from sqlalchemy.exc import IntegrityError
 
 from app import db
-from main_app.model import Ride, Organization, User
-from main_app.schemas import RideSchema, CreateRideSchema, JoinRideSchema, \
-    FindBestRidesSchema, RideJsonSchema, IdSchema, UserJsonSchema
+from main_app.model import Ride, Organization, User, JoinRideRequest
+from main_app.schemas import RideSchema, CreateRideSchema, \
+    FindBestRidesSchema, RideJsonSchema, IdSchema, UserJsonSchema, JoinRideJsonSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, format_time, validate_all
 from main_app.views.user_and_driver import _get_user_info
-from main_app.exceptions.custom import NotInOrganization, NotCarOwner
+from main_app.exceptions.custom import NotInOrganization, NotCarOwner, \
+    RideNotActive, NoFreeSeats, CreatorCannotJoin, RequestAlreadySent
 
 MAX_RIDES_IN_HISTORY = 10
 
@@ -71,6 +73,27 @@ def passengers():
     )
 
 
+@api.route('/ride/join', methods=['POST'])
+def ride_join():
+    ride = RideJsonSchema(only=('id', )).load(request.json)
+    if not ride.is_active:
+        raise RideNotActive()
+    if ride.start_organization not in current_user.organizations:
+        raise NotInOrganization()
+    if ride.free_seats < 1:
+        raise NoFreeSeats()
+    if ride.is_mine:
+        raise CreatorCannotJoin()
+    join_request = JoinRideRequest(user_id=current_user.id, ride_id=ride.id)
+    try:
+        db.session.add(join_request)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        raise RequestAlreadySent()
+    return JoinRideJsonSchema(exclude=('status',)).dump(join_request)
+
+
 @api.route('/get_all_rides', methods=['GET'])
 @login_required
 def get_all_rides():
@@ -125,48 +148,6 @@ def create_ride():
     )
     db.session.add(ride)
     db.session.commit()
-    response['ride_id'] = ride.id
-    return jsonify(response), 200
-
-
-@api.route('/join_ride', methods=['POST'])
-@login_required
-# TODO: better tests
-def join_ride():
-    data = request.get_json()
-    # Валидация параметров
-    errors = validate_all([validate_params_with_schema(JoinRideSchema(), data)])
-    if errors:
-        return errors
-    ride_id = data['ride_id']
-    # Поездка должна существовать
-    ride = db.session.query(Ride).filter_by(id=ride_id).first()
-    if not ride or not ride.is_available:
-        error = build_error(SwaggerResponses.INVALID_RIDE_WITH_ID, ride_id)
-        return jsonify(error), 400
-    # Поездка должна быть доступна
-    if not ride.is_available:
-        error = build_error(SwaggerResponses.ERROR_RIDE_UNAVAILABLE, ride_id)
-        return jsonify(error), 400
-    # Нельзя вступать в протухшие поездки
-    if ride.start_time < datetime.now():
-        error = build_error(SwaggerResponses.RIDE_IS_FINISHED, ride_id)
-        return jsonify(error), 400
-    # Пользователь не должен быть уже в поездке
-    if current_user in ride.passengers:
-        error = build_error(SwaggerResponses.ERROR_ALREADY_IN_RIDE, current_user.id)
-        return jsonify(error), 400
-    # Пользователь не должен быть хостом поездки
-    if current_user.id == ride.host_driver_id:
-        error = build_error(SwaggerResponses.ERROR_IS_RIDE_HOST, current_user.id)
-        return jsonify(error), 400
-    # Вроде, все ок. Можно добавлять в поездку
-    ride.passengers.append(current_user)
-    # Если все места заняты, то сделать поездку недоступной
-    if ride.total_seats == len(ride.passengers):
-        ride.is_available = False
-    db.session.commit()
-    response = SwaggerResponses.RIDE_ID
     response['ride_id'] = ride.id
     return jsonify(response), 200
 
