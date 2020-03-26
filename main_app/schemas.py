@@ -95,6 +95,7 @@ class RideJsonSchema(ma.ModelSchema, CamelCaseSchema):
     host = fields.Nested('UserJsonSchema', only=(
         'id', 'first_name', 'last_name', 'photo_url', 'rating', 'phone_number'
     ))
+    host_answer = fields.String(dump_only=True)
 
 
 class OrganizationSchemaUserIDs(ma.ModelSchema):

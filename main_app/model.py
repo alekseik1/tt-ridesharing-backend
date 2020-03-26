@@ -49,7 +49,9 @@ class User(UserMixin, db.Model):
 
 class JoinRideRequest(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, primary_key=True)
+    user = db.relationship('User')
     ride_id = db.Column(db.Integer, db.ForeignKey('ride.id'), nullable=False, primary_key=True)
+    ride = db.relationship('Ride', backref='join_requests')
     # 0 - no answer, 1 - accepted, -1 - declined
     status = db.Column(db.Integer, nullable=False, server_default='0')
 
@@ -135,6 +137,12 @@ class Ride(db.Model):
     @hybrid_property
     def is_mine(self):
         return self.host == current_user
+
+    @hybrid_property
+    def host_answer(self):
+        for request in self.join_requests:
+            if request.user == current_user:
+                return {1: 'ACCEPTED', 0: 'NO ANSWER', -1: 'DECLINED'}.get(request.status)
 
 
 class Car(db.Model):
