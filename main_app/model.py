@@ -48,9 +48,8 @@ class User(UserMixin, db.Model):
 
 
 class JoinRideRequest(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    ride_id = db.Column(db.Integer, db.ForeignKey('ride.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, primary_key=True)
+    ride_id = db.Column(db.Integer, db.ForeignKey('ride.id'), nullable=False, primary_key=True)
     # 0 - no answer, 1 - accepted, -1 - declined
     status = db.Column(db.Integer, nullable=False, server_default='0')
 
