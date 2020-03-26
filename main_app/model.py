@@ -54,6 +54,7 @@ class JoinRideRequest(db.Model):
     ride = db.relationship('Ride', backref='join_requests')
     # 0 - no answer, 1 - accepted, -1 - declined
     status = db.Column(db.Integer, nullable=False, server_default='0')
+    decline_reason = db.Column(db.String(200))
 
 
 class Organization(db.Model):
@@ -143,6 +144,12 @@ class Ride(db.Model):
         for request in self.join_requests:
             if request.user == current_user:
                 return {1: 'ACCEPTED', 0: 'NO ANSWER', -1: 'DECLINED'}.get(request.status)
+
+    @hybrid_property
+    def decline_reason(self):
+        for request in self.join_requests:
+            if request.user == current_user:
+                return request.decline_reason or ''
 
 
 class Car(db.Model):
