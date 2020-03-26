@@ -96,6 +96,7 @@ class RideJsonSchema(ma.ModelSchema, CamelCaseSchema):
         'id', 'first_name', 'last_name', 'photo_url', 'rating', 'phone_number'
     ))
     host_answer = fields.String(dump_only=True)
+    decline_reason = fields.String(dump_only=True)
 
 
 class OrganizationSchemaUserIDs(ma.ModelSchema):

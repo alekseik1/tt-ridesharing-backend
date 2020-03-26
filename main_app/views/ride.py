@@ -36,8 +36,8 @@ def active_rides():
     return jsonify(RideJsonSchema(only=(
         'id', 'free_seats',
         'submit_datetime', 'host',
-        'price', 'car', 'stop_address'
-        # TODO: `DriverAnswer`, `DeclineReason`
+        'price', 'car', 'stop_address',
+        'host_answer', 'decline_reason'
     ), many=True).dump(filter(attrgetter('is_active'), current_user.all_rides)))
 
 
