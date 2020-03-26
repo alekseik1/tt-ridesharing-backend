@@ -172,6 +172,6 @@ class BasicTest(TestCase):
         with self.subTest('Not member raises error'):
             with login_as(self.client, non_member):
                 response = make_request()
-                self.assert400(response)
+                self.assert403(response)
                 # Error message
                 self.assertEqual(NotInOrganization.description, response.json.get('description'))
