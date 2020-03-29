@@ -1,5 +1,6 @@
 from datetime import datetime
 from operator import attrgetter
+from typing import List
 
 from flask import jsonify, request
 from flask_login import login_required, current_user
@@ -112,3 +113,17 @@ def ride_join():
         db.session.rollback()
         raise RequestAlreadySent()
     return JoinRideJsonSchema(exclude=('status',)).dump(join_request)
+
+
+@api.route('/ride/history', methods=['GET'])
+@login_required
+def my_rides_history():
+    all_requests = db.session.query(JoinRideRequest).filter(
+        JoinRideRequest.user == current_user
+    ).all()     # type: List[JoinRideRequest]
+    return jsonify(RideJsonSchema(many=True, only=(
+        'id', 'host', 'start_organization_name', 'stop_address',
+        # TODO: should be finish time, not submit
+        'submit_datetime',
+        'price'
+    )).dump([x.ride for x in all_requests if not x.ride.is_active]))
