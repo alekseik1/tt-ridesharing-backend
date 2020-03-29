@@ -100,7 +100,11 @@ class RideJsonSchema(ma.ModelSchema, CamelCaseSchema):
     passengers = fields.Nested('UserJsonSchema', many=True, only=(
         'id', 'first_name', 'last_name', 'photo_url', 'rating',
     ))
-    start_organization_address = fields.String()
+    start_organization_address = fields.Function(
+        lambda obj: obj.start_organzation.address, dump_only=True)
+    start_organization_name = fields.Function(
+        lambda obj: obj.start_organization.name, dump_only=True)
+    fields.Function()
 
 
 class OrganizationSchemaUserIDs(ma.ModelSchema):
