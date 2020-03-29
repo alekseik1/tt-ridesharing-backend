@@ -22,7 +22,18 @@ association_user_organization = db.Table(
 )
 
 
-class User(UserMixin, db.Model):
+class RatingMixin:
+    """
+    Mixin for rating calculation. Class should have `reviews` field.
+    """
+    @hybrid_property
+    def rating(self):
+        if not self.reviews:
+            return 0.
+        return sum([x.rate for x in self.reviews])/len(self.reviews)
+
+
+class User(UserMixin, RatingMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(MAX_NAME_LENGTH), nullable=False)
     last_name = db.Column(db.String(MAX_SURNAME_LENGTH), nullable=False)
@@ -38,11 +49,6 @@ class User(UserMixin, db.Model):
     @password.setter
     def password(self, value):
         self._password_hash = generate_password_hash(value)
-
-    @hybrid_property
-    def rating(self):
-        # TODO: implementation
-        return 5.0
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
@@ -103,7 +109,7 @@ class Organization(db.Model):
         return max([x.price for x in self.is_start_for]) if self.is_start_for else '-'
 
 
-class Ride(db.Model):
+class Ride(RatingMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     start_organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
