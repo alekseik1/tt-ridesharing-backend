@@ -1,7 +1,7 @@
 import factory.fuzzy
 from datetime import datetime
 
-from main_app.model import Ride
+from main_app.model import Ride, RideFeedback
 from main_app.fixtures.cars import CarFactory
 from app import db
 
@@ -43,3 +43,17 @@ class RideFactory(factory.alchemy.SQLAlchemyModelFactory):
         if extracted:
             for user in extracted:
                 self.passengers.append(user)
+
+
+class RideFeedbackFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = RideFeedback
+        sqlalchemy_session = db.session
+        exclude = ['id', ]
+
+    @factory.post_generation
+    def ride(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            self.ride = extracted

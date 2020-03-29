@@ -1,9 +1,9 @@
-import factory
+import factory.fuzzy
 from mimesis import Person
 
 from app import db
 from main_app.controller import parse_phone_number
-from main_app.model import User
+from main_app.model import User, UserFeedback
 
 
 class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -20,3 +20,19 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
         lambda n: parse_phone_number('+7 (950) 000-00-00')
     )
     password = '12345'
+
+
+class UserFeedbackFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = UserFeedback
+        sqlalchemy_session = db.session
+        exclude = ['id', ]
+    rate = factory.fuzzy.FuzzyInteger(1, 10)
+    description = factory.Sequence(lambda n: f'feedback_{n}')
+
+    @factory.post_generation
+    def user(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            self.user = extracted
