@@ -52,6 +52,7 @@ def organization_members():
 
 
 @api.route('/organization/question', methods=['GET'])
+@login_required
 def question():
     return OrganizationJsonSchema(only=('id', 'control_question')).dump(
         db.session.query(Organization).filter_by(**IdSchema().load(request.args)).first()
@@ -59,6 +60,7 @@ def question():
 
 
 @api.route('/organization/join', methods=['POST'])
+@login_required
 def join():
     data = JoinOrganizationSchema().load(request.json)
     org = db.session.query(Organization).filter_by(id=data['id']).first()
@@ -71,6 +73,7 @@ def join():
 
 
 @api.route('/organization/leave', methods=['POST'])
+@login_required
 def leave():
     org = db.session.query(Organization).filter_by(**IdSchema().load(request.json)).first()
     if org not in current_user.organizations:
