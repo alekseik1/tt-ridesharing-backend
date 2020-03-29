@@ -14,6 +14,7 @@ from main_app.views import api
 
 
 @api.route('/user/organizations', methods=['GET'])
+@login_required
 def organizations():
     return jsonify(OrganizationJsonSchema(only=('id', 'name', 'address'), many=True).dump(
         current_user.organizations
@@ -21,6 +22,7 @@ def organizations():
 
 
 @api.route('/user', methods=['GET'])
+@login_required
 def user():
     user = UserJsonSchema(only=('id', )).load(request.args)
     if user.email is None:
