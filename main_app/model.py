@@ -136,6 +136,10 @@ class Ride(db.Model):
         )['address']
 
     @hybrid_property
+    def start_organization_address(self):
+        return self.start_organization.address
+
+    @hybrid_property
     def is_mine(self):
         return self.host == current_user
 

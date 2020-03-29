@@ -10,13 +10,15 @@ from sqlalchemy.exc import IntegrityError
 from app import db
 from main_app.model import Ride, Organization, User, JoinRideRequest
 from main_app.schemas import RideSchema, CreateRideSchema, \
-    FindBestRidesSchema, RideJsonSchema, IdSchema, UserJsonSchema, JoinRideJsonSchema
+    FindBestRidesSchema, RideJsonSchema, IdSchema, UserJsonSchema, \
+    JoinRideJsonSchema, RideSearchSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import validate_params_with_schema, format_time, validate_all
 from main_app.views.user_and_driver import _get_user_info
 from main_app.exceptions.custom import NotInOrganization, NotCarOwner, \
-    RideNotActive, NoFreeSeats, CreatorCannotJoin, RequestAlreadySent
+    RideNotActive, NoFreeSeats, CreatorCannotJoin, RequestAlreadySent, InsufficientPermissions
+from main_app.misc import get_distance
 
 MAX_RIDES_IN_HISTORY = 10
 
@@ -39,6 +41,34 @@ def active_rides():
         'price', 'car', 'stop_address',
         'host_answer', 'decline_reason'
     ), many=True).dump(filter(attrgetter('is_active'), current_user.all_rides)))
+
+
+@api.route('/ride/match', methods=['POST'])
+def match_ride():
+    data = RideSearchSchema().load(request.json)
+    org = db.session.query(Organization).filter_by(id=data['id']).first()
+    if not org:
+        raise InsufficientPermissions()
+    if org not in current_user.organizations:
+        raise NotInOrganization()
+    latitude, longitude = data['gps']['latitude'], data['gps']['longitude']
+
+    # match ride
+    all_rides = db.session.query(Ride).\
+        filter(Ride.start_organization_id == org.id).\
+        filter(Ride.is_active).all()
+    ranged_rides = sorted(
+        all_rides,
+        key=lambda ride: get_distance(
+            (ride.stop_latitude, ride.stop_longitude),
+            (latitude, longitude))
+    )
+    return jsonify(RideJsonSchema(only=(
+        'id', 'car', 'submit_datetime',
+        'price', 'host', 'free_seats',
+        'passengers', 'stop_address',
+        'start_organization_address',
+    ), many=True).dump(ranged_rides))
 
 
 @api.route('/ride', methods=['PUT'])

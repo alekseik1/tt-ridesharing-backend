@@ -97,6 +97,10 @@ class RideJsonSchema(ma.ModelSchema, CamelCaseSchema):
     ))
     host_answer = fields.String(dump_only=True)
     decline_reason = fields.String(dump_only=True)
+    passengers = fields.Nested('UserJsonSchema', many=True, only=(
+        'id', 'first_name', 'last_name', 'photo_url', 'rating',
+    ))
+    start_organization_address = fields.String()
 
 
 class OrganizationSchemaUserIDs(ma.ModelSchema):
@@ -301,6 +305,11 @@ class RegisterCarForDriverSchema(ma.ModelSchema):
             error = SwaggerResponses.INVALID_DRIVER_WITH_ID
             error['value'] = owner_id
             return jsonify(error), 400
+
+
+class RideSearchSchema(CamelCaseSchema):
+    id = fields.Integer(data_key='organization_id', required=True)
+    gps = fields.Nested('ReverseGeocodingSchema', required=True)
 
 
 class ReverseGeocodingSchema(Schema):
