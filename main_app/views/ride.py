@@ -34,6 +34,7 @@ def dump_rides(rides):
 
 
 @api.route('/ride/active', methods=['GET'])
+@login_required
 def active_rides():
     return jsonify(RideJsonSchema(only=(
         'id', 'free_seats',
@@ -44,6 +45,7 @@ def active_rides():
 
 
 @api.route('/ride/match', methods=['POST'])
+@login_required
 def match_ride():
     data = RideSearchSchema().load(request.json)
     org = db.session.query(Organization).filter_by(id=data['id']).first()
@@ -72,6 +74,7 @@ def match_ride():
 
 
 @api.route('/ride', methods=['PUT'])
+@login_required
 def ride():
     if request.method == 'PUT':
         ride = RideJsonSchema(only=(
@@ -91,6 +94,7 @@ def ride():
 
 
 @api.route('/ride/passengers', methods=['GET'])
+@login_required
 def passengers():
     return jsonify(
         UserJsonSchema(only=(
@@ -104,6 +108,7 @@ def passengers():
 
 
 @api.route('/ride/join', methods=['POST'])
+@login_required
 def ride_join():
     ride = RideJsonSchema(only=('id', )).load(request.json)
     if not ride.is_active:
