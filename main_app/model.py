@@ -1,6 +1,7 @@
 from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 from main_app.misc import reverse_geocoding_blocking
 from datetime import datetime
@@ -159,3 +160,24 @@ class Car(db.Model):
     registry_number = db.Column(db.String(20), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     owner = db.relationship('User', backref='cars')
+
+
+class FeedbackMixin:
+
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
+
+    id = db.Column(db.Integer, primary_key=True)
+    rate = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.String(600))
+
+
+class UserFeedback(FeedbackMixin, db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship(User, backref='reviews')
+
+
+class RideFeedback(FeedbackMixin, db.Model):
+    ride_id = db.Column(db.Integer, db.ForeignKey('ride.id'), nullable=False)
+    ride = db.relationship(Ride, backref='reviews')
