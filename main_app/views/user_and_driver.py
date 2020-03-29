@@ -18,8 +18,10 @@ def organizations():
 @login_required
 def user():
     user = UserJsonSchema(only=('id', )).load(request.args)
+    if user.id is None:
+        user = current_user
     if user.email is None:
         raise InsufficientPermissions()
     return UserJsonSchema(
-        only=('first_name', 'last_name', 'rating', 'photo_url')
+        only=('id', 'first_name', 'last_name', 'rating', 'photo_url')
     ).dump(user)
