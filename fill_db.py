@@ -3,7 +3,7 @@ import factory.random
 from app import create_app, db
 from main_app.fixtures.join_ride_request import JoinRideRequestFactory
 from main_app.fixtures.organizations import OrganizationFactory
-from main_app.fixtures.users import UserFactory
+from main_app.fixtures.users import UserFactory, UserFeedbackFactory
 from main_app.fixtures.cars import CarFactory
 from main_app.fixtures.rides import RideFactory
 
@@ -46,6 +46,11 @@ def fill_database(app):
                     user=user,
                     status=1
                 ))
+        # Add random rating to users
+        user_feedback_records = []
+        for user in users:
+            user_feedback_records.extend(factory.build_batch(UserFeedbackFactory, 10, user=user))
+        db.session.add_all(user_feedback_records)
         db.session.add_all(organizations)
         db.session.add_all(rides)
         db.session.add_all(join_requests)
