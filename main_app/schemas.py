@@ -57,7 +57,7 @@ class RideJsonSchema(ma.ModelSchema, CamelCaseSchema):
         'id', 'first_name', 'last_name', 'photo_url', 'rating',
     ))
     start_organization_address = fields.Function(
-        lambda obj: obj.start_organzation.address, dump_only=True)
+        lambda obj: obj.start_organization.address, dump_only=True)
     start_organization_name = fields.Function(
         lambda obj: obj.start_organization.name, dump_only=True)
     fields.Function()
