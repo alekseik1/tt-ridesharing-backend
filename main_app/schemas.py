@@ -161,7 +161,7 @@ class CarPermissiveSchema(CarSchema):
             field_obj.required = False
 
 
-class RideSearchSchema(Schema):
+class RideSearchSchema(CamelCaseSchema):
     id = fields.Integer(data_key='organization_id', required=True)
     latitude = fields.Float(required=True)
     longitude = fields.Float(required=True)
