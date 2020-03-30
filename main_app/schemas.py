@@ -161,9 +161,10 @@ class CarPermissiveSchema(CarSchema):
             field_obj.required = False
 
 
-class RideSearchSchema(CamelCaseSchema):
+class RideSearchSchema(Schema):
     id = fields.Integer(data_key='organization_id', required=True)
-    gps = fields.Nested('ReverseGeocodingSchema', required=True)
+    latitude = fields.Float(required=True)
+    longitude = fields.Float(required=True)
 
 
 class ReverseGeocodingSchema(Schema):

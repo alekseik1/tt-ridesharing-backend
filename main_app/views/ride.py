@@ -30,16 +30,16 @@ def active_rides():
     ), many=True).dump(filter(attrgetter('is_active'), current_user.all_rides)))
 
 
-@api.route('/ride/match', methods=['POST'])
+@api.route('/ride/match', methods=['GET'])
 @login_required
 def match_ride():
-    data = RideSearchSchema().load(request.json)
+    data = RideSearchSchema().load(request.args)
     org = db.session.query(Organization).filter_by(id=data['id']).first()
     if not org:
         raise InsufficientPermissions()
     if org not in current_user.organizations:
         raise NotInOrganization()
-    latitude, longitude = data['gps']['latitude'], data['gps']['longitude']
+    latitude, longitude = data['latitude'], data['longitude']
 
     # match ride
     all_rides = db.session.query(Ride).\
