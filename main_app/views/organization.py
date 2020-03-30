@@ -1,10 +1,10 @@
-from flask import request, jsonify
+from flask import request
 from flask_login import login_required, current_user
 
 from app import db
 from main_app.model import Organization
-from main_app.schemas import OrganizationSchemaUserInfo,\
-    IdSchema, OrganizationJsonSchema, JoinOrganizationSchema, OrganizationPermissiveSchema
+from main_app.schemas import IdSchema, OrganizationJsonSchema, \
+    JoinOrganizationSchema, OrganizationPermissiveSchema
 from main_app.exceptions.custom import IncorrectControlAnswer, \
     NotInOrganization, CreatorCannotLeave, InsufficientPermissions
 from main_app.views import api
@@ -83,11 +83,3 @@ def leave():
     org.users.remove(current_user)
     db.session.commit()
     return {}
-
-
-@api.route('/get_all_organizations', methods=['GET'])
-@login_required
-def get_all_organizations():
-    organization_schema = OrganizationSchemaUserInfo(many=True)
-    result = organization_schema.dump(db.session.query(Organization).all(), many=True)
-    return jsonify(result), 200
