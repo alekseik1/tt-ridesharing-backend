@@ -113,7 +113,7 @@ def ride_join():
     except IntegrityError:
         db.session.rollback()
         raise RequestAlreadySent()
-    return JoinRideJsonSchema(exclude=('status',)).dump(join_request)
+    return JoinRideJsonSchema(exclude=('status', 'user', )).dump(join_request)
 
 
 @api.route('/ride/history', methods=['GET'])
@@ -144,3 +144,14 @@ def rate_ride():
     db.session.add(review)
     db.session.commit()
     return RideFeedbackSchema(only=('id', )).dump(review)
+
+
+@api.route('/ride/requests', methods=['GET'])
+@login_required
+def ride_requests():
+    result = db.session.query(JoinRideRequest).filter(
+        JoinRideRequest.ride_id.in_([x.id for x in current_user.hosted_rides])
+    ).filter_by(status=0).all()     # 0 - not decided
+    return jsonify(JoinRideJsonSchema(many=True, only=(
+        'ride_id', 'user',
+    )).dump(result))

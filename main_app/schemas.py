@@ -71,6 +71,9 @@ class JoinRideJsonSchema(ma.ModelSchema, CamelCaseSchema):
         model = JoinRideRequest
         sqla_session = db.session
         include_fk = True
+    user = fields.Nested('UserJsonSchema', only=(
+        'id', 'first_name', 'last_name', 'photo_url', 'rating'
+    ))
 
 
 class RideSchema(ma.ModelSchema):
@@ -104,7 +107,9 @@ class RideJsonSchema(ma.ModelSchema, CamelCaseSchema):
         lambda obj: obj.start_organization.address, dump_only=True)
     start_organization_name = fields.Function(
         lambda obj: obj.start_organization.name, dump_only=True)
-    fields.Function()
+    join_requests = fields.Nested(JoinRideJsonSchema, many=True, only=(
+        'ride_id', 'user', 'status', 'decline_reason'
+    ))
 
 
 class OrganizationSchemaUserIDs(ma.ModelSchema):
