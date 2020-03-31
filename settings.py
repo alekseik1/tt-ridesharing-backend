@@ -16,6 +16,7 @@ class Config:
     """
     SECRET_KEY = os.environ['SECRET_KEY']
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
     PORT = os.environ.get('PORT', 5000)
 
     PRESERVE_CONTEXT_ON_EXCEPTION = os.environ.get('PRESERVE_CONTEXT_ON_EXCEPTION', False)

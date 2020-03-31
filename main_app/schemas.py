@@ -158,8 +158,8 @@ class OrganizationJsonSchema(ma.ModelSchema, CamelCaseSchema):
     # Not for dumping
     control_question = fields.String()
     control_answer = fields.String(load_only=True)
-    latitude = fields.Float(load_only=True)
-    longitude = fields.Float(load_only=True)
+    latitude = fields.Float(load_only=True, required=True)
+    longitude = fields.Float(load_only=True, required=True)
 
     creator = fields.Nested(UserJsonSchema, data_key='creator', dump_only=True, only=[
         'id', 'photo_url'
@@ -340,3 +340,7 @@ class RideFeedbackSchema(ma.ModelSchema, CamelCaseSchema):
         model = RideFeedback
         sqla_session = db.session
     ride = fields.Nested(RideJsonSchema, only=('id', ), required=True)
+
+
+class SearchSchema(CamelCaseSchema):
+    query = fields.String(required=True)

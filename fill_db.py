@@ -6,6 +6,7 @@ from main_app.fixtures.organizations import OrganizationFactory
 from main_app.fixtures.users import UserFactory, UserFeedbackFactory
 from main_app.fixtures.cars import CarFactory
 from main_app.fixtures.rides import RideFactory
+from main_app.model import Organization
 
 
 def fill_database(app):
@@ -65,6 +66,10 @@ def fill_database(app):
         db.session.add_all(join_requests)
         db.session.add_all(undecided_requests)
         db.session.commit()
+        # Reindex __searchable__ models
+        searchable_models = (Organization, )
+        for model in searchable_models:
+            model.reindex()
 
 
 if __name__ == '__main__':

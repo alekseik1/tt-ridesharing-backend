@@ -9,6 +9,7 @@ from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+from elasticsearch import Elasticsearch
 
 from main_app.exceptions import setup_handlers
 
@@ -48,6 +49,9 @@ def create_app():
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE=None,
     )
+    # elasticsearch
+    app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
+        if app.config['ELASTICSEARCH_URL'] else None
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -56,7 +60,7 @@ def create_app():
     CORS(app, supports_credentials=True)
     login.init_app(app)
     # register all Blueprints
-    from main_app.views import auth, user_and_driver, organization, ride, car, misc
+    from main_app.views import auth, user_and_driver, organization, ride, car, misc     # noqa: F401
     from main_app.views import api
     app.register_blueprint(api)
 

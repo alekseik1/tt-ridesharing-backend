@@ -4,7 +4,8 @@ from flask_login import login_required, current_user
 from app import db
 from main_app.model import Organization
 from main_app.schemas import OrganizationSchemaUserInfo,\
-    IdSchema, OrganizationJsonSchema, JoinOrganizationSchema, OrganizationPermissiveSchema
+    IdSchema, OrganizationJsonSchema, JoinOrganizationSchema, OrganizationPermissiveSchema,\
+    SearchSchema
 from main_app.exceptions.custom import IncorrectControlAnswer, \
     NotInOrganization, CreatorCannotLeave, InsufficientPermissions
 from main_app.views import api
@@ -93,3 +94,13 @@ def get_all_organizations():
     organization_schema = OrganizationSchemaUserInfo(many=True)
     result = organization_schema.dump(db.session.query(Organization).all(), many=True)
     return jsonify(result), 200
+
+
+@api.route('/organization/search', methods=['GET'])
+@login_required
+def search_organizations():
+    query_string = SearchSchema().load(request.args)
+    results, total = Organization.search(query_string['query'], 1, 10)
+    return jsonify(OrganizationJsonSchema(many=True, only=(
+        'id', 'name', 'address'
+    )).dump(results))
