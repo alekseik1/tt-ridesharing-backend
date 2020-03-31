@@ -30,7 +30,9 @@ def organization():
         db.session.commit()
         return IdSchema().dump(org)
     if request.method == 'POST':
-        org = OrganizationPermissiveSchema().load(request.json)
+        org = OrganizationPermissiveSchema(only=(
+            'id', 'name', 'latitude', 'longitude', 'description', 'photo_url'
+        )).load(request.json)
         if current_user != org.creator:
             raise InsufficientPermissions()
         # Update address
