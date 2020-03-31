@@ -340,3 +340,7 @@ class RideFeedbackSchema(ma.ModelSchema, CamelCaseSchema):
         model = RideFeedback
         sqla_session = db.session
     ride = fields.Nested(RideJsonSchema, only=('id', ), required=True)
+
+
+class SearchSchema(CamelCaseSchema):
+    query = fields.String(required=True)
