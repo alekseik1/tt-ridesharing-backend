@@ -13,7 +13,7 @@ def fill_database(app):
         db.drop_all()
         db.create_all()
         # Users without cars
-        users = factory.build_batch(UserFactory, 20)
+        users = factory.build_batch(UserFactory, 50)
         db.session.add_all(users)
         # Create 10 cars and 10 owners for them
         cars = factory.build_batch(CarFactory, 20)
@@ -46,6 +46,15 @@ def fill_database(app):
                     user=user,
                     status=1
                 ))
+        # Also, create some undecided requests to rides
+        undecided_requests = []
+        for ride in rides:
+            for i in range(15, 20):
+                undecided_requests.append(JoinRideRequestFactory(
+                    ride=ride,
+                    user=users[i],
+                    status=0
+                ))
         # Add random rating to users
         user_feedback_records = []
         for user in users:
@@ -54,6 +63,7 @@ def fill_database(app):
         db.session.add_all(organizations)
         db.session.add_all(rides)
         db.session.add_all(join_requests)
+        db.session.add_all(undecided_requests)
         db.session.commit()
 
 
