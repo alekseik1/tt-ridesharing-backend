@@ -174,6 +174,15 @@ class FeedbackMixin:
     def __tablename__(cls):
         return cls.__name__.lower()
 
+    @declared_attr
+    def voter_id(cls):
+        return db.Column(db.Integer, db.ForeignKey(f'user.id'), nullable=False, server_default='1')
+
+    @declared_attr
+    def voter(cls):
+        return db.relationship(User, backref=f'{cls.__tablename__}_left',
+                               foreign_keys=[cls.voter_id])
+
     id = db.Column(db.Integer, primary_key=True)
     rate = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(600))
@@ -181,7 +190,7 @@ class FeedbackMixin:
 
 class UserFeedback(FeedbackMixin, db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship(User, backref='reviews')
+    user = db.relationship(User, backref='reviews', foreign_keys=[user_id, ])
 
 
 class RideFeedback(FeedbackMixin, db.Model):
