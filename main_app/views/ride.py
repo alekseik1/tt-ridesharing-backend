@@ -7,13 +7,14 @@ from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
 
 from app import db
-from main_app.model import Ride, Organization, JoinRideRequest
+from main_app.model import Ride, Organization, JoinRideRequest, RideFeedback
 from main_app.schemas import \
     RideJsonSchema, IdSchema, UserJsonSchema, \
-    JoinRideJsonSchema, RideSearchSchema
+    JoinRideJsonSchema, RideSearchSchema, RideFeedbackSchema
 from main_app.views import api
 from main_app.exceptions.custom import NotInOrganization, NotCarOwner, \
-    RideNotActive, NoFreeSeats, CreatorCannotJoin, RequestAlreadySent, InsufficientPermissions
+    RideNotActive, NoFreeSeats, CreatorCannotJoin, RequestAlreadySent, InsufficientPermissions, \
+    NotInRide, NotForOwner, RideNotFinished
 from main_app.misc import get_distance
 
 MAX_RIDES_IN_HISTORY = 10
@@ -127,3 +128,19 @@ def my_rides_history():
         'submit_datetime',
         'price'
     )).dump([x.ride for x in all_requests if not x.ride.is_active]))
+
+
+@api.route('/ride/rate', methods=['PUT'])
+@login_required
+def rate_ride():
+    review = RideFeedbackSchema().load(request.json)    # type: RideFeedback
+    if current_user not in review.ride.passengers:
+        raise NotInRide()
+    if current_user == review.ride.host:
+        raise NotForOwner()
+    if review.ride.is_active:
+        raise RideNotFinished()
+    review.voter = current_user
+    db.session.add(review)
+    db.session.commit()
+    return RideFeedbackSchema(only=('id', )).dump(review)

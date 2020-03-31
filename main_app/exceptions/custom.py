@@ -59,3 +59,18 @@ class CreatorCannotJoin(HTTPException):
 class RequestAlreadySent(HTTPException):
     code = 400
     description = 'Request already sent'
+
+
+class NotInRide(HTTPException):
+    code = 403
+    description = 'You did not take this ride'
+
+
+class NotForOwner(HTTPException):
+    code = 403
+    description = 'Owner cannot do that'
+
+
+class RideNotFinished(HTTPException):
+    code = 403
+    description = 'Ride has not finished yet'
