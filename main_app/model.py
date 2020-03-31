@@ -108,7 +108,8 @@ class JoinRideRequest(db.Model):
     decline_reason = db.Column(db.String(200))
 
 
-class Organization(db.Model):
+class Organization(SearchableMixin, db.Model):
+    __searchable__ = ['name', 'address']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     latitude = db.Column(db.Float, nullable=False)
