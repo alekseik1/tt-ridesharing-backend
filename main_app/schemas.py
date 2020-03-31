@@ -3,7 +3,7 @@ from marshmallow.validate import Length
 from flask import jsonify
 
 from app import ma, db
-from main_app.model import Ride, User, Organization, Car, JoinRideRequest
+from main_app.model import Ride, User, Organization, Car, JoinRideRequest, RideFeedback
 from settings import MAX_EMAIL_LENGTH
 from main_app.controller import check_email, parse_phone_number, check_image_url
 from main_app.responses import SwaggerResponses
@@ -328,3 +328,10 @@ class ForwardGeocodingSchema(Schema):
 
 class CarIdSchema(ma.ModelSchema):
     car_id = fields.Integer(required=True)
+
+
+class RideFeedbackSchema(ma.ModelSchema, CamelCaseSchema):
+    class Meta:
+        model = RideFeedback
+        sqla_session = db.session
+    ride = fields.Nested(RideJsonSchema, only=('id', ), required=True)
