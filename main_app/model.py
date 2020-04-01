@@ -32,6 +32,8 @@ class SearchableMixin:
         when = []
         for i in range(len(ids)):
             when.append((ids[i], i))
+        if not when:    # workaround for empty list crash
+            return cls.query.filter(cls.id.in_(ids)), total
         return cls.query.filter(cls.id.in_(ids)).order_by(
             db.case(when, value=cls.id)), total
 
