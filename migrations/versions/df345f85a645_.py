@@ -1,7 +1,7 @@
 """empty message
 
 Revision ID: df345f85a645
-Revises: 
+Revises:
 Create Date: 2020-03-22 15:03:54.268896
 
 """
@@ -43,7 +43,7 @@ def upgrade():
     sa.Column('name', sa.String(length=200), nullable=False),
     sa.Column('latitude', sa.Float(), nullable=True),
     sa.Column('longitude', sa.Float(), nullable=True),
-    sa.Column('address', sa.String(length=600), nullable=True),
+    sa.Column('address', sa.String(length=600), nullable=True, server_default='undefined'),
     sa.Column('description', sa.String(length=600), nullable=True),
     sa.Column('creator_id', sa.Integer(), server_default='1', nullable=False),
     sa.Column('photo_url', sa.String(length=2000), nullable=True),
