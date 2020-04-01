@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: df345f85a645
+Revision ID: 77abee6f4ad0
 Revises:
-Create Date: 2020-03-22 15:03:54.268896
+Create Date: 2020-04-01 19:10:42.733668
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'df345f85a645'
+revision = '77abee6f4ad0'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -41,29 +41,43 @@ def upgrade():
     op.create_table('organization',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=200), nullable=False),
-    sa.Column('latitude', sa.Float(), nullable=True),
-    sa.Column('longitude', sa.Float(), nullable=True),
-    sa.Column('address', sa.String(length=600), nullable=True, server_default='undefined'),
+    sa.Column('latitude', sa.Float(), nullable=False),
+    sa.Column('longitude', sa.Float(), nullable=False),
+    sa.Column('address', sa.String(length=600), server_default='undefined', nullable=False),
     sa.Column('description', sa.String(length=600), nullable=True),
     sa.Column('creator_id', sa.Integer(), server_default='1', nullable=False),
+    sa.Column('control_question', sa.String(length=400), server_default='undefined', nullable=False),
+    sa.Column('control_answer', sa.String(length=200), server_default='undefined', nullable=False),
     sa.Column('photo_url', sa.String(length=2000), nullable=True),
     sa.ForeignKeyConstraint(['creator_id'], ['user.id'], name=op.f('fk_organization_creator_id_user')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_organization'))
     )
+    op.create_table('userfeedback',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('rate', sa.Integer(), nullable=False),
+    sa.Column('description', sa.String(length=600), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('voter_id', sa.Integer(), server_default='1', nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_userfeedback_user_id_user')),
+    sa.ForeignKeyConstraint(['voter_id'], ['user.id'], name=op.f('fk_userfeedback_voter_id_user')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_userfeedback'))
+    )
     op.create_table('association_user_organization',
     sa.Column('left_id', sa.Integer(), nullable=True),
     sa.Column('right_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['left_id'], ['user.id'], name=op.f('fk_association_user_organization_left_id_user')),
-    sa.ForeignKeyConstraint(['right_id'], ['organization.id'], name=op.f('fk_association_user_organization_right_id_organization'))
+    sa.ForeignKeyConstraint(['left_id'], ['user.id'], name=op.f('fk_association_user_organization_left_id_user'), ondelete='cascade'),
+    sa.ForeignKeyConstraint(['right_id'], ['organization.id'], name=op.f('fk_association_user_organization_right_id_organization'), ondelete='cascade')
     )
     op.create_table('ride',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('start_organization_id', sa.Integer(), nullable=False),
     sa.Column('stop_latitude', sa.Float(), nullable=False),
     sa.Column('stop_longitude', sa.Float(), nullable=False),
+    sa.Column('submit_datetime', sa.DateTime(), server_default='2020-04-01T19:10:42.506321', nullable=True),
     sa.Column('total_seats', sa.Integer(), server_default='4', nullable=False),
     sa.Column('host_id', sa.Integer(), nullable=False),
-    sa.Column('price', sa.Float(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), server_default='true', nullable=False),
+    sa.Column('price', sa.Float(), server_default='0', nullable=False),
     sa.Column('car_id', sa.Integer(), server_default='2', nullable=False),
     sa.Column('description', sa.String(length=600), nullable=True),
     sa.ForeignKeyConstraint(['car_id'], ['car.id'], name=op.f('fk_ride_car_id_car')),
@@ -77,14 +91,36 @@ def upgrade():
     sa.ForeignKeyConstraint(['left_id'], ['user.id'], name=op.f('fk_association_user_ride_left_id_user')),
     sa.ForeignKeyConstraint(['right_id'], ['ride.id'], name=op.f('fk_association_user_ride_right_id_ride'))
     )
+    op.create_table('join_ride_request',
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('ride_id', sa.Integer(), nullable=False),
+    sa.Column('status', sa.Integer(), server_default='0', nullable=False),
+    sa.Column('decline_reason', sa.String(length=200), nullable=True),
+    sa.ForeignKeyConstraint(['ride_id'], ['ride.id'], name=op.f('fk_join_ride_request_ride_id_ride')),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_join_ride_request_user_id_user')),
+    sa.PrimaryKeyConstraint('user_id', 'ride_id', name=op.f('pk_join_ride_request'))
+    )
+    op.create_table('ridefeedback',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('rate', sa.Integer(), nullable=False),
+    sa.Column('description', sa.String(length=600), nullable=True),
+    sa.Column('ride_id', sa.Integer(), nullable=False),
+    sa.Column('voter_id', sa.Integer(), server_default='1', nullable=False),
+    sa.ForeignKeyConstraint(['ride_id'], ['ride.id'], name=op.f('fk_ridefeedback_ride_id_ride')),
+    sa.ForeignKeyConstraint(['voter_id'], ['user.id'], name=op.f('fk_ridefeedback_voter_id_user')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_ridefeedback'))
+    )
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('ridefeedback')
+    op.drop_table('join_ride_request')
     op.drop_table('association_user_ride')
     op.drop_table('ride')
     op.drop_table('association_user_organization')
+    op.drop_table('userfeedback')
     op.drop_table('organization')
     op.drop_table('car')
     op.drop_table('user')
