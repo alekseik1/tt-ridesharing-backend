@@ -27,6 +27,7 @@ def organization():
         org.address = reverse_geocoding_blocking(
             latitude=org.latitude, longitude=org.longitude
         )['address']
+        org.users = [current_user]
         db.session.add(org)
         db.session.commit()
         return IdSchema().dump(org)
