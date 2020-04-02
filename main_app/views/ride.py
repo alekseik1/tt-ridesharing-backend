@@ -18,16 +18,19 @@ from main_app.exceptions.custom import NotInOrganization, NotCarOwner, \
 from main_app.misc import get_distance
 
 MAX_RIDES_IN_HISTORY = 10
+STANDART_RIDE_INFO = [
+    'id', 'free_seats',
+    'submit_datetime', 'host',
+    'price', 'car', 'stop_address',
+    'host_answer', 'decline_reason'
+]
 
 
 @api.route('/ride/active', methods=['GET'])
 @login_required
 def active_rides():
     return jsonify(RideJsonSchema(only=(
-        'id', 'free_seats',
-        'submit_datetime', 'host',
-        'price', 'car', 'stop_address',
-        'host_answer', 'decline_reason'
+        STANDART_RIDE_INFO
     ), many=True).dump(filter(attrgetter('is_active'), current_user.all_rides)))
 
 
@@ -155,3 +158,10 @@ def ride_requests():
     return jsonify(JoinRideJsonSchema(many=True, only=(
         'ride_id', 'user',
     )).dump(result))
+
+
+@api.route('/ride/hosted', methods=['GET'])
+@login_required
+def my_hosted_rides():
+    return jsonify(RideJsonSchema(many=True, only=STANDART_RIDE_INFO).dump(
+        filter(lambda ride: ride.is_active, current_user.hosted_rides)))
