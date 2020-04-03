@@ -346,3 +346,8 @@ class RideFeedbackSchema(ma.ModelSchema, CamelCaseSchema):
 
 class SearchSchema(CamelCaseSchema):
     query = fields.String(required=True)
+
+
+class PasswordChangeSchema(CamelCaseSchema):
+    old_password = fields.String(required=True)
+    new_password = fields.String(required=True)
