@@ -1,4 +1,5 @@
 import factory.random
+from sqlalchemy.exc import DatabaseError
 
 from app import create_app, db
 from main_app.fixtures.join_ride_request import JoinRideRequestFactory
@@ -65,7 +66,10 @@ def fill_database(app):
         db.session.add_all(rides)
         db.session.add_all(join_requests)
         db.session.add_all(undecided_requests)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except DatabaseError:
+            db.session.rollback()
         # Reindex __searchable__ models
         searchable_models = (Organization, )
         for model in searchable_models:
