@@ -1,25 +1,19 @@
-from flask_testing import TestCase
 from flask import url_for
 import unittest
 
 from tests import login_as
-from app import create_app, db
-from fill_db import fill_database
+from app import db
 from settings import BLUEPRINT_API_NAME
 from main_app.schemas import CarSchema, IdSchema
 from main_app.model import Car, User
 from main_app.views.car import car as endpoint
+from . import TestWithDatabase
 
 
-class BasicTest(TestCase):
-
-    def create_app(self):
-        app = create_app()
-        app.config['LOGIN_DISABLED'] = True
-        return app
+class BasicTest(TestWithDatabase):
 
     def setUp(self):
-        fill_database(self.app)
+        super().setUp()
         self.url = url_for(f'{BLUEPRINT_API_NAME}.{endpoint.__name__}')
 
     def test_get_car(self):

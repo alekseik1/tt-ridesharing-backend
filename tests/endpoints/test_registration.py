@@ -1,4 +1,3 @@
-from flask_testing import TestCase
 from flask import url_for
 import factory
 import unittest
@@ -7,19 +6,15 @@ from settings import BLUEPRINT_API_NAME
 from main_app.schemas import UserIDSchema
 from main_app.model import User
 from main_app.views import auth
-import app
 from app import db
 from main_app.fixtures.users import UserFactory
+from . import TestWithDatabase
 
 
-class BasicRegistrationTests(TestCase):
-
-    def create_app(self):
-        return app.create_app()
+class BasicRegistrationTests(TestWithDatabase):
 
     def setUp(self) -> None:
-        db.drop_all()
-        db.create_all()
+        super().setUp()
         self.url = url_for(f'{BLUEPRINT_API_NAME}.{auth.register_user.__name__}')
 
     def _register_random_user(self):

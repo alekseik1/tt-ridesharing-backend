@@ -1,25 +1,20 @@
-from flask_testing import TestCase
 from flask import url_for
 import unittest
 
-from app import create_app, db
+from app import db
 from settings import BLUEPRINT_API_NAME
 from main_app.views.organization import organization as endpoint
 from main_app.schemas import OrganizationJsonSchema, IdSchema, UserJsonSchema
 from main_app.exceptions.custom import NotInOrganization, CreatorCannotLeave
 from tests import login_as
 from main_app.model import Organization, User
-from fill_db import fill_database
+from . import TestWithDatabase
 
 
-class BasicTest(TestCase):
-
-    def create_app(self):
-        app = create_app()
-        return app
+class BasicTest(TestWithDatabase):
 
     def setUp(self):
-        fill_database(self.app)
+        super().setUp()
         self.url = url_for(f'{BLUEPRINT_API_NAME}.{endpoint.__name__}')
 
     def test_get_organization(self):
