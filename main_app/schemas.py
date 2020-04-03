@@ -91,7 +91,9 @@ class RideJsonSchema(ma.ModelSchema, CamelCaseSchema):
     free_seats = fields.Integer(dump_only=True)
     car = fields.Nested('CarSchema')
     car_id = fields.Integer(required=True, load_only=True)
-    start_organization = fields.Nested('OrganizationJsonSchema')
+    start_organization = fields.Nested('OrganizationJsonSchema', only=(
+        'id', 'name', 'address',
+    ))
     start_organization_id = fields.Integer(required=True, load_only=True)
     total_seats = fields.Integer(required=True)
     price = fields.Float(required=True)
