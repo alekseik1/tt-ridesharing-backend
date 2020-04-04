@@ -24,7 +24,7 @@ MAX_RIDES_IN_HISTORY = 10
 @login_required
 def active_rides():
     return jsonify(RideJsonSchema(only=(
-        STANDART_RIDE_INFO
+        STANDART_RIDE_INFO + ['host_answer']
     ), many=True).dump(filter(attrgetter('is_active'), current_user.all_rides)))
 
 
