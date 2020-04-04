@@ -10,7 +10,7 @@ from app import db
 from main_app.model import Ride, Organization, JoinRideRequest, RideFeedback
 from main_app.schemas import \
     RideJsonSchema, IdSchema, UserJsonSchema, \
-    JoinRideJsonSchema, RideSearchSchema, RideFeedbackSchema
+    JoinRideJsonSchema, RideSearchSchema, RideFeedbackSchema, STANDART_RIDE_INFO
 from main_app.views import api
 from main_app.exceptions.custom import NotInOrganization, NotCarOwner, \
     RideNotActive, NoFreeSeats, CreatorCannotJoin, RequestAlreadySent, InsufficientPermissions, \
@@ -18,12 +18,6 @@ from main_app.exceptions.custom import NotInOrganization, NotCarOwner, \
 from main_app.misc import get_distance
 
 MAX_RIDES_IN_HISTORY = 10
-STANDART_RIDE_INFO = [
-    'id', 'free_seats',
-    'submit_datetime', 'host',
-    'price', 'car', 'stop_address',
-    'host_answer', 'decline_reason', 'start_organization'
-]
 
 
 @api.route('/ride/active', methods=['GET'])

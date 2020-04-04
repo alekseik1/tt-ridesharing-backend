@@ -8,6 +8,13 @@ from settings import MAX_EMAIL_LENGTH
 from main_app.controller import check_email, parse_phone_number, check_image_url
 from main_app.responses import SwaggerResponses
 
+STANDART_RIDE_INFO = [
+    'id', 'free_seats',
+    'submit_datetime', 'host',
+    'price', 'car', 'stop_address',
+    'host_answer', 'decline_reason', 'start_organization'
+]
+
 
 def camelcase(s):
     parts = iter(s.split("_"))
