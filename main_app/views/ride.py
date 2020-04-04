@@ -165,3 +165,16 @@ def ride_requests():
 def my_hosted_rides():
     return jsonify(RideJsonSchema(many=True, only=STANDART_RIDE_INFO).dump(
         filter(lambda ride: ride.is_active, current_user.hosted_rides)))
+
+
+@api.route('/ride/finish', methods=['POST'])
+@login_required
+def finish_ride():
+    ride = RideJsonSchema(only=('id', )).load(request.json)
+    if not ride.is_mine:
+        raise InsufficientPermissions()
+    if not ride.is_active:
+        raise RideNotActive()
+    ride.is_active = False
+    db.session.commit()
+    return RideJsonSchema(only=('id', )).dump(ride)
