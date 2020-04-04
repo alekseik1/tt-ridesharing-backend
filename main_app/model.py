@@ -102,7 +102,7 @@ class User(UserMixin, RatingMixin, db.Model):
 
 class JoinRideRequest(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, primary_key=True)
-    user = db.relationship('User')
+    user = db.relationship('User', backref='join_requests')
     ride_id = db.Column(db.Integer, db.ForeignKey('ride.id'), nullable=False, primary_key=True)
     ride = db.relationship('Ride', backref='join_requests')
     # 0 - no answer, 1 - accepted, -1 - declined

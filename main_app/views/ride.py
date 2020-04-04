@@ -1,5 +1,4 @@
 from datetime import datetime
-from operator import attrgetter
 from typing import List
 
 from flask import jsonify, request
@@ -23,9 +22,13 @@ MAX_RIDES_IN_HISTORY = 10
 @api.route('/ride/active', methods=['GET'])
 @login_required
 def active_rides():
+    # TODO: move logic to SQL-query, not pythonic `filter`
+    requests_to_active_rides = filter(
+        lambda request: request.ride.is_active,
+        current_user.join_requests)
     return jsonify(RideJsonSchema(only=(
         STANDART_RIDE_INFO + ['host_answer']
-    ), many=True).dump(filter(attrgetter('is_active'), current_user.all_rides)))
+    ), many=True).dump([request.ride for request in requests_to_active_rides]))
 
 
 @api.route('/ride/match', methods=['GET'])
