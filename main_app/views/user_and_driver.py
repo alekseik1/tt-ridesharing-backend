@@ -1,7 +1,8 @@
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from flask_login import login_required, current_user
 
-from main_app.schemas import OrganizationJsonSchema, UserJsonSchema, PasswordChangeSchema
+from main_app.schemas import OrganizationJsonSchema, UserJsonSchema, \
+    PasswordChangeSchema, UploadFileSchema
 from main_app.exceptions.custom import InsufficientPermissions, InvalidCredentials
 from app import db
 from main_app.views import api
@@ -41,3 +42,24 @@ def change_password():
     current_user.password = new_password
     db.session.commit()
     return UserJsonSchema(only=('id', )).dump(current_user)
+
+
+@api.route('/user/sign_s3', methods=['GET'])
+def user_avatar_sign_s3():
+    data = UploadFileSchema().load(request.args)
+
+    file_name = data.get('file_name')
+    file_type = data.get('file_type')
+    s3 = current_app.s3_client
+
+    presigned_post = s3.generate_presigned_post(
+        Bucket=current_app.config['S3_BUCKET'],
+        Key=file_name,
+        Fields={"acl": "public-read", "Content-Type": file_type},
+        Conditions=[
+            {"acl": "public-read"},
+            {"Content-Type": file_type}
+        ],
+        ExpiresIn=3600
+    )
+    return presigned_post

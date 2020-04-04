@@ -21,3 +21,4 @@ flake8
 sentry-sdk[flask]==0.14.2
 factory-boy
 elasticsearch
+boto3

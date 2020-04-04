@@ -2,6 +2,7 @@ import logging
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+import boto3
 
 from flask import Flask, request
 from flask_cors import CORS
@@ -85,6 +86,10 @@ def create_app():
         if not user:
             return None
         return user
+
+    # S3 storage
+    app.s3_client = boto3.client('s3', endpoint_url=app.config['S3_URL']) \
+        if app.config.get('S3_URL') else None
 
     setup_handlers(app)
     setup_logger(app)

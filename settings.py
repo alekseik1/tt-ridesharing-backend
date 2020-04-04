@@ -24,3 +24,6 @@ class Config:
     FLASK_ENV = os.environ.get('FLASK_ENV', 'production')
     DEBUG = os.environ.get('DEBUG', False)
     TESTING = os.environ.get('TESTING', False)
+
+    S3_BUCKET = os.environ.get('S3_BUCKET')
+    S3_URL = os.environ.get('S3_URL')
