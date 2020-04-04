@@ -56,7 +56,7 @@ def match_ride():
         'id', 'car', 'submit_datetime',
         'price', 'host', 'free_seats',
         'passengers', 'stop_address',
-        'start_organization_address',
+        'start_organization_address', 'host_answer'
     ), many=True).dump(ranged_rides))
 
 
