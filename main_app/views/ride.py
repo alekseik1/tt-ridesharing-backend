@@ -164,14 +164,32 @@ def my_hosted_rides():
         filter(lambda ride: ride.is_active, current_user.hosted_rides)))
 
 
-@api.route('/ride/finish', methods=['POST'])
-@login_required
-def finish_ride():
-    ride = RideJsonSchema(only=('id', )).load(request.json)
+def deactivate_ride(ride):
     if not ride.is_mine:
         raise InsufficientPermissions()
     if not ride.is_active:
         raise RideNotActive()
     ride.is_active = False
+    db.session.commit()
+
+
+@api.route('/ride/finish', methods=['POST'])
+@login_required
+def finish_ride():
+    ride = RideJsonSchema(only=('id', )).load(request.json)
+    deactivate_ride(ride)
+    return RideJsonSchema(only=('id', )).dump(ride)
+
+
+@api.route('/ride/cancel', methods=['POST'])
+@login_required
+def cancel_ride():
+    ride = RideJsonSchema(only=('id', )).load(request.json)
+    deactivate_ride(ride)
+    # Remove all passengers
+    ride.passengers = []
+    # Mark all join requests as `DECLINED`
+    for join_request in db.session.query(JoinRideRequest).filter_by(ride_id=ride.id).all():
+        join_request.status = -1
     db.session.commit()
     return RideJsonSchema(only=('id', )).dump(ride)
