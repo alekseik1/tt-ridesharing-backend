@@ -7,7 +7,7 @@ class InvalidCredentials(HTTPException):
 
 
 class AlreadyLoggedIn(HTTPException):
-    code = 400
+    code = 200
     description = 'Already logged-in'
 
 
