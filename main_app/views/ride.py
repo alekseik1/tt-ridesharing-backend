@@ -178,6 +178,11 @@ def deactivate_ride(ride):
 def finish_ride():
     ride = RideJsonSchema(only=('id', )).load(request.json)
     deactivate_ride(ride)
+    # Mark all undecided requests as 'DECLINED'
+    for join_request in db.session.query(JoinRideRequest).\
+            filter_by(status=0).filter_by(ride_id=ride.id).all():
+        join_request.status = -1
+    db.session.commit()
     return RideJsonSchema(only=('id', )).dump(ride)
 
 
