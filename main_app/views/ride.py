@@ -27,7 +27,7 @@ def active_rides():
         lambda request: request.ride.is_active,
         current_user.join_requests)
     return jsonify(RideJsonSchema(only=(
-        STANDART_RIDE_INFO + ['host_answer']
+        STANDART_RIDE_INFO + ['host_answer', 'start_organization_address']
     ), many=True).dump([request.ride for request in requests_to_active_rides]))
 
 
