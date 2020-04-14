@@ -211,7 +211,7 @@ class Car(db.Model):
     model = db.Column(db.String(100), nullable=False)
     color = db.Column(db.String(100), nullable=False)
     registry_number = db.Column(db.String(20), nullable=False)
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     owner = db.relationship('User', backref='cars')
 
 
