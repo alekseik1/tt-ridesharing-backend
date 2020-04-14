@@ -1,5 +1,4 @@
 from flask import url_for
-import unittest
 
 from tests import login_as
 from app import db
@@ -33,28 +32,30 @@ class BasicTest(TestWithDatabase):
             self.assert200(response)
             IdSchema().load(response.json)
 
-    @unittest.skip('DELETE is broken, needs DB investigation')
-    def test_delete_car(self):
+    def test_delete_car_owner(self):
         car = db.session.query(Car).first()
-        with self.subTest('Car owner'):
-            with login_as(self.client, car.owner):
-                response = self.client.delete(self.url, json={
-                    'id': car.id
-                })
-                self.assert200(response)
-        with self.subTest('Not owner'):
-            user = db.session.query(User).filter(car.owner_id != User.id).first()
-            with login_as(self.client, user):
-                response = self.client.delete(self.url, json={
-                    'id': car.id
-                })
-                self.assert403(response)
-        with self.subTest('Car does not exist'):
-            with login_as(self.client, car.owner):
-                response = self.client.delete(self.url, json={
-                    'id': -2
-                })
-                self.assert403(response)
+        with login_as(self.client, car.owner):
+            response = self.client.delete(self.url, json={
+                'id': car.id
+            })
+            self.assert200(response)
+
+    def test_delete_not_car_owner(self):
+        car = db.session.query(Car).first()
+        user = db.session.query(User).filter(car.owner_id != User.id).first()
+        with login_as(self.client, user):
+            response = self.client.delete(self.url, json={
+                'id': car.id
+            })
+            self.assert403(response)
+
+    def test_delete_car_not_exists(self):
+        car = db.session.query(Car).first()
+        with login_as(self.client, car.owner):
+            response = self.client.delete(self.url, json={
+                'id': -2
+            })
+            self.assert403(response)
 
     def _post_routine(self, user, json):
         with login_as(self.client, user):
