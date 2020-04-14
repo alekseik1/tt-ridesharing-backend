@@ -1,5 +1,6 @@
 import factory.random
 from sqlalchemy.exc import DatabaseError
+from datetime import datetime, timedelta
 
 from app import create_app, db
 from main_app.fixtures.join_ride_request import JoinRideRequestFactory
@@ -36,7 +37,8 @@ def fill_database(app):
                 start_organization=organizations[i % len(organizations)],
                 host=car_users[i % len(car_users)],
                 passengers=users[3*i:3*(i+1)],
-                car=car_users[i % len(car_users)].cars[0]
+                car=car_users[i % len(car_users)].cars[0],
+                start_datetime=(datetime.now() + timedelta(minutes=15)).isoformat()
             ))
         # User can join ride only via JoinRequest acceptance
         # So, we need to create corresponding JoinRequest with 'ACCEPTED' answer

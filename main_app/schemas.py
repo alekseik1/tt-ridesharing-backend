@@ -12,7 +12,7 @@ STANDART_RIDE_INFO = [
     'id', 'free_seats',
     'submit_datetime', 'host',
     'price', 'car', 'stop_address',
-    'host_answer', 'decline_reason', 'start_organization'
+    'host_answer', 'decline_reason', 'start_organization', 'start_datetime'
 ]
 
 

@@ -166,6 +166,8 @@ class Ride(RatingMixin, db.Model):
     stop_latitude = db.Column(db.Float, nullable=False)
     stop_longitude = db.Column(db.Float, nullable=False)
     submit_datetime = db.Column(db.DateTime, server_default=datetime.now().isoformat())
+    start_datetime = db.Column(db.DateTime, nullable=False)
+    stop_datetime = db.Column(db.DateTime)
 
     total_seats = db.Column(db.Integer, server_default='4', nullable=False)
     host_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

@@ -53,7 +53,7 @@ def match_ride():
             (latitude, longitude))
     )
     return jsonify(RideJsonSchema(only=(
-        'id', 'car', 'submit_datetime',
+        'id', 'car', 'submit_datetime', 'start_datetime',
         'price', 'host', 'free_seats',
         'passengers', 'stop_address',
         'start_organization_address', 'host_answer'
@@ -67,7 +67,7 @@ def ride():
         ride = RideJsonSchema(only=(
             'car_id', 'start_organization_id',
             'stop_latitude', 'stop_longitude',
-            'total_seats', 'price', 'description'
+            'total_seats', 'price', 'description', 'start_datetime'
         )).load(request.json)
         ride.host = current_user
         if ride.start_organization_id not in [x.id for x in current_user.organizations]:
@@ -124,8 +124,7 @@ def my_rides_history():
     ).all()     # type: List[JoinRideRequest]
     return jsonify(RideJsonSchema(many=True, only=(
         'id', 'host', 'start_organization_name', 'stop_address',
-        # TODO: should be finish time, not submit
-        'submit_datetime',
+        'submit_datetime', 'start_time', 'stop_time'
         'price'
     )).dump([x.ride for x in all_requests if not x.ride.is_active]))
 
@@ -170,6 +169,7 @@ def deactivate_ride(ride):
     if not ride.is_active:
         raise RideNotActive()
     ride.is_active = False
+    ride.stop_datetime = datetime.now().isoformat()
     db.session.commit()
 
 
