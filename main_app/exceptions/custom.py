@@ -74,3 +74,8 @@ class NotForOwner(HTTPException):
 class RideNotFinished(HTTPException):
     code = 403
     description = 'Ride has not finished yet'
+
+
+class AlreadyDecided(HTTPException):
+    code = 403
+    description = 'Join request has already been processed'

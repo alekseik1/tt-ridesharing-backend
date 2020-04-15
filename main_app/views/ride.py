@@ -13,7 +13,7 @@ from main_app.schemas import \
 from main_app.views import api
 from main_app.exceptions.custom import NotInOrganization, NotCarOwner, \
     RideNotActive, NoFreeSeats, CreatorCannotJoin, RequestAlreadySent, InsufficientPermissions, \
-    NotInRide, NotForOwner, RideNotFinished
+    NotInRide, NotForOwner, RideNotFinished, AlreadyDecided
 from main_app.misc import get_distance
 
 MAX_RIDES_IN_HISTORY = 10
@@ -198,3 +198,40 @@ def cancel_ride():
         join_request.status = -1
     db.session.commit()
     return RideJsonSchema(only=('id', )).dump(ride)
+
+
+def process_join_request(join_request: JoinRideRequest, action: str):
+    if join_request.user is None or join_request.ride is None:
+        # Not found in DB
+        raise InsufficientPermissions()
+    if join_request.ride.host != current_user:
+        raise InsufficientPermissions()
+    if join_request.status != 0:
+        raise AlreadyDecided()
+    if action == 'ACCEPT':
+        if join_request.ride.free_seats < 1:
+            raise NoFreeSeats()
+        join_request.status = 1
+    elif action == 'DECLINE':
+        join_request.status = -1
+    db.session.commit()
+
+
+@api.route('/ride/request/accept', methods=['POST'])
+@login_required
+def accept_request():
+    join_request = JoinRideJsonSchema(only=('user_id', 'ride_id')).load(request.json)
+    process_join_request(join_request, 'ACCEPT')
+    # Add to passengers
+    join_request.ride.passengers.append(join_request.user)
+    db.session.commit()
+    return 'ok'
+
+
+@api.route('/ride/request/decline', methods=['POST'])
+@login_required
+def decline_request():
+    join_request = JoinRideJsonSchema(
+        only=('user_id', 'ride_id', 'decline_reason')).load(request.json)
+    process_join_request(join_request, 'DECLINE')
+    return 'ok'
