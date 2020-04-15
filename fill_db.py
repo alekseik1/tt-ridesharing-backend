@@ -18,13 +18,6 @@ def fill_database(app):
         # Users without cars
         users = factory.build_batch(UserFactory, 50)
         db.session.add_all(users)
-        # HACK: special user for phone number authorization
-        db.session.add(UserFactory(
-            first_name='Никита',
-            last_name='Израилев',
-            email='+79646991019@ridesharing.online',
-            phone_number='+79646991019'
-        ))
         # Create 10 cars and 10 owners for them
         cars = factory.build_batch(CarFactory, 20)
         car_users = [x.owner for x in cars]
