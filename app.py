@@ -30,6 +30,17 @@ ma = Marshmallow()
 login = LoginManager()
 
 
+def init_elastic(app: Flask):
+    from main_app.model import Organization
+    searchable = (Organization, )
+    app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
+        if app.config['ELASTICSEARCH_URL'] else None
+    if app.elasticsearch:
+        for model in searchable:
+            if not app.elasticsearch.indices.exists(index=model.__tablename__):
+                app.elasticsearch.indices.create(index=model.__tablename__)
+
+
 def create_app():
     # Configure Sentry if possible
     if 'SENTRY_DSN' in os.environ:
@@ -49,9 +60,6 @@ def create_app():
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE=None,
     )
-    # elasticsearch
-    app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
-        if app.config['ELASTICSEARCH_URL'] else None
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -62,6 +70,7 @@ def create_app():
     # register all Blueprints
     from main_app.views import auth, user_and_driver, organization, ride, car, misc     # noqa: F401
     from main_app.views import api
+    init_elastic(app)
     app.register_blueprint(api)
 
     from main_app.model import User
