@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 77abee6f4ad0
+Revision ID: ad431d1d8a8e
 Revises:
-Create Date: 2020-04-01 19:10:42.733668
+Create Date: 2020-04-18 10:40:36.903698
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '77abee6f4ad0'
+revision = 'ad431d1d8a8e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,7 +34,7 @@ def upgrade():
     sa.Column('model', sa.String(length=100), nullable=False),
     sa.Column('color', sa.String(length=100), nullable=False),
     sa.Column('registry_number', sa.String(length=20), nullable=False),
-    sa.Column('owner_id', sa.Integer(), nullable=False),
+    sa.Column('owner_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['owner_id'], ['user.id'], name=op.f('fk_car_owner_id_user')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_car'))
     )
@@ -70,19 +70,22 @@ def upgrade():
     )
     op.create_table('ride',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('start_organization_id', sa.Integer(), nullable=False),
-    sa.Column('stop_latitude', sa.Float(), nullable=False),
-    sa.Column('stop_longitude', sa.Float(), nullable=False),
-    sa.Column('submit_datetime', sa.DateTime(), server_default='2020-04-01T19:10:42.506321', nullable=True),
+    sa.Column('organization_id', sa.Integer(), nullable=False),
+    sa.Column('latitude', sa.Float(), nullable=False),
+    sa.Column('longitude', sa.Float(), nullable=False),
+    sa.Column('submit_datetime', sa.DateTime(), server_default='2020-04-18T10:40:36.670917', nullable=True),
+    sa.Column('start_datetime', sa.DateTime(), nullable=False),
+    sa.Column('stop_datetime', sa.DateTime(), nullable=True),
     sa.Column('total_seats', sa.Integer(), server_default='4', nullable=False),
     sa.Column('host_id', sa.Integer(), nullable=False),
     sa.Column('is_active', sa.Boolean(), server_default='true', nullable=False),
     sa.Column('price', sa.Float(), server_default='0', nullable=False),
     sa.Column('car_id', sa.Integer(), server_default='2', nullable=False),
     sa.Column('description', sa.String(length=600), nullable=True),
+    sa.Column('from_organization', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['car_id'], ['car.id'], name=op.f('fk_ride_car_id_car')),
     sa.ForeignKeyConstraint(['host_id'], ['user.id'], name=op.f('fk_ride_host_id_user')),
-    sa.ForeignKeyConstraint(['start_organization_id'], ['organization.id'], name=op.f('fk_ride_start_organization_id_organization')),
+    sa.ForeignKeyConstraint(['organization_id'], ['organization.id'], name=op.f('fk_ride_organization_id_organization')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_ride'))
     )
     op.create_table('association_user_ride',

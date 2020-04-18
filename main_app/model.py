@@ -159,12 +159,12 @@ class Organization(SearchableMixin, db.Model):
 class Ride(RatingMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    start_organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
-    start_organization = db.relationship(
-        'Organization', backref='is_start_for', foreign_keys=[start_organization_id])
+    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
+    organization = db.relationship(
+        'Organization', backref='is_start_for', foreign_keys=[organization_id])
 
-    stop_latitude = db.Column(db.Float, nullable=False)
-    stop_longitude = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
     submit_datetime = db.Column(db.DateTime, server_default=datetime.now().isoformat())
     start_datetime = db.Column(db.DateTime, nullable=False)
     stop_datetime = db.Column(db.DateTime)
@@ -180,15 +180,16 @@ class Ride(RatingMixin, db.Model):
     car_id = db.Column(db.Integer, db.ForeignKey('car.id'), nullable=False, server_default='2')
     car = db.relationship('Car')
     description = db.Column(db.String(600))
+    from_organization = db.Column(db.Boolean, nullable=False)
 
     @hybrid_property
     def free_seats(self):
         return self.total_seats - len(self.passengers)
 
     @hybrid_property
-    def stop_address(self):
+    def address(self):
         return reverse_geocoding_blocking(
-            latitude=self.stop_latitude, longitude=self.stop_longitude
+            latitude=self.latitude, longitude=self.longitude
         )['address']
 
     @hybrid_property
