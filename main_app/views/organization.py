@@ -16,7 +16,7 @@ from main_app.misc import reverse_geocoding_blocking
 @login_required
 def organization():
     if request.method == 'GET':
-        return OrganizationJsonSchema(exclude=('users', 'is_start_for', 'control_question')).dump(
+        return OrganizationJsonSchema(exclude=('users', 'rides', 'control_question')).dump(
             db.session.query(Organization).filter_by(
                 **IdSchema().load(request.args)
             ).first()

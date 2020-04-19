@@ -4,7 +4,6 @@ from factory.random import randgen
 from main_app.model import Car
 import mimesis
 from app import db
-from .users import UserFactory
 
 
 class CarFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -17,4 +16,5 @@ class CarFactory(factory.alchemy.SQLAlchemyModelFactory):
     registry_number = factory.Sequence(
         lambda n: f'К{randgen.randint(100, 999)}ХР779'
     )
-    owner = factory.SubFactory(UserFactory)
+    owner = None
+    owner_id = factory.SelfAttribute('owner.id')

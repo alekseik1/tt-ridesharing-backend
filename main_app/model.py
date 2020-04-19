@@ -137,7 +137,8 @@ class Organization(SearchableMixin, db.Model):
 
     @hybrid_property
     def last_ride_datetime(self):
-        return max([x.submit_datetime for x in self.is_start_for]) if self.is_start_for else '-'
+        # TODO: спроси, только по исходящим считать или по всем
+        return max([x.submit_datetime for x in self.rides]) if self.rides else '-'
 
     @hybrid_property
     def total_members(self):
@@ -149,11 +150,13 @@ class Organization(SearchableMixin, db.Model):
 
     @hybrid_property
     def min_ride_cost(self):
-        return min([x.price for x in self.is_start_for]) if self.is_start_for else '-'
+        # TODO: спроси, только по исходящим считать или по всем
+        return min([x.price for x in self.rides]) if self.rides else '-'
 
     @hybrid_property
     def max_ride_cost(self):
-        return max([x.price for x in self.is_start_for]) if self.is_start_for else '-'
+        # TODO: спроси, только по исходящим считать или по всем
+        return max([x.price for x in self.rides]) if self.rides else '-'
 
 
 class Ride(RatingMixin, db.Model):
@@ -161,7 +164,7 @@ class Ride(RatingMixin, db.Model):
 
     organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
     organization = db.relationship(
-        'Organization', backref='is_start_for', foreign_keys=[organization_id])
+        'Organization', backref='rides', foreign_keys=[organization_id])
 
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)

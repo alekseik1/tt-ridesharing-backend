@@ -16,6 +16,8 @@ class JoinRideRequestFactory(factory.alchemy.SQLAlchemyModelFactory):
             return
         if extracted:
             self.user = extracted
+        else:
+            raise Exception('You should provide `user` to factory')
 
     @factory.post_generation
     def ride(self, create, extracted, **kwargs):
@@ -23,3 +25,5 @@ class JoinRideRequestFactory(factory.alchemy.SQLAlchemyModelFactory):
             return
         if extracted:
             self.ride = extracted
+        else:
+            raise Exception('You should provide `user` to factory')
