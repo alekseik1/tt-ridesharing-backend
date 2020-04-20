@@ -17,6 +17,7 @@ def fill_database(app):
         #    - [x] Юзер без всего
         user_no_car = UserFactory(cars=[])
         db.session.add(user_no_car)
+        db.session.commit()
 
         orgs = factory.build_batch(OrganizationFactory, 1)  # type: List[Organization]
         for org in orgs:

@@ -146,6 +146,7 @@ class IdSchema(CamelCaseSchema):
 class UserJsonSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = User
+        sqla_session = db.session
     organizations = fields.Nested('OrganizationJsonSchema', many=True)
     rating = fields.Float(dump_only=True)
 
@@ -238,7 +239,7 @@ class UserIDSchema(Schema):
     id = fields.Integer(data_key='user_id', required=True)
 
 
-class RegisterUserSchema(ma.ModelSchema):
+class RegisterUserSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = User
         exclude = ['_password_hash', 'id', ]
@@ -257,7 +258,7 @@ class RegisterUserSchema(ma.ModelSchema):
     @post_load(pass_original=True)
     def make_user(self, user_obj: User, data, **kwargs):
         user_obj.password = data['password']
-        user_obj.phone_number = parse_phone_number(data['phone_number'])
+        user_obj.phone_number = parse_phone_number(data['phoneNumber'])
         return user_obj
 
 

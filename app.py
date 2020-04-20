@@ -1,5 +1,6 @@
 import logging
 import os
+from dotenv import load_dotenv
 from datetime import datetime
 
 from flask import Flask, request
@@ -12,6 +13,10 @@ from sqlalchemy import MetaData
 from elasticsearch import Elasticsearch
 
 from main_app.exceptions import setup_handlers
+
+
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 
 convention = {

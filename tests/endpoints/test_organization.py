@@ -114,33 +114,36 @@ class BasicTest(TestWithDatabase):
             self.assert200(response)
             OrganizationJsonSchema(only=('id', 'control_question')).load(response.json)
 
-    def test_organization_join(self):
-        def _everything_is_fine_for(user, org):
-            with login_as(self.client, user):
-                response = self.client.post(f'{self.url}/join', json={
-                    'id': org.id, 'controlAnswer': org.control_answer
-                })
-                self.assert200(response)
-                OrganizationJsonSchema(only=('id',)).load(response.json)
+    def _everything_is_fine_for(self, user, org):
+        with login_as(self.client, user):
+            response = self.client.post(f'{self.url}/join', json={
+                'id': org.id, 'controlAnswer': org.control_answer
+            })
+            self.assert200(response)
+            OrganizationJsonSchema(only=('id',)).load(response.json)
 
+    def test_already_in_organization(self):
+        org = db.session.query(Organization).filter_by(id=1).first()
+        self._everything_is_fine_for(org.users[0], org)
+
+    def test_not_in_organization(self):
+        org = db.session.query(Organization).filter_by(id=1).first()
+        user = db.session.query(User).filter(
+            User.id.notin_([x.id for x in org.users])
+        ).first()
+        self._everything_is_fine_for(user, org)
+
+    def test_incorrect_control_answer(self):
         ID = 1
         org = db.session.query(Organization).filter_by(id=ID).first()
-        with self.subTest('Already in organization'):
-            _everything_is_fine_for(org.users[0], org)
-        with self.subTest('Not in organization'):
-            user = db.session.query(User).filter(
-                User.id.notin_([x.id for x in org.users])
-            ).first()
-            _everything_is_fine_for(user, org)
-        with self.subTest('Incorrect answer'):
-            user = db.session.query(User).filter(
-                User.id.notin_([x.id for x in org.users])
-            ).first()
-            with login_as(self.client, user):
-                response = self.client.post(f'{self.url}/join', json={
-                    'id': ID, 'controlAnswer': f'INCORRECT {org.control_answer}'
-                })
-                self.assert400(response)
+        user = db.session.query(User).filter(
+            User.id.notin_([x.id for x in org.users])
+        ).first()
+        with login_as(self.client, user):
+            response = self.client.post(f'{self.url}/join', json={
+                'id': ID, 'controlAnswer': f'INCORRECT {org.control_answer}'
+            })
+            self.assert400(response)
 
     def test_leave_organization(self):
         ID = 1
