@@ -11,7 +11,6 @@ class OrganizationFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = Organization
         sqlalchemy_session = db.session
-        exclude = ['id', ]
     name = factory.Sequence(lambda n: f'{mimesis.Food().dish()} restaurant')
     latitude = factory.fuzzy.FuzzyFloat(55.0, 56.0)
     longitude = factory.fuzzy.FuzzyFloat(37.0, 38.0)

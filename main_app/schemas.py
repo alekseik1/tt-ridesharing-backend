@@ -11,8 +11,8 @@ from main_app.responses import SwaggerResponses
 STANDART_RIDE_INFO = [
     'id', 'free_seats',
     'submit_datetime', 'host',
-    'price', 'car', 'stop_address',
-    'host_answer', 'decline_reason', 'start_organization', 'start_datetime'
+    'price', 'car', 'address', 'from_organization',
+    'host_answer', 'decline_reason', 'organization', 'start_datetime'
 ]
 
 
@@ -40,9 +40,10 @@ class LoginSchema(Schema):
 
 class FindBestRidesSchema(ma.ModelSchema):
     start_date = fields.DateTime(required=False)
-    start_organization_id = fields.Integer(required=True)
-    destination_latitude = fields.Integer(required=True)
-    destination_longitude = fields.Integer(required=True)
+    organization_id = fields.Integer(required=True)
+    latitude = fields.Integer(required=True)
+    longitude = fields.Integer(required=True)
+    from_organization = fields.Boolean(required=True)
     max_destination_distance_km = fields.Integer(required=False)
 
 
@@ -51,15 +52,17 @@ class OrganizationIDSchema(ma.ModelSchema):
 
 
 class CreateRideSchema(ma.ModelSchema):
-    start_organization_id = fields.Integer(required=True)
-    stop_latitude = fields.Float(required=True)
-    stop_longitude = fields.Float(required=True)
-    stop_address = fields.String(required=False)
+    organization_id = fields.Integer(required=True)
+    latitude = fields.Float(required=True)
+    longitude = fields.Float(required=True)
+    address = fields.String(required=False)
     start_time = fields.String(required=True)
     description = fields.String(required=False)
     total_seats = fields.Integer(required=True)
     cost = fields.Float(required=False)
+    # TODO: rewrite as Nested(Car(only=('id', )))
     car_id = fields.Integer(required=True)
+    from_organization = fields.Boolean(required=True)
 
     @validates('start_time')
     def is_not_empty(self, value):
@@ -94,14 +97,14 @@ class RideJsonSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = Ride
         sqla_session = db.session
-    stop_address = fields.String(dump_only=True)
+    address = fields.String(dump_only=True)
     free_seats = fields.Integer(dump_only=True)
     car = fields.Nested('CarSchema')
     car_id = fields.Integer(required=True, load_only=True)
-    start_organization = fields.Nested('OrganizationJsonSchema', only=(
+    organization = fields.Nested('OrganizationJsonSchema', only=(
         'id', 'name', 'address',
     ))
-    start_organization_id = fields.Integer(required=True, load_only=True)
+    organization_id = fields.Integer(required=True, load_only=True)
     total_seats = fields.Integer(required=True)
     price = fields.Float(required=True)
     host = fields.Nested('UserJsonSchema', only=(
@@ -112,9 +115,9 @@ class RideJsonSchema(ma.ModelSchema, CamelCaseSchema):
     passengers = fields.Nested('UserJsonSchema', many=True, only=(
         'id', 'first_name', 'last_name', 'photo_url', 'rating',
     ))
-    start_organization_address = fields.Function(
+    organization_address = fields.Function(
         lambda obj: obj.start_organization.address, dump_only=True)
-    start_organization_name = fields.Function(
+    organization_name = fields.Function(
         lambda obj: obj.start_organization.name, dump_only=True)
     join_requests = fields.Nested(JoinRideJsonSchema, many=True, only=(
         'ride_id', 'user', 'status', 'decline_reason'
@@ -124,7 +127,7 @@ class RideJsonSchema(ma.ModelSchema, CamelCaseSchema):
 class OrganizationSchemaUserIDs(ma.ModelSchema):
     class Meta:
         model = Organization
-        exclude = ['is_start_for']
+        exclude = ['rides']
 
 
 class UserSchemaOrganizationInfo(ma.ModelSchema):
@@ -201,7 +204,7 @@ class UserSchemaOrganizationIDs(ma.ModelSchema):
 class OrganizationSchemaUserInfo(ma.ModelSchema):
     class Meta:
         model = Organization
-        exclude = ['is_start_for']
+        exclude = ['rides']
     users = fields.Nested(UserSchemaOrganizationIDs, many=True)
 
 
@@ -329,6 +332,7 @@ class RideSearchSchema(CamelCaseSchema):
     id = fields.Integer(data_key='organization_id', required=True)
     latitude = fields.Float(required=True)
     longitude = fields.Float(required=True)
+    from_organization = fields.Boolean(required=True)
 
 
 class ReverseGeocodingSchema(Schema):

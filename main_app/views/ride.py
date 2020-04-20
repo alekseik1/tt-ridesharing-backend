@@ -27,7 +27,7 @@ def active_rides():
         lambda request: request.ride.is_active,
         current_user.join_requests)
     return jsonify(RideJsonSchema(only=(
-        STANDART_RIDE_INFO + ['host_answer', 'start_organization_address']
+        STANDART_RIDE_INFO + ['host_answer', 'organization_address']
     ), many=True).dump([request.ride for request in requests_to_active_rides]))
 
 
@@ -41,10 +41,12 @@ def match_ride():
     if org not in current_user.organizations:
         raise NotInOrganization()
     latitude, longitude = data['latitude'], data['longitude']
+    from_organization = data['fromOrganization']
 
     # match ride
     all_rides = db.session.query(Ride).\
-        filter(Ride.start_organization_id == org.id).\
+        filter(Ride.organization_id == org.id).\
+        filter(Ride.from_organization == from_organization).\
         filter(Ride.is_active).all()
     ranged_rides = sorted(
         all_rides,
@@ -56,7 +58,8 @@ def match_ride():
         'id', 'car', 'submit_datetime', 'start_datetime',
         'price', 'host', 'free_seats',
         'passengers', 'stop_address',
-        'start_organization_address', 'host_answer'
+        'organization_address', 'host_answer',
+        'latitude', 'longitude', 'address',
     ), many=True).dump(ranged_rides))
 
 
@@ -65,12 +68,12 @@ def match_ride():
 def ride():
     if request.method == 'PUT':
         ride = RideJsonSchema(only=(
-            'car_id', 'start_organization_id',
-            'stop_latitude', 'stop_longitude',
+            'car_id', 'organization_id',
+            'latitude', 'longitude', 'from_organization',
             'total_seats', 'price', 'description', 'start_datetime'
         )).load(request.json)
         ride.host = current_user
-        if ride.start_organization_id not in [x.id for x in current_user.organizations]:
+        if ride.organization_id not in [x.id for x in current_user.organizations]:
             raise NotInOrganization()
         if ride.car_id not in [car.id for car in current_user.cars]:
             raise NotCarOwner()
@@ -100,7 +103,7 @@ def ride_join():
     ride = RideJsonSchema(only=('id', )).load(request.json)
     if not ride.is_active:
         raise RideNotActive()
-    if ride.start_organization not in current_user.organizations:
+    if ride.organization not in current_user.organizations:
         raise NotInOrganization()
     if ride.free_seats < 1:
         raise NoFreeSeats()
@@ -123,7 +126,7 @@ def my_rides_history():
         JoinRideRequest.user == current_user
     ).all()     # type: List[JoinRideRequest]
     return jsonify(RideJsonSchema(many=True, only=(
-        'id', 'host', 'start_organization_name', 'stop_address',
+        'id', 'host', 'organization_name', 'address',
         'submit_datetime', 'start_datetime', 'stop_datetime',
         'price'
     )).dump([x.ride for x in all_requests if not x.ride.is_active]))

@@ -137,7 +137,8 @@ class Organization(SearchableMixin, db.Model):
 
     @hybrid_property
     def last_ride_datetime(self):
-        return max([x.submit_datetime for x in self.is_start_for]) if self.is_start_for else '-'
+        # TODO: спроси, только по исходящим считать или по всем
+        return max([x.submit_datetime for x in self.rides]) if self.rides else '-'
 
     @hybrid_property
     def total_members(self):
@@ -149,22 +150,24 @@ class Organization(SearchableMixin, db.Model):
 
     @hybrid_property
     def min_ride_cost(self):
-        return min([x.price for x in self.is_start_for]) if self.is_start_for else '-'
+        # TODO: спроси, только по исходящим считать или по всем
+        return min([x.price for x in self.rides]) if self.rides else '-'
 
     @hybrid_property
     def max_ride_cost(self):
-        return max([x.price for x in self.is_start_for]) if self.is_start_for else '-'
+        # TODO: спроси, только по исходящим считать или по всем
+        return max([x.price for x in self.rides]) if self.rides else '-'
 
 
 class Ride(RatingMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    start_organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
-    start_organization = db.relationship(
-        'Organization', backref='is_start_for', foreign_keys=[start_organization_id])
+    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
+    organization = db.relationship(
+        'Organization', backref='rides', foreign_keys=[organization_id])
 
-    stop_latitude = db.Column(db.Float, nullable=False)
-    stop_longitude = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
     submit_datetime = db.Column(db.DateTime, server_default=datetime.now().isoformat())
     start_datetime = db.Column(db.DateTime, nullable=False)
     stop_datetime = db.Column(db.DateTime)
@@ -180,15 +183,16 @@ class Ride(RatingMixin, db.Model):
     car_id = db.Column(db.Integer, db.ForeignKey('car.id'), nullable=False, server_default='2')
     car = db.relationship('Car')
     description = db.Column(db.String(600))
+    from_organization = db.Column(db.Boolean, nullable=False)
 
     @hybrid_property
     def free_seats(self):
         return self.total_seats - len(self.passengers)
 
     @hybrid_property
-    def stop_address(self):
+    def address(self):
         return reverse_geocoding_blocking(
-            latitude=self.stop_latitude, longitude=self.stop_longitude
+            latitude=self.latitude, longitude=self.longitude
         )['address']
 
     @hybrid_property
