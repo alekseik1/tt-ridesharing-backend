@@ -111,6 +111,7 @@ def fill_database(app):
                         user=user,
                         ride=ride_finished
                     ))
+                db.session.commit()
         db.session.add_all(orgs)
         db.session.commit()
         print(f'Юзер без всего: {user_no_car.id}')
