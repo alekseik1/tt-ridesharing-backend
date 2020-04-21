@@ -115,19 +115,6 @@ def fill_database(app):
                 db.session.commit()
         db.session.add_all(orgs)
         db.session.commit()
-        print(f'Юзер без всего: {user_no_car.id}')
-        print(f'Юзеры в организации, без машин: {[x.id for x in users_org_no_car]}')
-        print(f'Юзер в организации, с машиной, не хостил: {user_org_nohost.id}')
-        print(f'Юзер в организации, с машиной, хостил, '
-              f'нет реквестов: {user_org_host_norequests.id}')
-        print(f'Юзер в организации, с машиной, хостил, '
-              f'не ответил на реквесты: {user_org_host_notdecided.id}')
-        print(f'Юзер в организации, с машиной, хостил, '
-              f'все принял: {user_org_host_accepted.id}')
-        print(f'Юзер в организации, с машиной, хостил, '
-              f'все отклонил: {user_org_host_declined.id}')
-        print(f'Юзер в организации, с машиной, хостил, '
-              f'есть завершенная поездка: {user_org_host_finished.id}')
 
 
 if __name__ == '__main__':
