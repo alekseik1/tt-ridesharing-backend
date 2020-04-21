@@ -1,5 +1,4 @@
 import factory.fuzzy
-from mimesis import Person, locales
 
 from app import db
 from main_app.controller import parse_phone_number
@@ -12,8 +11,8 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = User
         sqlalchemy_session = db.session
-    first_name = factory.Sequence(lambda n: Person(locale=locales.RU, seed=n).name())
-    last_name = factory.Sequence(lambda n: Person(locale=locales.RU, seed=n).surname())
+    first_name = factory.Faker('first_name')
+    last_name = factory.Faker('last_name')
     email = factory.Sequence(lambda n: f'user_{n+1}@gmail.com')
     photo_url = 'https://ridesharing-photos.com/photo1.jpg'
     phone_number = factory.Sequence(
