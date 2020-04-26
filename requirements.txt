@@ -3,8 +3,8 @@ flask_sqlalchemy
 flask_script
 flask_migrate
 flask_testing
-flask_marshmallow
-marshmallow-sqlalchemy
+flask_marshmallow==0.11.0
+marshmallow-sqlalchemy==0.22.3
 marshmallow
 flask_login
 cryptography
