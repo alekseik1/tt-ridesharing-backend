@@ -41,7 +41,7 @@ def match_ride():
     if org not in current_user.organizations:
         raise NotInOrganization()
     latitude, longitude = data['latitude'], data['longitude']
-    from_organization = data['fromOrganization']
+    from_organization = data['from_organization']
 
     # match ride
     all_rides = db.session.query(Ride).\
