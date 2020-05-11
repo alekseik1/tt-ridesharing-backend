@@ -51,7 +51,7 @@ def match_ride():
     ranged_rides = sorted(
         all_rides,
         key=lambda ride: get_distance(
-            (ride.stop_latitude, ride.stop_longitude),
+            (ride.latitude, ride.longitude),
             (latitude, longitude))
     )
     return jsonify(RideJsonSchema(only=(
