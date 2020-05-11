@@ -1,26 +1,23 @@
 language: python
 cache: pip
-
 services:
-  - docker
-
+- docker
 jobs:
   include:
-    - stage: test
-      install: pip install flake8
-      script: python -m flake8 main_app
-    - stage: test
-      script: docker-compose up --abort-on-container-exit
-    - stage: deploy
-      script: skip
-      deploy:
-        provider: heroku
-        api_key:
-          secure: XnR1H6ZxmKxh44tTriy4X/GQSIWqAOrxq9OiKlZa3ISdGk1v5IBWBs+9bTxq92/rtvaGg0aHbz7m2z+oysinez9kFzJ1Vnu/6Z07YLF6/n6ZqLHQOcDgZJAGIYAtD+9ePu+JmAv67fkK1UpBd1UPp+2pkJyrZ3EwUE6URhJP0ajj7ZG/fC6TzSdPrEBStT4v0wgGDAHMuphRqkozYDlZ61ZlYPzqbNaRlybpDtFY1U96Gnrs+zUalWttatKtBeH0rJNfm4itOQarftbENITmmKnEEx/adbXD/EApXkFtkkYqXp2rm3WutObfiK3GNPGlEsyRjFevlDahAPVN8V4JJEkJeYaK67MOPNprAZaol9KCQhh5Qw2IFPiQ6wz9wnQX9IFYLpaOB+jSUxMOrjs3lJebwRD6AxhY6aMzGEssGWQgx4CRTBAkPtanz7bI855ssZ4Ucf9A9UxYzcbzZ3psEBHvEJoILTB4/vNjdO7cHyCKqSqsZEFsXHWoaQ09W1TpRJ49KkjcxtvxSGixUEWajQbAJUEKuelc4EFP8SegeLm/F2LQdmbuv+VY5rc6kteuv4zgfmpKajDbFh3gD9iVwIQLvNzb57hEsrh2l4QYfdy+G4TqO8CQG578VG0+KQLsz06Ms+tQ9Zf+6REo3E6oV0bQwUtObmu6UwwZaDzMB+g=
-        app:
-          master: tt-ridesharing-backend
-          dev: tt-ridesharing-backend-staging
-
+  - stage: test
+    install: pip install flake8
+    script: python -m flake8 main_app
+  - stage: test
+    script: docker-compose up --abort-on-container-exit
+  - stage: deploy
+    script: skip
+    deploy:
+      provider: heroku
+      api_key:
+        secure: EUpSdo0gFRSEMz+TwLyGkSE+2JanF4OA36cBabavkcU9CSj1zIhrYrNq1+n9ZBCqBEASt+06TRy8SwyvRaMEVT3p6l7s91X3rC+P5EcQBt7vw1el2dDQIS8K+a/N6h1T6KXYXOGMBxUMIvWN8BYfcV9BkQ2xtBf9gGlOP6J7Am7JGVlyHDdCpT+zXriGIXAwJFuBf7NMx8y153/JV02J7P/M2BVIZFs4mgLs0VMryw0iXr/aclXFaoSM7C7ebk2LhqUl/HiBoRunhKJ72yJnFb3N0wn4UvTsg/EmeCiU1rcTGQhyiQdetaoAPjoGAbsiN4BSqat8zEFPtm9A8AA2eC7XzTHbOBO3n25q9m+xKIedgPQkuu7clEiAJSZAD2f/Z25qO79AnHba0LmLlugvRIo/KEfzcOPuye7gftPzgtdPrSfuQ7R6wYbr2obyuQFcxxN37QeAOp0Pudn6RUu1tAW8WkPZWX0mdoX3z51l5bvqMMEG1+22YQgZQRBbowV9J4Cl/MVT2tM7GwYbbXs4cm3IRNWax9vWm4E8Aly02o9+9C7XwKzUmOjLaiiZxmbtWcEZH7s9SV+hozvmzInF1WImTOyfhUMGHW7tOIuCLqbm1VHBKEu6LCfyb1JZygKSjI9g8d05325R1phEDbh2w25bFApJ6h2hLEErXP1+rYI=
+      app:
+        master: tt-ridesharing-backend
+        dev: tt-ridesharing-backend-staging
 env:
   global:
   - secure: ICUASzQfYtyrRuKSae0gnVPFLJTEQ2CbgJGrAGVipkVGqajU5rW85TDXXg2dkBPae9DtD+DuoYFOPuSYxr+a/71rnvLV5mFQj03M6/V1knddjEWrh4LpdntIdmVTXr8S3DTRoB03i+uaB/Jpoguz6wlMh2cul3zOtc+SEv8SF5bVsFBaBgP5E84FUtH9DrKGMRSeBuFWJ9hd3aO4lI0egkFaN0Xi6/VIcBZMaq8o1kunsTUjO2QOezFzkyvLbO8Gq6w/Oi63DuKbQqix0cC8ZcXyL1EdluhV+GIp7UHDmRw6GkQFaZ+eV7GJlWO4VKewghWFZmIy3bCx2YOTSxTGqxlLa7qv3eMuISVGMfQAJA2NuidJgsJRYmub/5y8paTOMmDKgZUev9TWxD46j1/aShn/RWX20PIjUG+PwqKfEK1FOrT4+WbfRcV7IUXpXw9ECUWFcS+KqlOGyfxt4t1RxcSI8Ttz9DoKe3BJPnxx/UBJyWPiY7/dqCEPIWwlDZQSois7or3UCcVlVZTVua5XmU8rIGoQUtG5WZRodo/RYfV/FWLdl3QV3+0eM1qbXTkMtSh2pVAN23RlYHOrymXJMvtu849Bcg3Ngp+mwsaP2Lvf0P9U4B/5xYnFIHhYUFoZTBo4RiwZNDfVpXrRL+rjuk8HPNc/i+0AmhCE72ov788=
