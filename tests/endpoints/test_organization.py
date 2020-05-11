@@ -30,6 +30,7 @@ class BasicTest(TestWithDatabase):
             'id', 'photo_url',
             'total_members', 'total_drivers',
             'min_ride_cost', 'max_ride_cost',
+            'latitude', 'longitude',
             'description',
         ))
 
