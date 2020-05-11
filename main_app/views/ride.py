@@ -57,7 +57,7 @@ def match_ride():
     return jsonify(RideJsonSchema(only=(
         'id', 'car', 'submit_datetime', 'start_datetime',
         'price', 'host', 'free_seats',
-        'passengers', 'stop_address',
+        'passengers',
         'organization_address', 'host_answer',
         'latitude', 'longitude', 'address',
     ), many=True).dump(ranged_rides))
