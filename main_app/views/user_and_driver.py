@@ -45,21 +45,27 @@ def change_password():
 
 
 @api.route('/user/sign_s3', methods=['GET'])
+@login_required
 def user_avatar_sign_s3():
     data = UploadFileSchema().load(request.args)
 
-    file_name = data.get('file_name')
     file_type = data.get('file_type')
     s3 = current_app.s3_client
+    file_name = f'{current_user.id}.{file_type}'
 
     presigned_post = s3.generate_presigned_post(
         Bucket=current_app.config['S3_BUCKET'],
         Key=file_name,
-        Fields={"acl": "public-read", "Content-Type": file_type},
+        Fields={"acl": "public-read", "Content-Type": f'image/{file_type}'},
         Conditions=[
             {"acl": "public-read"},
-            {"Content-Type": file_type}
+            {"Content-Type": f'image/{file_type}'}
         ],
         ExpiresIn=3600
     )
+    # https://sharemyride-avatars.s3.eu-north-1.amazonaws.com/53.png
+    # Save avatar URL in database
+    current_user.photo_url = f"https://{current_app.config.get('S3_BUCKET', '')}." \
+                             f"{s3.meta.endpoint_url.split('://')[1]}/{file_name}"
+    db.session.commit()
     return presigned_post

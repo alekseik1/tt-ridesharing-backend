@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 import boto3
+from botocore.client import Config
 
 from flask import Flask, request
 from flask_cors import CORS
@@ -88,8 +89,14 @@ def create_app():
         return user
 
     # S3 storage
-    app.s3_client = boto3.client('s3', endpoint_url=app.config['S3_URL']) \
-        if app.config.get('S3_URL') else None
+    #app.s3_client = boto3.client('s3', endpoint_url=app.config['S3_URL']) \
+    #    if app.config.get('S3_URL') else None
+    app.s3_client = boto3.client(
+        's3',
+        config=Config(signature_version='s3v4', region_name='eu-north-1',),
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'),
+    )
 
     setup_handlers(app)
     setup_logger(app)

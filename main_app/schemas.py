@@ -366,5 +366,10 @@ class PasswordChangeSchema(CamelCaseSchema):
 
 
 class UploadFileSchema(CamelCaseSchema):
-    file_name = fields.String(required=True)
     file_type = fields.String(required=True)
+
+    @validates('file_type')
+    def is_image(self, file_type):
+        if file_type not in ['png', 'jpeg']:
+            raise ValidationError('File type should be `png` or `jpeg`')
+
