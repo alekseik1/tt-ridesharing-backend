@@ -9,7 +9,7 @@ MAX_ORGANIZATIONS_PER_USER = 5
 
 @api.route('/', methods=['GET', 'POST'])
 def root():
-    return redirect(url_for('.'+index.__name__))
+    return redirect(url_for('.' + index.__name__))
 
 
 @api.route('/index')

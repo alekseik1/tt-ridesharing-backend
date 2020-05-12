@@ -76,7 +76,7 @@ class RatingMixin:
     def rating(self):
         if not self.reviews:
             return 0.
-        return sum([x.rate for x in self.reviews])/len(self.reviews)
+        return sum([x.rate for x in self.reviews]) / len(self.reviews)
 
 
 class User(UserMixin, RatingMixin, db.Model):
