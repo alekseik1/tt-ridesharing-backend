@@ -74,6 +74,6 @@ def search_car_model():
     results = []
     with open('blobs/models.csv', 'r') as f:
         for line in f.readlines():
-            if search_string in line:
+            if search_string.lower() in line.lower():
                 results.append(line.strip())
     return jsonify(results)
