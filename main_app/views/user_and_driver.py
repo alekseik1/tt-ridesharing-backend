@@ -2,7 +2,7 @@ from flask import jsonify, request, current_app
 from flask_login import login_required, current_user
 
 from main_app.schemas import OrganizationJsonSchema, UserJsonSchema, \
-    PasswordChangeSchema, UploadFileSchema
+    PasswordChangeSchema, UploadFileSchema, UserChangeSchema
 from main_app.exceptions.custom import InsufficientPermissions, InvalidCredentials
 from app import db
 from main_app.views import api
@@ -16,20 +16,27 @@ def organizations():
     ))
 
 
-@api.route('/user', methods=['GET'])
+@api.route('/user', methods=['GET', 'POST'])
 @login_required
 def user():
-    user = UserJsonSchema(only=('id', )).load(request.args)
-    GENERAL_INFO = ['id', 'first_name', 'last_name', 'rating', 'photo_url']
-    if user.id is None:
+    if request.method == 'GET':
+        user = UserJsonSchema(only=('id', )).load(request.args)
+        GENERAL_INFO = ['id', 'first_name', 'last_name', 'rating', 'photo_url']
+        if user.id is None:
+            return UserJsonSchema(
+                only=GENERAL_INFO + ['email', 'phone_number']
+            ).dump(current_user)
+        if user.email is None:
+            raise InsufficientPermissions()
         return UserJsonSchema(
-            only=GENERAL_INFO + ['email', 'phone_number']
-        ).dump(current_user)
-    if user.email is None:
-        raise InsufficientPermissions()
-    return UserJsonSchema(
-        only=GENERAL_INFO
-    ).dump(user)
+            only=GENERAL_INFO
+        ).dump(user)
+    elif request.method == 'POST':
+        updated_params = UserChangeSchema().load(request.json)
+        for prop, new_value in updated_params.items():
+            setattr(current_user, prop, new_value)
+        db.session.commit()
+        return 'ok'
 
 
 @api.route('/user/password', methods=['POST'])

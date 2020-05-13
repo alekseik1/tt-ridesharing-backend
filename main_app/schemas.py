@@ -151,6 +151,13 @@ class UserJsonSchema(ma.ModelSchema, CamelCaseSchema):
     rating = fields.Float(dump_only=True)
 
 
+class UserChangeSchema(CamelCaseSchema):
+    first_name = fields.String(required=False)
+    last_name = fields.String(required=False)
+    email = fields.String(required=False)
+    phone_number = fields.String(required=False)
+
+
 class JoinOrganizationSchema(CamelCaseSchema):
     id = fields.Integer(required=True)
     control_answer = fields.String(required=True)
