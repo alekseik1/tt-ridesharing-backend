@@ -156,6 +156,7 @@ class UserChangeSchema(CamelCaseSchema):
     last_name = fields.String(required=False)
     email = fields.String(required=False)
     phone_number = fields.String(required=False)
+    about = fields.String(required=False)
 
 
 class JoinOrganizationSchema(CamelCaseSchema):

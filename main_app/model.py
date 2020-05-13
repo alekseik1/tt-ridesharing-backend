@@ -87,6 +87,7 @@ class User(UserMixin, RatingMixin, db.Model):
     photo_url = db.Column(db.String(MAX_URL_LENGTH))
     phone_number = db.Column(db.String(20), server_default='+71111111111', nullable=False)
     _password_hash = db.Column(db.String(94), nullable=False)
+    about = db.Column(db.String(400))
 
     @hybrid_property
     def password(self):

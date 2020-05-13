@@ -21,7 +21,7 @@ def organizations():
 def user():
     if request.method == 'GET':
         user = UserJsonSchema(only=('id', )).load(request.args)
-        GENERAL_INFO = ['id', 'first_name', 'last_name', 'rating', 'photo_url']
+        GENERAL_INFO = ['id', 'first_name', 'last_name', 'rating', 'photo_url', 'about']
         if user.id is None:
             return UserJsonSchema(
                 only=GENERAL_INFO + ['email', 'phone_number']
