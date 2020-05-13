@@ -66,3 +66,14 @@ def register_car_for_driver():
     data['owner_id'] = current_user.id
     car = register_car(data)
     return jsonify(car_id=car.id), 200
+
+
+@api.route('/car/models', methods=['GET'])
+def search_car_model():
+    search_string = request.args.get('search', 'never find me')
+    results = []
+    with open('blobs/models.csv', 'r') as f:
+        for line in f.readlines():
+            if search_string in line:
+                results.append(line.strip())
+    return jsonify(results)
