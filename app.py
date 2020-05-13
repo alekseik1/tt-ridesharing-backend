@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 from dotenv import load_dotenv
 from datetime import datetime
 import boto3
@@ -104,15 +105,12 @@ def create_app():
 
 
 def setup_logger(app):
-    os.makedirs('logs', exist_ok=True)
-    date = datetime.now().strftime('%d_%m__%H_%M')
     log_level = logging.ERROR
     if app.debug:
         log_level = logging.DEBUG
     if app.testing:
         log_level = logging.INFO
-    logging.basicConfig(filename=f'logs/{app.config.get("LOGGER_NAME", app.name)}_error_{date}.log',
-                        level=log_level)
+    logging.basicConfig(stream=sys.stdout, level=log_level)
 
     @app.before_request
     def log_request_info():
