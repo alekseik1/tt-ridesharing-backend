@@ -1,8 +1,9 @@
 from flask import jsonify, request, current_app
 from flask_login import login_required, current_user
 
+from main_app.model import User
 from main_app.schemas import OrganizationJsonSchema, UserJsonSchema, \
-    PasswordChangeSchema, UploadFileSchema, UserChangeSchema
+    PasswordChangeSchema, UploadFileSchema, UserChangeSchema, SearchSchema
 from main_app.exceptions.custom import InsufficientPermissions, InvalidCredentials
 from app import db
 from main_app.views import api
@@ -76,3 +77,13 @@ def user_avatar_sign_s3():
                              f"{s3.meta.endpoint_url.split('://')[1]}/{file_name}"
     db.session.commit()
     return presigned_post
+
+
+@api.route('/user/search', methods=['GET'])
+@login_required
+def search_users():
+    query_string = SearchSchema().load(request.args)
+    results, total = User.search(query_string['query'], 1, 10)
+    return jsonify(UserJsonSchema(many=True, only=(
+        'id', 'first_name', 'last_name', 'phone_number', 'email', 'photo_url'
+    )).dump(results))

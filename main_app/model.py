@@ -79,7 +79,8 @@ class RatingMixin:
         return sum([x.rate for x in self.reviews]) / len(self.reviews)
 
 
-class User(UserMixin, RatingMixin, db.Model):
+class User(SearchableMixin, UserMixin, RatingMixin, db.Model):
+    __searchable__ = ['first_name', 'last_name', 'email', 'phone_number']
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(MAX_NAME_LENGTH), nullable=False)
     last_name = db.Column(db.String(MAX_SURNAME_LENGTH), nullable=False)
