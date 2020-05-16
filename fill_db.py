@@ -10,6 +10,18 @@ from main_app.fixtures.rides import RideFactory
 from main_app.model import Organization
 
 
+def clean_firebase():
+    # NOTE: can have `has_next_page` == True - need to implement all pages reading
+    import firebase_admin
+    from firebase_admin import credentials
+    from firebase_admin.auth import list_users, delete_user
+
+    cred = credentials.Certificate("firebase_creds.json")
+    firebase_admin.initialize_app(cred)
+    for user in list_users().users:
+        delete_user(user.uid)
+
+
 def fill_database(app):
     with app.app_context():
         db.drop_all()
