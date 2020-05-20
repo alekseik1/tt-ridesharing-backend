@@ -39,8 +39,8 @@ login = LoginManager()
 
 
 def init_elastic(app: Flask):
-    from main_app.model import Organization
-    searchable = (Organization, )
+    from main_app.model import Organization, User
+    searchable = (Organization, User, )
     app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
         if app.config['ELASTICSEARCH_URL'] else None
     if app.elasticsearch:
