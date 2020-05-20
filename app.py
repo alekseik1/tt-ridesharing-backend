@@ -3,6 +3,7 @@ import os
 import sys
 from dotenv import load_dotenv
 from datetime import datetime
+import time
 import boto3
 from botocore.client import Config
 
@@ -38,12 +39,27 @@ ma = Marshmallow()
 login = LoginManager()
 
 
+def wait_for_elastic(client):
+    for _ in range(100):
+        try:
+            client.cluster.health(wait_for_status='yellow')
+            return True
+        except ConnectionError:
+            time.sleep(.1)
+    else:
+        # timeout
+        return False
+
+
 def init_elastic(app: Flask):
     from main_app.model import Organization, User
     searchable = (Organization, User, )
     app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
         if app.config['ELASTICSEARCH_URL'] else None
     if app.elasticsearch:
+        if not wait_for_elastic(app.elasticsearch):
+            app.elasticsearch = None
+            return
         for model in searchable:
             if not app.elasticsearch.indices.exists(index=model.__tablename__):
                 app.elasticsearch.indices.create(index=model.__tablename__)
