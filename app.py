@@ -15,6 +15,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from elasticsearch import Elasticsearch
+import elasticsearch.exceptions
 
 from main_app.exceptions import setup_handlers
 
@@ -44,7 +45,7 @@ def wait_for_elastic(client):
         try:
             client.cluster.health(wait_for_status='yellow')
             return True
-        except ConnectionError:
+        except elasticsearch.exceptions.ConnectionError:
             time.sleep(.1)
     else:
         # timeout
@@ -117,15 +118,15 @@ def create_app():
 
     setup_handlers(app)
     setup_logger(app)
+    app.logger.info('App is ready!')
     return app
 
 
 def setup_logger(app):
-    log_level = logging.ERROR
-    if app.debug:
-        log_level = logging.DEBUG
-    if app.testing:
-        log_level = logging.INFO
+    from flask.logging import default_handler
+    app.logger.removeHandler(default_handler)
+
+    log_level = logging.INFO
     logging.basicConfig(stream=sys.stdout, level=log_level)
 
     @app.before_request
