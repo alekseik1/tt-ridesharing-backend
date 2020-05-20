@@ -128,7 +128,7 @@ def my_rides_history():
     return jsonify(RideJsonSchema(many=True, only=(
         'id', 'host', 'organization_name', 'address',
         'submit_datetime', 'start_datetime', 'stop_datetime',
-        'price'
+        'price', 'from_organization'
     )).dump([x.ride for x in all_requests if not x.ride.is_active]))
 
 
