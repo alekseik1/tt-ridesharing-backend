@@ -7,8 +7,8 @@ jobs:
   - stage: test
     install: pip install flake8
     script: python -m flake8 main_app
-  - stage: test
-    script: docker-compose up --abort-on-container-exit
+  #- stage: test
+  #  script: docker-compose up --abort-on-container-exit
   - stage: deploy
     script: skip
     deploy:
