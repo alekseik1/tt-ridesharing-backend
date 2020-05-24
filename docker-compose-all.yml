@@ -8,13 +8,10 @@ services:
         #- GEOCODING_KEY=$GEOCODING_KEY
       - DATABASE_URL=postgresql://app:app@db:5432/ridesharing
       - ELASTICSEARCH_URL=http://es:9200/
-      - FLASK_RUN_HOST=0.0.0.0
     entrypoint: ["./wait-for-it.sh", "es:9200", "--", "./entrypoint.sh"]
     command: ["gunicorn", "-b", "0.0.0.0:8000", "app:create_app()"]
     ports:
         - 80:8000
-    volumes:
-        - ./:/app
     depends_on:
       - db
       - es
