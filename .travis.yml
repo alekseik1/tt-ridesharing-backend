@@ -5,11 +5,13 @@ services:
 jobs:
   include:
   - stage: test
+    name: "flake8 test"
     install: pip install flake8
     script: python -m flake8 main_app
   #- stage: test
   #  script: docker-compose up --abort-on-container-exit
   - stage: deploy
+    name: "heroku"
     script: skip
     deploy:
       provider: heroku
@@ -18,6 +20,27 @@ jobs:
       app:
         master: tt-ridesharing-backend
         dev: tt-ridesharing-backend-staging
+  - stage: deploy
+    name: "docker hub"
+    before_script:
+      - docker pull "$IMAGE_NAME" || true
+      - major=0
+      - version=$major.$TRAVIS_BUILD_NUMBER
+    script:
+      - docker build --pull --cache-from "$IMAGE_NAME" --tag "$IMAGE_NAME" .
+    before_deploy:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:latest"
+      - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${version}"
+    deploy:
+      - provider: script
+        script: docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${version}"
+        on:
+          branch: master
+      - provider: script
+        script: docker push "${IMAGE_NAME}:dev"
+        on:
+          branch: dev
 env:
   global:
   - secure: ICUASzQfYtyrRuKSae0gnVPFLJTEQ2CbgJGrAGVipkVGqajU5rW85TDXXg2dkBPae9DtD+DuoYFOPuSYxr+a/71rnvLV5mFQj03M6/V1knddjEWrh4LpdntIdmVTXr8S3DTRoB03i+uaB/Jpoguz6wlMh2cul3zOtc+SEv8SF5bVsFBaBgP5E84FUtH9DrKGMRSeBuFWJ9hd3aO4lI0egkFaN0Xi6/VIcBZMaq8o1kunsTUjO2QOezFzkyvLbO8Gq6w/Oi63DuKbQqix0cC8ZcXyL1EdluhV+GIp7UHDmRw6GkQFaZ+eV7GJlWO4VKewghWFZmIy3bCx2YOTSxTGqxlLa7qv3eMuISVGMfQAJA2NuidJgsJRYmub/5y8paTOMmDKgZUev9TWxD46j1/aShn/RWX20PIjUG+PwqKfEK1FOrT4+WbfRcV7IUXpXw9ECUWFcS+KqlOGyfxt4t1RxcSI8Ttz9DoKe3BJPnxx/UBJyWPiY7/dqCEPIWwlDZQSois7or3UCcVlVZTVua5XmU8rIGoQUtG5WZRodo/RYfV/FWLdl3QV3+0eM1qbXTkMtSh2pVAN23RlYHOrymXJMvtu849Bcg3Ngp+mwsaP2Lvf0P9U4B/5xYnFIHhYUFoZTBo4RiwZNDfVpXrRL+rjuk8HPNc/i+0AmhCE72ov788=

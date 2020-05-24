@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    environment:
+      - SECRET_KEY=$SECRET_KEY
+      - GEOCODING_KEY=$GEOCODING_KEY
+      - DATABASE_URL=postgresql://app:app@db:5432/ridesharing_test
+    command: ["python", "-m", "unittest", "discover"]
+    depends_on:
+      - db
+
+  db:
+    image: postgres:12.0-alpine
+    ports:
+    - 5432:5432
+    environment:
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=app
+      - POSTGRES_DB=ridesharing_test

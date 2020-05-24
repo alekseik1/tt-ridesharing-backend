@@ -1,6 +1,7 @@
 import factory.random
 from datetime import timedelta
 from typing import List
+import sys
 
 from app import create_app, db
 from main_app.fixtures.join_ride_request import JoinRideRequestFactory
@@ -131,4 +132,6 @@ def fill_database(app):
 
 if __name__ == '__main__':
     app = create_app()
+    if len(sys.argv) == 2:
+        clean_firebase()
     fill_database(app)
