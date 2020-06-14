@@ -30,15 +30,13 @@ jobs:
       - docker build --pull --cache-from "$IMAGE_NAME" --tag "$IMAGE_NAME" .
     before_deploy:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:latest"
-      - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${version}"
     deploy:
       - provider: script
-        script: docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${version}"
+        script: bash +x deploy-dokcer.sh prod
         on:
           branch: master
       - provider: script
-        script: docker push "${IMAGE_NAME}:dev"
+        script: bash +x deploy-docker.sh dev
         on:
           branch: dev
 env:
