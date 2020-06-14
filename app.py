@@ -131,7 +131,7 @@ def setup_logger(app):
 
     @app.before_request
     def log_request_info():
-        app.logger.debug('Body: %s', request.get_data())
+        app.logger.debug(f'Body: {request.get_data()}\nJSON: {request.get_json()}')
 
 
 if __name__ == '__main__':
