@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 from dotenv import load_dotenv
-from datetime import datetime
 import time
 import boto3
 from botocore.client import Config
@@ -99,6 +98,7 @@ def create_app():
     app.register_blueprint(api)
 
     from main_app.model import User
+
     @login.user_loader
     def load_user(id):
         user = User.query.get(int(id))
@@ -107,7 +107,7 @@ def create_app():
         return user
 
     # S3 storage
-    #app.s3_client = boto3.client('s3', endpoint_url=app.config['S3_URL']) \
+    # app.s3_client = boto3.client('s3', endpoint_url=app.config['S3_URL']) \
     #    if app.config.get('S3_URL') else None
     app.s3_client = boto3.client(
         's3',
@@ -126,7 +126,7 @@ def setup_logger(app):
     from flask.logging import default_handler
     app.logger.removeHandler(default_handler)
 
-    log_level = logging.INFO
+    log_level = logging.DEBUG if app.config.get('DEBUG', False) else logging.INFO
     logging.basicConfig(stream=sys.stdout, level=log_level)
 
     @app.before_request
