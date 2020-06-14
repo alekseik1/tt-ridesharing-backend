@@ -384,4 +384,4 @@ class UploadFileSchema(CamelCaseSchema):
 
 
 class UpdateFirebaseIdSchema(CamelCaseSchema):
-    firebase_token = fields.String(required=True)
+    token = fields.String(required=True)

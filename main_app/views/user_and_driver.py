@@ -94,7 +94,7 @@ def search_users():
 @login_required
 def update_firebase_id():
     data = UpdateFirebaseIdSchema().load(request.json)
-    new_id = data['firebase_token']
+    new_id = data['token']
     record = db.session.query(FirebaseIds).filter_by(user=current_user).first()
     if not record:
         db.session.add(FirebaseIds(user=current_user, firebase_id=new_id))
