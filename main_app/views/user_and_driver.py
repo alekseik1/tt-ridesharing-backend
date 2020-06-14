@@ -1,9 +1,10 @@
 from flask import jsonify, request, current_app
 from flask_login import login_required, current_user
 
-from main_app.model import User
+from main_app.model import User, FirebaseIds
 from main_app.schemas import OrganizationJsonSchema, UserJsonSchema, \
-    PasswordChangeSchema, UploadFileSchema, UserChangeSchema, SearchSchema
+    PasswordChangeSchema, UploadFileSchema, UserChangeSchema, SearchSchema, \
+    UpdateFirebaseIdSchema
 from main_app.exceptions.custom import InsufficientPermissions, InvalidCredentials
 from app import db
 from main_app.views import api
@@ -87,3 +88,17 @@ def search_users():
     return jsonify(UserJsonSchema(many=True, only=(
         'id', 'first_name', 'last_name', 'phone_number', 'email', 'photo_url'
     )).dump(results))
+
+
+@api.route('/user/updateFirebaseRegistrationToken', methods=['POST'])
+@login_required
+def update_firebase_id():
+    data = UpdateFirebaseIdSchema().load(request.json)
+    new_id = data['firebase_token']
+    record = db.session.query(FirebaseIds).filter_by(user=current_user).first()
+    if not record:
+        db.session.add(FirebaseIds(user=current_user, firebase_id=new_id))
+    else:
+        record.firebase_id = new_id
+    db.session.commit()
+    return 'ok'

@@ -381,3 +381,7 @@ class UploadFileSchema(CamelCaseSchema):
     def is_image(self, file_type):
         if file_type not in ['png', 'jpeg']:
             raise ValidationError('File type should be `png` or `jpeg`')
+
+
+class UpdateFirebaseIdSchema(CamelCaseSchema):
+    firebase_token = fields.String(required=True)

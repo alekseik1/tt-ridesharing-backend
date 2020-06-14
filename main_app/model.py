@@ -251,3 +251,10 @@ class UserFeedback(FeedbackMixin, db.Model):
 class RideFeedback(FeedbackMixin, db.Model):
     ride_id = db.Column(db.Integer, db.ForeignKey('ride.id'), nullable=False)
     ride = db.relationship(Ride, backref='reviews')
+
+
+class FirebaseIds(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'),
+                        primary_key=True, nullable=False)
+    user = db.relationship(User, backref='firebase_id')
+    firebase_id = db.Column(db.String(300), nullable=False)
