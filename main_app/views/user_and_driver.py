@@ -96,8 +96,7 @@ def search_users():
 def update_firebase_id():
     data = UpdateFirebaseIdSchema().load(request.json)
     response = requests.post(
-        # TODO: hardcoded URL
-        '/fcm/update_token/',
+        f"{current_app.config['FCM_BACKEND_URL']}/update_token/",
         data={'id': current_user.id, 'token': data['token']}
     )
     return response.content, response.status_code
