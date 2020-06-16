@@ -47,9 +47,9 @@ def forward_geocoding_blocking(address):
 
 
 def notify_at(timestamp, user_id, title, message):
-    response = requests.post(
+    response = requests.get(
         f"{current_app.config['FCM_BACKEND_URL']}/send_at",
-        data={'id': user_id, 'title': title, 'message': message, 'timestamp': timestamp}
+        params={'id': user_id, 'title': title, 'message': message, 'timestamp': timestamp}
     )
     current_app.logger.info(f'response from FCM: {(response.content, response.status_code)}')
     return response.content, response.status_code
