@@ -1,7 +1,8 @@
+import requests
 from flask import jsonify, request, current_app
 from flask_login import login_required, current_user
 
-from main_app.model import User, FirebaseIds
+from main_app.model import User
 from main_app.schemas import OrganizationJsonSchema, UserJsonSchema, \
     PasswordChangeSchema, UploadFileSchema, UserChangeSchema, SearchSchema, \
     UpdateFirebaseIdSchema
@@ -94,11 +95,9 @@ def search_users():
 @login_required
 def update_firebase_id():
     data = UpdateFirebaseIdSchema().load(request.json)
-    new_id = data['token']
-    record = db.session.query(FirebaseIds).filter_by(user=current_user).first()
-    if not record:
-        db.session.add(FirebaseIds(user=current_user, firebase_id=new_id))
-    else:
-        record.firebase_id = new_id
-    db.session.commit()
-    return 'ok'
+    response = requests.post(
+        # TODO: hardcoded URL
+        '/fcm/update_token/',
+        data={'id': current_user.id, 'token': data['token']}
+    )
+    return response.content, response.status_code
