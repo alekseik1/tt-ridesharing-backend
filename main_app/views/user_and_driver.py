@@ -99,4 +99,5 @@ def update_firebase_id():
         f"{current_app.config['FCM_BACKEND_URL']}/update_token/",
         data={'id': current_user.id, 'token': data['token']}
     )
+    current_app.logger.info(f'response from FCM: {(response.content, response.status_code)}')
     return response.content, response.status_code
