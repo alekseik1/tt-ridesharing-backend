@@ -1,5 +1,6 @@
 import os
 import requests
+from flask import current_app
 from werkzeug.exceptions import BadRequest
 
 
@@ -43,3 +44,12 @@ def forward_geocoding_blocking(address):
         raise BadRequest(f"Yandex error: {yandex_response.get('message')}")
     results = _parse_geocoding_results(yandex_response)
     return results
+
+
+def notify_at(timestamp, user_id, title, message):
+    response = requests.post(
+        f"{current_app.config['FCM_BACKEND_URL']}/send_at",
+        data={'id': user_id, 'title': title, 'message': message, 'timestamp': timestamp}
+    )
+    current_app.logger.info(f'response from FCM: {(response.content, response.status_code)}')
+    return response.content, response.status_code
