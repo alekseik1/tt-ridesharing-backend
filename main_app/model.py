@@ -258,3 +258,13 @@ class FirebaseIds(db.Model):
                         primary_key=True, nullable=False)
     user = db.relationship(User, backref='firebase_id')
     firebase_id = db.Column(db.String(300), nullable=False)
+
+
+class DriverSubscription(db.Model):
+    subscriber_id = db.Column(
+        db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
+    subscriber = db.relationship(User, backref='subscribed_to', foreign_keys=[subscriber_id, ])
+    driver_id = db.Column(
+        db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True
+    )
+    driver = db.relationship(User, backref='subscribers', foreign_keys=[driver_id, ])
