@@ -1,12 +1,14 @@
 import requests
 from flask import jsonify, request, current_app
 from flask_login import login_required, current_user
+from sqlalchemy.exc import IntegrityError
 
-from main_app.model import User
+from main_app.model import User, DriverSubscription
 from main_app.schemas import OrganizationJsonSchema, UserJsonSchema, \
     PasswordChangeSchema, UploadFileSchema, UserChangeSchema, SearchSchema, \
-    UpdateFirebaseIdSchema
-from main_app.exceptions.custom import InsufficientPermissions, InvalidCredentials
+    UpdateFirebaseIdSchema, SubscribeToDriverSchema
+from main_app.exceptions.custom import InsufficientPermissions, InvalidCredentials, \
+    SubscriptionError
 from app import db
 from main_app.views import api
 
@@ -101,3 +103,27 @@ def update_firebase_id():
     )
     current_app.logger.info(f'response from FCM: {(response.content, response.status_code)}')
     return response.content, response.status_code
+
+
+@api.route('/user/subscribe', methods=['POST'])
+@login_required
+def subscribe():
+    data = SubscribeToDriverSchema().load(request.json)
+    driver_id, action = data['id'], data['action']
+    if action == 'SUBSCRIBE':
+        try:
+            db.session.add(DriverSubscription(
+                subscriber=current_user, driver_id=driver_id))
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            raise SubscriptionError()
+    elif action == 'UNSUBSCRIBE':
+        subscription_entry = db.session.query(DriverSubscription).filter_by(
+            subscriber=current_user, driver_id=driver_id).first()
+        if not subscription_entry:
+            raise SubscriptionError(
+                f'{current_user.id} is not subscribed to {driver_id}')
+        db.session.delete(subscription_entry)
+        db.session.commit()
+    return 'ok'

@@ -1,5 +1,5 @@
 from marshmallow import fields, validates, ValidationError, Schema, post_load
-from marshmallow.validate import Length
+from marshmallow.validate import Length, OneOf
 from flask import jsonify
 
 from app import ma, db
@@ -385,3 +385,8 @@ class UploadFileSchema(CamelCaseSchema):
 
 class UpdateFirebaseIdSchema(CamelCaseSchema):
     token = fields.String(required=True)
+
+
+class SubscribeToDriverSchema(CamelCaseSchema):
+    id = fields.Integer(required=True)
+    action = fields.String(validate=OneOf(['SUBSCRIBE', 'UNSUBSCRIBE']), required=True)
