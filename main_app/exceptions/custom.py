@@ -79,3 +79,8 @@ class RideNotFinished(HTTPException):
 class AlreadyDecided(HTTPException):
     code = 403
     description = 'Join request has already been processed'
+
+
+class SubscriptionError(HTTPException):
+    code = 400
+    description = 'ID not exist or user is already subscribed'
