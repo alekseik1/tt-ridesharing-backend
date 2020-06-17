@@ -14,7 +14,7 @@ from main_app.views import api
 from main_app.exceptions.custom import NotInOrganization, NotCarOwner, \
     RideNotActive, NoFreeSeats, CreatorCannotJoin, RequestAlreadySent, InsufficientPermissions, \
     NotInRide, NotForOwner, RideNotFinished, AlreadyDecided
-from main_app.misc import get_distance
+from main_app.misc import get_distance, notify_at
 
 MAX_RIDES_IN_HISTORY = 10
 
@@ -80,6 +80,14 @@ def ride():
         ride.submit_datetime = datetime.now().isoformat()
         db.session.add(ride)
         db.session.commit()
+        for user in current_user.subscribers:
+            notify_at(
+                timestamp=datetime.now().timestamp(),
+                user_id=user.id,
+                title='Новая поездка',
+                message='Пользователь {} {} создал поездку'.format(
+                    current_user.first_name, current_user.last_name),
+            )
         return IdSchema().dump(ride)
 
 
