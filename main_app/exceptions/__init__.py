@@ -1,9 +1,9 @@
-from .custom import InvalidCredentials, AlreadyLoggedIn, EmailBusy
+from .custom import InvalidCredentials, AlreadyLoggedIn, PhoneBusy
 from .handlers import setup_handlers
 
 __all__ = [
     'InvalidCredentials',
     'AlreadyLoggedIn',
-    'EmailBusy',
+    'PhoneBusy',
     'setup_handlers'
 ]
