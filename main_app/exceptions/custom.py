@@ -11,9 +11,9 @@ class AlreadyLoggedIn(HTTPException):
     description = 'Already logged-in'
 
 
-class PhoneBusy(HTTPException):
+class EmailBusy(HTTPException):
     code = 400
-    description = 'Phone is already registered'
+    description = 'Email is already registered'
 
 
 class IncorrectControlAnswer(HTTPException):

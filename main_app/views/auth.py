@@ -9,7 +9,7 @@ from main_app.schemas import RegisterUserSchema, LoginSchema, UserIDSchema
 from main_app.views import api
 from main_app.responses import SwaggerResponses, build_error
 from main_app.controller import parse_phone_number
-from main_app.exceptions import InvalidCredentials, AlreadyLoggedIn, PhoneBusy
+from main_app.exceptions import InvalidCredentials, AlreadyLoggedIn, EmailBusy
 
 
 @api.route('/logout', methods=['POST'])
@@ -46,7 +46,7 @@ def register_user():
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        raise PhoneBusy()
+        raise EmailBusy()
     return UserIDSchema().dump(user)
 
 

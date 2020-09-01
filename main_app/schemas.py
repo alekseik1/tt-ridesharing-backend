@@ -252,6 +252,7 @@ class RegisterUserSchema(ma.ModelSchema, CamelCaseSchema):
     class Meta:
         model = User
         exclude = ['_password_hash', 'id', ]
+    email = fields.Email(required=True)
     password = fields.String(required=True)
     phone_number = fields.String(required=True)
 

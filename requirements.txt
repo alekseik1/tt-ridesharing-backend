@@ -17,7 +17,6 @@ email-validator
 gunicorn
 requests
 python-dotenv
-pytest
 flake8
 sentry-sdk[flask]==0.14.2
 factory-boy
