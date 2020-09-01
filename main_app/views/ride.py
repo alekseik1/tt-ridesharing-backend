@@ -170,7 +170,7 @@ def ride_requests():
 @api.route('/ride/hosted', methods=['GET'])
 @login_required
 def my_hosted_rides():
-    return jsonify(RideJsonSchema(many=True, only=STANDART_RIDE_INFO).dump(
+    return jsonify(RideJsonSchema(many=True, only=[STANDART_RIDE_INFO] + ['passengers']).dump(
         filter(lambda ride: ride.is_active, current_user.hosted_rides)))
 
 
