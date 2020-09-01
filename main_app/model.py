@@ -86,8 +86,7 @@ class User(SearchableMixin, UserMixin, RatingMixin, db.Model):
     last_name = db.Column(db.String(MAX_SURNAME_LENGTH), nullable=False)
     email = db.Column(db.String(MAX_EMAIL_LENGTH), nullable=True)
     photo_url = db.Column(db.String(MAX_URL_LENGTH))
-    phone_number = db.Column(db.String(20), server_default='+71111111111',
-                             nullable=False, unique=True)
+    phone_number = db.Column(db.String(20), server_default='+71111111111', nullable=False, unique=True)
     _password_hash = db.Column(db.String(94), nullable=False)
     about = db.Column(db.String(400))
 
